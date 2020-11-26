@@ -4,6 +4,9 @@
 Public Class ConfigurationNodeValueInfo
     Public ID As String
 
+    ''' <summary>
+    ''' 所属配置项ID
+    ''' </summary>
     Public ConfigurationNodeID As String
 
     Public SortID As Integer

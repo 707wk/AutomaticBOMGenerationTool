@@ -28,31 +28,31 @@ Public Class MainForm
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-            .Text = "解析数据",
-            .IsPercent = False
-        }
-            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+        'Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+        '    .Text = "解析数据",
+        '    .IsPercent = False
+        '}
+        '    tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
 
-                            End Sub)
+        '                        be.Write("清空数据库")
+                                ClearLocalDatabase()
 
-            If tmpDialog.Error IsNot Nothing Then
-                MsgBox()
-            End If
+                                'be.Write("获取替换物料品号")
+                                Dim tmpIDList = GetMaterialpIDList(TextBox1.Text)
 
-        End Using
+                                'be.Write("获取替换物料信息")
+                                Dim tmpList = GetMaterialInfoList(TextBox1.Text, tmpIDList)
 
-        Console.WriteLine("清空数据库")
-        ClearLocalDatabase()
+                                'be.Write("导入替换物料信息到临时数据库")
+                                SaveMaterialInfoToLocalDatabase(tmpList)
 
-        Console.WriteLine("获取替换物料品号")
-        Dim tmpIDList = GetMaterialpIDList(TextBox1.Text)
+        '                    End Sub)
 
-        Console.WriteLine("获取替换物料信息")
-        Dim tmpList = GetMaterialInfoList(TextBox1.Text, tmpIDList)
+        '    If tmpDialog.Error IsNot Nothing Then
+        '        MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "解析出错")
+        '    End If
 
-        Console.WriteLine("导入替换物料信息到临时数据库")
-        SaveMaterialInfoToLocalDatabase(tmpList)
+        'End Using
 
         Console.WriteLine("解析配置节点信息")
         TransformationConfigurationTable(TextBox1.Text)
@@ -436,9 +436,10 @@ values(
                     '添加物料关联信息
                     Dim tmpLinkNode = New MaterialLinkInfo With {
                         .ID = Wangk.Resource.IDHelper.NewID,
-                        .ParentID = tmpChildNode.ID,
-                        .ConfigurationNodeID = tmpNode.ID,
-                        .ConfigurationNodeValueID = tmpMaterialNode.ID
+                        .NodeID = tmpChildNode.ConfigurationNodeID,
+                        .NodeValueID = tmpChildNode.ID,
+                        .LinkNodeID = tmpNode.ID,
+                        .LinkNodeValueID = tmpMaterialNode.ID
                     }
                     SaveMaterialLinkInfoToLocalDatabase(tmpLinkNode)
 
@@ -600,15 +601,17 @@ where ConfigurationNodeID=@ConfigurationNodeID and Value=@Value"
                 .CommandText = "insert into MaterialLinkInfo 
 values(
 @ID,
-@ParentID,
-@ConfigurationNodeID,
-@ConfigurationNodeValueID
+@NodeID,
+@NodeValueID,
+@LinkNodeID,
+@LinkNodeValueID
 )"
             }
             cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
-            cmd.Parameters.Add(New SQLiteParameter("@ParentID", DbType.String) With {.Value = value.ParentID})
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = value.ConfigurationNodeID})
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeValueID", DbType.String) With {.Value = value.ConfigurationNodeValueID})
+            cmd.Parameters.Add(New SQLiteParameter("@NodeID", DbType.String) With {.Value = value.NodeID})
+            cmd.Parameters.Add(New SQLiteParameter("@NodeValueID", DbType.String) With {.Value = value.NodeValueID})
+            cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = value.LinkNodeID})
+            cmd.Parameters.Add(New SQLiteParameter("@LinkNodeValueID", DbType.String) With {.Value = value.LinkNodeValueID})
 
             cmd.ExecuteNonQuery()
 
