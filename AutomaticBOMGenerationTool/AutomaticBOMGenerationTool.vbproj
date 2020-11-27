@@ -145,6 +145,18 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.Designer.vb">
+      <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeValueControl.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\MaterialInfoControl.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\MainForm.Designer.vb">
       <DependentUpon>MainForm.vb</DependentUpon>
     </Compile>
@@ -174,6 +186,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.resx">
+      <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\MainForm.resx">
       <DependentUpon>MainForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -205,7 +220,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="01.UserInterfaceLayer\MainForm\ChildForm\" />
-    <Folder Include="01.UserInterfaceLayer\MainForm\Control\" />
     <Folder Include="02.BusinessLogicLayer\" />
   </ItemGroup>
   <ItemGroup>

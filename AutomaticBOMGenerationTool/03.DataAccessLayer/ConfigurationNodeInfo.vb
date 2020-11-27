@@ -11,4 +11,9 @@ Public Class ConfigurationNodeInfo
     ''' </summary>
     Public Name As String
 
+    ''' <summary>
+    ''' 是否是物料节点
+    ''' </summary>
+    Public IsMaterial As Boolean
+
 End Class

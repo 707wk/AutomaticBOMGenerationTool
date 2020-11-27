@@ -16,9 +16,4 @@ Public Class ConfigurationNodeValueInfo
     ''' </summary>
     Public Value As String
 
-    ''' <summary>
-    ''' 是否是物料
-    ''' </summary>
-    Public IsMaterial As Boolean
-
 End Class

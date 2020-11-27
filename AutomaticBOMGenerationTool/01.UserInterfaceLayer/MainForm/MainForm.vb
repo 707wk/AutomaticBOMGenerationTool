@@ -11,6 +11,10 @@ Public Class MainForm
 
     End Sub
 
+    Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        ShowConfigurationNodeControl()
+    End Sub
+
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Using tmpDialog As New OpenFileDialog With {
                             .Filter = "BON模板文件|*.xlsx",
@@ -35,16 +39,16 @@ Public Class MainForm
         '    tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
 
         '                        be.Write("清空数据库")
-                                ClearLocalDatabase()
+        ClearLocalDatabase()
 
-                                'be.Write("获取替换物料品号")
-                                Dim tmpIDList = GetMaterialpIDList(TextBox1.Text)
+        'be.Write("获取替换物料品号")
+        Dim tmpIDList = GetMaterialpIDList(TextBox1.Text)
 
-                                'be.Write("获取替换物料信息")
-                                Dim tmpList = GetMaterialInfoList(TextBox1.Text, tmpIDList)
+        'be.Write("获取替换物料信息")
+        Dim tmpList = GetMaterialInfoList(TextBox1.Text, tmpIDList)
 
-                                'be.Write("导入替换物料信息到临时数据库")
-                                SaveMaterialInfoToLocalDatabase(tmpList)
+        'be.Write("导入替换物料信息到临时数据库")
+        SaveMaterialInfoToLocalDatabase(tmpList)
 
         '                    End Sub)
 
@@ -59,6 +63,19 @@ Public Class MainForm
 
         Console.WriteLine("解析完毕")
 
+        ShowConfigurationNodeControl()
+
+    End Sub
+
+    Private Sub ShowConfigurationNodeControl()
+        FlowLayoutPanel1.Controls.Clear()
+        Dim tmpNodeList = GetConfigurationNodeInfoItems()
+        For Each item In tmpNodeList
+            FlowLayoutPanel1.Controls.Add(New ConfigurationNodeControl With {
+                                          .NodeInfo = item,
+                                          .Width = FlowLayoutPanel1.Width - 32
+                                          })
+        Next
     End Sub
 
 #Region "清空数据库"
@@ -304,6 +321,18 @@ values(
     ''' <param name="filePath"></param>
     Private Sub TransformationConfigurationTable(filePath As String)
 
+        ReplaceableMaterialParser(filePath)
+
+        FixedMatchingMaterialParser(filePath)
+
+    End Sub
+
+#Region "解析可替换物料"
+    ''' <summary>
+    ''' 解析可替换物料
+    ''' </summary>
+    Private Sub ReplaceableMaterialParser(filePath As String)
+
         Dim headerLocation = FindHeaderLocation(filePath, "产品配置选项")
 
         Using tmpFileStream = File.OpenRead(filePath)
@@ -401,7 +430,8 @@ values(
                     tmpNode = New ConfigurationNodeInfo With {
                     .ID = Wangk.Resource.IDHelper.NewID,
                     .SortID = rootSortID,
-                    .Name = tmpNodeStr
+                    .Name = tmpNodeStr,
+                    .IsMaterial = True
                 }
                     SaveConfigurationNodeInfoToLocalDatabase(tmpNode)
                     rootSortID += 1
@@ -422,12 +452,16 @@ values(
                     '不存在则添加配置值信息
                     If tmpMaterialNode Is Nothing Then
 
+                        Dim tmpMaterialInfo = GetMaterialInfoBypIDFromLocalDatabase(item)
+                        If tmpMaterialInfo Is Nothing Then
+                            Throw New Exception($"第 {rID + 1} 行 未找到品号对应物料信息")
+                        End If
+
                         tmpMaterialNode = New ConfigurationNodeValueInfo With {
-                            .ID = Wangk.Resource.IDHelper.NewID,
+                            .ID = tmpMaterialInfo.ID,
                             .ConfigurationNodeID = tmpNode.ID,
                             .SortID = childSortID,
-                            .Value = item,
-                            .IsMaterial = True
+                            .Value = item
                         }
                         SaveConfigurationNodeValueInfoToLocalDatabase(tmpMaterialNode)
                         childSortID += 1
@@ -448,13 +482,81 @@ values(
 
             Next
 
-#Region "解析固定搭配"
-
+        End Using
+    End Sub
 #End Region
 
-        End Using
+#Region "解析固定搭配物料"
+    ''' <summary>
+    ''' 解析固定搭配物料
+    ''' </summary>
+    Private Sub FixedMatchingMaterialParser(filePath As String)
 
+        Dim headerLocation = FindHeaderLocation(filePath, "料品固定搭配集")
+
+        Using tmpFileStream = File.OpenRead(filePath)
+            Dim tmpWorkbook = New XSSFWorkbook(tmpFileStream)
+            Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+
+            For rID = headerLocation.Y + 1 To tmpSheet.LastRowNum - 1
+                Dim tmpIRow = tmpSheet.GetRow(rID)
+
+                '空行则跳过
+                If tmpIRow Is Nothing Then Continue For
+
+                Dim tmpICell = tmpIRow.GetCell(headerLocation.X)
+
+                '转换为大写
+                Dim materialStr = tmpICell.ToString.ToUpper
+                '转换为窄字符标点
+                materialStr = StrConv(materialStr, VbStrConv.Narrow)
+
+                '内容为空则跳过
+                If String.IsNullOrWhiteSpace(materialStr) Then Continue For
+                '结束解析
+                If materialStr.Equals("存货单位") Then Exit For
+
+#Region "解析固定替换"
+                '分割
+                Dim tmpArray = materialStr.Split(",")
+
+                For Each item In tmpArray
+                    If String.IsNullOrWhiteSpace(item) Then
+                        Continue For
+                    End If
+
+                    Dim tmpStr = item.Replace("AND", ",")
+                    Dim tmpMaterialArray = tmpStr.Split(",")
+
+                    Dim parentNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(0).Trim())
+                    If parentNode Is Nothing Then
+                        Throw New Exception($"第 {rID + 1} 行 替换物料 {tmpMaterialArray(0).Trim()} 不存在")
+                    End If
+
+                    For i001 = 1 To tmpMaterialArray.Count - 1
+                        Dim linkNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(i001).Trim())
+                        If linkNode Is Nothing Then
+                            Throw New Exception($"第 {rID + 1} 行 替换物料 {tmpMaterialArray(i001).Trim()} 不存在")
+                        End If
+
+                        SaveMaterialLinkInfoToLocalDatabase(New MaterialLinkInfo With {
+                                                            .ID = Wangk.Resource.IDHelper.NewID,
+                                                            .NodeID = parentNode.ConfigurationNodeID,
+                                                            .NodeValueID = parentNode.ID,
+                                                            .LinkNodeID = linkNode.ConfigurationNodeID,
+                                                            .LinkNodeValueID = linkNode.ID
+                                                            })
+
+                    Next
+
+                Next
+#End Region
+
+            Next
+
+        End Using
     End Sub
+#End Region
 
 #Region "添加配置节点信息到临时数据库"
     ''' <summary>
@@ -471,12 +573,14 @@ values(
 values(
 @ID,
 @Name,
-@SortID
+@SortID,
+@IsMaterial
 )"
             }
             cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
             cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = value.Name})
             cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
+            cmd.Parameters.Add(New SQLiteParameter("@IsMaterial", DbType.Boolean) With {.Value = value.IsMaterial})
 
             cmd.ExecuteNonQuery()
 
@@ -533,15 +637,13 @@ values(
 @ID,
 @ConfigurationNodeID,
 @Value,
-@SortID,
-@IsMaterial
+@SortID
 )"
             }
             cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
             cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = value.ConfigurationNodeID})
             cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value.Value})
             cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
-            cmd.Parameters.Add(New SQLiteParameter("@IsMaterial", DbType.Boolean) With {.Value = value.IsMaterial})
 
             cmd.ExecuteNonQuery()
 
@@ -575,8 +677,78 @@ where ConfigurationNodeID=@ConfigurationNodeID and Value=@Value"
                         .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
                         .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
                         .Value = reader(NameOf(ConfigurationNodeValueInfo.Value)),
-                        .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID)),
-                        .IsMaterial = reader(NameOf(ConfigurationNodeValueInfo.IsMaterial))
+                        .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID))
+                    }
+                End If
+            End Using
+
+        End Using
+
+        Return Nothing
+    End Function
+#End Region
+
+#Region "根据配置值获取配置值信息"
+    ''' <summary>
+    ''' 根据配置值获取配置值信息
+    ''' </summary>
+    Private Function GetConfigurationNodeValueInfoByValueFromLocalDatabase(value As String) As ConfigurationNodeValueInfo
+
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "select * from ConfigurationNodeValueInfo 
+where Value=@Value"
+            }
+            cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value})
+
+            Using reader As SQLiteDataReader = cmd.ExecuteReader()
+                If reader.Read Then
+                    Return New ConfigurationNodeValueInfo With {
+                        .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
+                        .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
+                        .Value = reader(NameOf(ConfigurationNodeValueInfo.Value)),
+                        .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID))
+                    }
+                End If
+            End Using
+
+        End Using
+
+        Return Nothing
+    End Function
+#End Region
+
+#Region "根据品号获取物料信息"
+    ''' <summary>
+    ''' 根据品号获取物料信息
+    ''' </summary>
+    Private Function GetMaterialInfoBypIDFromLocalDatabase(pID As String) As MaterialInfo
+
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "select * from MaterialInfo 
+where pID=@pID"
+            }
+            cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = pID})
+
+            Using reader As SQLiteDataReader = cmd.ExecuteReader()
+                If reader.Read Then
+                    Return New MaterialInfo With {
+                        .ID = reader(NameOf(MaterialInfo.ID)),
+                        .pID = reader(NameOf(MaterialInfo.pID)),
+                        .pName = reader(NameOf(MaterialInfo.pName)),
+                        .pConfig = reader(NameOf(MaterialInfo.pConfig)),
+                        .pUnit = reader(NameOf(MaterialInfo.pUnit)),
+                        .pCount = reader(NameOf(MaterialInfo.pCount)),
+                        .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
                     }
                 End If
             End Using
@@ -617,6 +789,40 @@ values(
 
         End Using
     End Sub
+#End Region
+
+#Region "获取节点信息"
+    ''' <summary>
+    ''' 获取节点信息
+    ''' </summary>
+    Private Function GetConfigurationNodeInfoItems() As List(Of ConfigurationNodeInfo)
+
+        Dim tmpList = New List(Of ConfigurationNodeInfo)
+
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "select * from ConfigurationNodeInfo order by SortID"
+            }
+
+            Using reader As SQLiteDataReader = cmd.ExecuteReader()
+                While reader.Read
+                    tmpList.Add(New ConfigurationNodeInfo With {
+                        .ID = reader(NameOf(ConfigurationNodeInfo.ID)),
+                        .SortID = reader(NameOf(ConfigurationNodeInfo.SortID)),
+                        .Name = reader(NameOf(ConfigurationNodeInfo.Name)),
+                        .IsMaterial = reader(NameOf(ConfigurationNodeInfo.IsMaterial))
+                    })
+                End While
+            End Using
+
+        End Using
+
+        Return tmpList
+    End Function
 #End Region
 
 End Class
