@@ -151,9 +151,6 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeValueControl.vb">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\MaterialInfoControl.vb">
       <SubType>Component</SubType>
     </Compile>

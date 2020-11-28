@@ -1,15 +1,24 @@
 ﻿Public Class MaterialInfoControl
     Inherits RadioButton
 
-    Public Cache As MaterialInfo
+    Private _Cache As MaterialInfo
+    Public Property Cache As MaterialInfo
+        Get
+            Return _Cache
+        End Get
+        Set(ByVal value As MaterialInfo)
+            _Cache = value
+            Me.Size = New Size(320, 80)
+        End Set
+    End Property
 
     Public Sub New()
         Me.Appearance = Appearance.Button
         Me.FlatStyle = FlatStyle.Flat
         Me.FlatAppearance.BorderColor = Color.FromArgb(173, 173, 173)
         'Me.AutoSize = True
-        Me.Size = New Size(320, 80)
-        Me.TextAlign = ContentAlignment.TopLeft
+        Me.Size = New Size(160, 28)
+        Me.TextAlign = ContentAlignment.MiddleLeft
 
         StringFormatFar.Alignment = StringAlignment.Far
 
@@ -27,20 +36,28 @@
         End If
     End Sub
 
-    Private ReadOnly TitleFontSolidBrush = New SolidBrush(Color.Black)
-    Private ReadOnly ContextFontSolidBrush = New SolidBrush(Color.DimGray)
+    Private ReadOnly TitleFontSolidBrush As New SolidBrush(Color.Black)
+    Private ReadOnly ContextFontSolidBrush As New SolidBrush(Color.DimGray)
     Private ReadOnly StringFormatFar As New StringFormat()
+    Private ReadOnly BorderPen As New Pen(Color.FromArgb(0, 122, 204), 2)
+    Private ReadOnly OldFont As New Font("微软雅黑", Me.Font.Size)
     Private Sub MaterialInfoControl_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
 
-        Dim tmpFontSize = e.Graphics.MeasureString("品号", Me.Font)
+        If _Cache IsNot Nothing Then
 
-        e.Graphics.DrawString($"品名 : {Cache.pName}", Me.Font, TitleFontSolidBrush, 0, 0)
-        e.Graphics.DrawString($"￥{Cache.pUnitPrice}", Me.Font, TitleFontSolidBrush, Me.Width, 0, StringFormatFar)
+            Dim tmpFontSize = e.Graphics.MeasureString("品号", Me.Font)
 
-        e.Graphics.DrawString($"品号 : {Cache.pID}", Me.Font, ContextFontSolidBrush, 0, tmpFontSize.Height)
+            e.Graphics.DrawString($"{_Cache.pName}", Me.Font, TitleFontSolidBrush, 1, 1)
+            e.Graphics.DrawString($"￥{_Cache.pUnitPrice}", Me.Font, TitleFontSolidBrush, Me.Width - 2, 1, StringFormatFar)
 
-        e.Graphics.DrawString($"规格 : {Cache.pConfig}", Me.Font, ContextFontSolidBrush, New Rectangle(0, tmpFontSize.Height * 2, Me.Width, Me.Height - tmpFontSize.Height * 2))
+            e.Graphics.DrawString($"品号 : {_Cache.pID}", Me.OldFont, ContextFontSolidBrush, 1, tmpFontSize.Height + 1)
 
+            e.Graphics.DrawString($"规格 : {_Cache.pConfig}", Me.OldFont, ContextFontSolidBrush, New Rectangle(1, tmpFontSize.Height * 2 + 1, Me.Width - 2, Me.Height - tmpFontSize.Height * 2 - 2))
+        End If
+
+        If Me.Checked Then
+            e.Graphics.DrawRectangle(BorderPen, 1, 1, Me.Width - 2, Me.Height - 2)
+        End If
 
     End Sub
 End Class

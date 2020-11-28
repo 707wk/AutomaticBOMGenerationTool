@@ -12,25 +12,18 @@ Public Class ConfigurationNodeControl
             Dim tmpList = GetMaterialInfoItems(NodeInfo.ID)
             For Each item In tmpList
 
-                Dim addRadioButton = New ConfigurationNodeValueControl With {
-                    .Text = $"品号 : {item.pID}
-品名 : {item.pName}
-规格 : {item.pConfig}
-单价 : ￥ {item.pUnitPrice} x {item.pCount}"
-                                              }
-
-                FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {.Cache = item})
+                FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
+                                              .Cache = item
+                                              })
             Next
 
         Else
             Dim tmpList = GetConfigurationNodeValueInfoItems(NodeInfo.ID)
             For Each item In tmpList
 
-                Dim addRadioButton = New ConfigurationNodeValueControl With {
-                    .Text = $"{item.Value}"
-                }
-
-                FlowLayoutPanel1.Controls.Add(addRadioButton)
+                FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
+                                              .Text = $"{item.Value}"
+                                              })
             Next
         End If
 
@@ -63,7 +56,9 @@ on ConfigurationNodeInfo.ID=ConfigurationNodeValueInfo.ConfigurationNodeID
 and ConfigurationNodeInfo.ID=@ConfigurationNodeID
 
 inner join MaterialInfo
-on MaterialInfo.ID=ConfigurationNodeValueInfo.ID"
+on MaterialInfo.ID=ConfigurationNodeValueInfo.ID
+
+order by MaterialInfo.pUnitPrice"
             }
             cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
@@ -106,7 +101,9 @@ from ConfigurationNodeValueInfo
 
 inner join ConfigurationNodeInfo
 on ConfigurationNodeInfo.ID=ConfigurationNodeValueInfo.ConfigurationNodeID
-and ConfigurationNodeInfo.ID=@ConfigurationNodeID"
+and ConfigurationNodeInfo.ID=@ConfigurationNodeID
+
+order by ConfigurationNodeValueInfo.SortID"
             }
             cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
