@@ -29,10 +29,10 @@ Public Class ConfigurationNodeControl
 
     End Sub
 
-    Private Shared LinePen As New Pen(Color.Silver, 1) With {.DashStyle = Drawing2D.DashStyle.Dash}
-    Private Sub ConfigurationNodeControl_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
-        e.Graphics.DrawLine(LinePen, 0, Me.Height - 1, Me.Width, Me.Height - 1)
-    End Sub
+    'Private Shared LinePen As New Pen(Color.Silver, 1) With {.DashStyle = Drawing2D.DashStyle.Dash}
+    'Private Sub ConfigurationNodeControl_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
+    '    e.Graphics.DrawLine(LinePen, 0, Me.Height - 1, Me.Width, Me.Height - 1)
+    'End Sub
 
 #Region "获取物料信息"
     ''' <summary>
