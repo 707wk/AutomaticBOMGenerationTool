@@ -28,7 +28,7 @@ Partial Class ConfigurationNodeControl
         '
         'Label1
         '
-        Me.Label1.BackColor = System.Drawing.Color.LightGray
+        Me.Label1.BackColor = System.Drawing.SystemColors.Control
         Me.Label1.Dock = System.Windows.Forms.DockStyle.Top
         Me.Label1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.Label1.Location = New System.Drawing.Point(0, 0)
@@ -53,6 +53,7 @@ Partial Class ConfigurationNodeControl
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
+        Me.BackColor = System.Drawing.Color.White
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Controls.Add(Me.Label1)
         Me.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))

@@ -32,50 +32,62 @@ Public Class MainForm
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        'Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-        '    .Text = "解析数据",
-        '    .IsPercent = False
-        '}
-        '    tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "解析数据",
+            .IsPercent = False
+        }
+            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
 
-        '                        be.Write("清空数据库")
-        ClearLocalDatabase()
+                                be.Write("清空数据库")
+                                ClearLocalDatabase()
 
-        'be.Write("获取替换物料品号")
-        Dim tmpIDList = GetMaterialpIDList(TextBox1.Text)
+                                be.Write("获取替换物料品号")
+                                Dim tmpIDList = GetMaterialpIDList(TextBox1.Text)
 
-        'be.Write("获取替换物料信息")
-        Dim tmpList = GetMaterialInfoList(TextBox1.Text, tmpIDList)
+                                be.Write("获取替换物料信息")
+                                Dim tmpList = GetMaterialInfoList(TextBox1.Text, tmpIDList)
 
-        'be.Write("导入替换物料信息到临时数据库")
-        SaveMaterialInfoToLocalDatabase(tmpList)
+                                be.Write("导入替换物料信息到临时数据库")
+                                SaveMaterialInfoToLocalDatabase(tmpList)
 
-        '                    End Sub)
+                                be.Write("解析配置节点信息")
+                                TransformationConfigurationTable(TextBox1.Text)
 
-        '    If tmpDialog.Error IsNot Nothing Then
-        '        MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "解析出错")
-        '    End If
+                            End Sub)
 
-        'End Using
+            If tmpDialog.Error IsNot Nothing Then
+                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "解析出错")
+            End If
 
-        Console.WriteLine("解析配置节点信息")
-        TransformationConfigurationTable(TextBox1.Text)
-
-        Console.WriteLine("解析完毕")
+        End Using
 
         ShowConfigurationNodeControl()
 
     End Sub
 
     Private Sub ShowConfigurationNodeControl()
+
+        AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Clear()
+
         FlowLayoutPanel1.Controls.Clear()
         Dim tmpNodeList = GetConfigurationNodeInfoItems()
         For Each item In tmpNodeList
-            FlowLayoutPanel1.Controls.Add(New ConfigurationNodeControl With {
+
+            Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
                                           .NodeInfo = item,
                                           .Width = FlowLayoutPanel1.Width - 32
-                                          })
+                                          }
+
+            FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
+
+            AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Add(item.ID, addConfigurationNodeControl)
+
         Next
+
+        For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+            item.Init()
+        Next
+
     End Sub
 
 #Region "清空数据库"

@@ -1,6 +1,8 @@
 ﻿Public Class MaterialInfoControl
     Inherits RadioButton
 
+    Public ID As String
+
     Private _Cache As MaterialInfo
     Public Property Cache As MaterialInfo
         Get

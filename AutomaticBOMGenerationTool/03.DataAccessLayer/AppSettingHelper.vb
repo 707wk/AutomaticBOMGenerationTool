@@ -130,4 +130,10 @@ Public Class AppSettingHelper
     ''' </summary>
     Public Shared SQLiteConnection As String = "data source= .\Data\LocalDatabase.db"
 
+    ''' <summary>
+    ''' 配置控件查找表
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public ConfigurationNodeControlTable As New Dictionary(Of String, ConfigurationNodeControl)
+
 End Class
