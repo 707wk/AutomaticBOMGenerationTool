@@ -29,6 +29,7 @@ Partial Class MainForm
         Me.Button2 = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button3 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -92,11 +93,21 @@ Partial Class MainForm
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "配置表"
         '
+        'Button3
+        '
+        Me.Button3.Location = New System.Drawing.Point(696, 12)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(120, 26)
+        Me.Button3.TabIndex = 5
+        Me.Button3.Text = "导出当前配置..."
+        Me.Button3.UseVisualStyleBackColor = True
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1264, 709)
+        Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
@@ -119,4 +130,5 @@ Partial Class MainForm
     Friend WithEvents Button2 As Button
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents Button3 As Button
 End Class

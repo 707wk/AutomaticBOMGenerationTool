@@ -131,6 +131,16 @@ Public Class AppSettingHelper
     Public Shared SQLiteConnection As String = "data source= .\Data\LocalDatabase.db"
 
     ''' <summary>
+    ''' 源文件地址
+    ''' </summary>
+    Public Shared SourceFilePath As String = ".\Data\SourceFile.xlsx"
+
+    ''' <summary>
+    ''' 模板文件地址
+    ''' </summary>
+    Public Shared TemplateFilePath As String = ".\Data\Template.xlsx"
+
+    ''' <summary>
     ''' 配置控件查找表
     ''' </summary>
     <Newtonsoft.Json.JsonIgnore>

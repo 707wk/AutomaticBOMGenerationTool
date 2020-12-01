@@ -2,54 +2,32 @@
 
 Public Class ConfigurationNodeControl
 
+    ''' <summary>
+    ''' 配置项信息
+    ''' </summary>
     Public NodeInfo As ConfigurationNodeInfo
 
+    ''' <summary>
+    ''' 当前选择值ID
+    ''' </summary>
     Public SelectedValueID As String
-    'Private ConfigurationNodeIDList As HashSet(Of String)
 
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         Me.Label1.Text = $"{NodeInfo.Name} :"
 
-        'If GetLinkCount(NodeInfo.ID) > 0 Then
-        '    Exit Sub
-        'End If
-
-        'If NodeInfo.IsMaterial Then
-        '    Dim tmpList = GetMaterialInfoItems(NodeInfo.ID)
-        '    For Each item In tmpList
-
-        '        FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
-        '                                      .Cache = item,
-        '                                      .ID = item.ID
-        '                                      })
-        '    Next
-
-        'Else
-        '    Dim tmpList = GetConfigurationNodeValueInfoItems(NodeInfo.ID)
-        '    For Each item In tmpList
-
-        '        FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
-        '                                      .Text = $"{item.Value}",
-        '                                      .ID = item.ID
-        '                                      })
-        '    Next
-        'End If
-
-        'For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
-        '    AddHandler item.CheckedChanged, AddressOf CheckedChanged
-        'Next
-
-        'Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
-        'tmpMaterialInfoControl.Checked = True
-
     End Sub
 
+#Region "初始化显示"
+    ''' <summary>
+    ''' 初始化显示
+    ''' </summary>
     Public Sub Init()
         If GetLinkCount(NodeInfo.ID) > 0 Then
             Exit Sub
         End If
 
+        '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
             Dim tmpList = GetMaterialInfoItems(NodeInfo.ID)
             For Each item In tmpList
@@ -77,7 +55,9 @@ Public Class ConfigurationNodeControl
 
         Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
         tmpMaterialInfoControl.Checked = True
+
     End Sub
+#End Region
 
 #Region "获取被关联项数"
     ''' <summary>
@@ -297,7 +277,7 @@ order by ConfigurationNodeValueInfo.SortID"
         Dim tmpList = GetLinkNodeIDList(tmp.ID)
         For Each item In tmpList
             Dim tmpControl As ConfigurationNodeControl = AppSettingHelper.GetInstance.ConfigurationNodeControlTable(item)
-            tmpControl.UpdateValue()
+            tmpControl.UpdateValueWithOtherConfiguration()
         Next
 
     End Sub
@@ -334,10 +314,15 @@ group by MaterialLinkInfo.LinkNodeID"
     End Function
 #End Region
 
-    Private Sub UpdateValue()
+#Region "根据其他配置项更新自身选项"
+    ''' <summary>
+    ''' 根据其他配置项更新自身选项
+    ''' </summary>
+    Private Sub UpdateValueWithOtherConfiguration()
 
         Dim originHashSet = GetConfigurationNodeValueIDItems(NodeInfo.ID)
 
+        '遍历其他配置项当前值
         For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
             If item.NodeInfo.ID = NodeInfo.ID Then
                 Continue For
@@ -349,16 +334,19 @@ group by MaterialLinkInfo.LinkNodeID"
                 Continue For
             End If
 
+            '取交集
             originHashSet.IntersectWith(tmpHashSet)
 
         Next
 
+        '移除事件绑定
         For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
             RemoveHandler item.CheckedChanged, AddressOf CheckedChanged
         Next
 
         FlowLayoutPanel1.Controls.Clear()
 
+        '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
             Dim tmpList = GetMaterialInfoItems(originHashSet)
             For Each item In tmpList
@@ -380,14 +368,17 @@ group by MaterialLinkInfo.LinkNodeID"
             Next
         End If
 
+        '添加事件绑定
         For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
             AddHandler item.CheckedChanged, AddressOf CheckedChanged
         Next
 
+        '默认选中第一项
         Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
         tmpMaterialInfoControl.Checked = True
 
     End Sub
+#End Region
 
 #Region "获取配置项值ID列表"
     ''' <summary>
@@ -456,5 +447,15 @@ group by LinkNodeValueID"
         Return tmpHashSet
     End Function
 #End Region
+
+    Private Sub ConfigurationNodeControl_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
+
+        If FlowLayoutPanel1.Controls.Count > 0 Then
+            For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
+                RemoveHandler item.CheckedChanged, AddressOf CheckedChanged
+            Next
+        End If
+
+    End Sub
 
 End Class

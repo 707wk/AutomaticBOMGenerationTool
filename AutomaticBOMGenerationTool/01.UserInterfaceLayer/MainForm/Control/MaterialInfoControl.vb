@@ -21,6 +21,7 @@
         'Me.AutoSize = True
         Me.Size = New Size(160, 28)
         Me.TextAlign = ContentAlignment.MiddleLeft
+        Me.Cursor = Cursors.Hand
 
         StringFormatFar.Alignment = StringAlignment.Far
 

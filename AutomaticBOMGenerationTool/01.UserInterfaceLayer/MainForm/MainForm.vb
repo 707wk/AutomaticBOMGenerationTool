@@ -8,6 +8,7 @@ Public Class MainForm
         Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.GetInstance.ProductVersion}"
 
         Button2.Enabled = False
+        Button3.Enabled = False
 
     End Sub
 
@@ -26,7 +27,9 @@ Public Class MainForm
             End If
 
             TextBox1.Text = tmpDialog.FileName
+
             Button2.Enabled = True
+            Button3.Enabled = False
 
         End Using
     End Sub
@@ -36,22 +39,30 @@ Public Class MainForm
             .Text = "解析数据",
             .IsPercent = False
         }
+            Dim filePath = TextBox1.Text
+
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+
+                                be.Write("复制文件")
+                                File.Copy(filePath, AppSettingHelper.SourceFilePath, True)
 
                                 be.Write("清空数据库")
                                 ClearLocalDatabase()
 
                                 be.Write("获取替换物料品号")
-                                Dim tmpIDList = GetMaterialpIDList(TextBox1.Text)
+                                Dim tmpIDList = GetMaterialpIDList(AppSettingHelper.SourceFilePath)
 
                                 be.Write("获取替换物料信息")
-                                Dim tmpList = GetMaterialInfoList(TextBox1.Text, tmpIDList)
+                                Dim tmpList = GetMaterialInfoList(AppSettingHelper.SourceFilePath, tmpIDList)
 
                                 be.Write("导入替换物料信息到临时数据库")
                                 SaveMaterialInfoToLocalDatabase(tmpList)
 
                                 be.Write("解析配置节点信息")
-                                TransformationConfigurationTable(TextBox1.Text)
+                                TransformationConfigurationTable(AppSettingHelper.SourceFilePath)
+
+                                be.Write("制作提取模板")
+                                CreateTemplate(AppSettingHelper.SourceFilePath)
 
                             End Sub)
 
@@ -63,8 +74,14 @@ Public Class MainForm
 
         ShowConfigurationNodeControl()
 
+        Button3.Enabled = True
+
     End Sub
 
+#Region "创建配置项选择控件"
+    ''' <summary>
+    ''' 创建配置项选择控件
+    ''' </summary>
     Private Sub ShowConfigurationNodeControl()
 
         AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Clear()
@@ -89,6 +106,7 @@ Public Class MainForm
         Next
 
     End Sub
+#End Region
 
 #Region "清空数据库"
     ''' <summary>
@@ -324,6 +342,44 @@ values(
             Throw New Exception($"未找到 {headText}")
 
         End Using
+    End Function
+#End Region
+
+#Region "查找表头位置"
+    ''' <summary>
+    ''' 查找表头位置
+    ''' </summary>
+    Private Function FindHeaderLocation(
+                                       wb As XSSFWorkbook,
+                                       headText As String) As Point
+
+        Dim tmpWorkbook = wb
+        Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+
+        '逐行
+        For rID = 0 To tmpSheet.LastRowNum - 1
+            Dim tmpIRow = tmpSheet.GetRow(rID)
+
+            '空行跳过
+            If tmpIRow Is Nothing Then Continue For
+
+            '逐列
+            For cID = 0 To tmpIRow.LastCellNum - 1
+                Dim tmpICell = tmpIRow.GetCell(cID)
+
+                '空单元格跳过
+                If tmpICell Is Nothing Then Continue For
+
+                If tmpICell.ToString.Equals(headText) Then
+                    Return New Point(cID, rID)
+                End If
+
+            Next
+
+        Next
+
+        Throw New Exception($"未找到 {headText}")
+
     End Function
 #End Region
 
@@ -836,5 +892,121 @@ values(
         Return tmpList
     End Function
 #End Region
+
+#Region "制作提取模板"
+    ''' <summary>
+    ''' 制作提取模板
+    ''' </summary>
+    Private Sub CreateTemplate(filePath As String)
+        Dim headerLocation = FindHeaderLocation(filePath, "显示屏规格")
+
+        Using tmpFileStream = File.OpenRead(AppSettingHelper.SourceFilePath)
+            Dim tmpWorkbook = New XSSFWorkbook(tmpFileStream)
+            Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+
+            '移除核价产品配置表
+            tmpSheet.ShiftRows(headerLocation.Y, tmpSheet.LastRowNum, -headerLocation.Y)
+
+            '查找阶层
+            headerLocation = FindHeaderLocation(tmpWorkbook, "阶层")
+            Dim levelCount = 0
+            '统计阶层层数
+            Dim tmpRow = tmpSheet.GetRow(headerLocation.Y + 1)
+            For i001 = 0 To 10
+                If tmpRow.GetCell(headerLocation.X + i001).ToString.Equals($"{i001 + 1}") Then
+                    levelCount += 1
+                Else
+                    Exit For
+                End If
+            Next
+
+            Dim MaterialID As Integer = 1
+
+#Region "移除多余替换料"
+            For rID = headerLocation.Y + 2 To tmpSheet.LastRowNum
+                Dim tmpIRow = tmpSheet.GetRow(rID)
+
+                '空行跳过
+                If tmpIRow Is Nothing Then Continue For
+
+                '跳过最后两行
+                Dim tmpICell = tmpIRow.GetCell(0)
+                If String.IsNullOrWhiteSpace(tmpICell.ToString) OrElse
+                    Val(tmpICell.ToString) > 0 Then
+
+                Else
+                    Continue For
+                End If
+
+                Dim isHaveNodeMaterial As Boolean = False
+                '判断是否是带节点物料
+                For cID = headerLocation.X To headerLocation.X + levelCount - 1
+                    Dim tmpLevelCell = tmpIRow.GetCell(cID)
+
+                    If tmpLevelCell Is Nothing Then
+                        Continue For
+                    End If
+
+                    If Not String.IsNullOrWhiteSpace(tmpLevelCell.ToString) Then
+                        isHaveNodeMaterial = True
+                        Exit For
+                    End If
+
+                Next
+
+                '更新序号
+                If isHaveNodeMaterial Then
+                    tmpIRow.GetCell(0).SetCellValue(MaterialID)
+                    MaterialID += 1
+                Else
+                    tmpIRow.GetCell(0).SetCellValue("")
+                End If
+
+                tmpICell = tmpIRow.GetCell(headerLocation.X + levelCount)
+                '非替换料跳过
+                If String.IsNullOrWhiteSpace($"{tmpICell}") Then
+                    Continue For
+                End If
+
+                '跳过带节点物料
+                If isHaveNodeMaterial Then
+                    Continue For
+                End If
+
+                '移除不带节点的替换物料
+                tmpSheet.ShiftRows(rID + 1, tmpSheet.LastRowNum, -1)
+
+                rID -= 1
+
+            Next
+#End Region
+
+            '标题合并
+            tmpSheet.AddMergedRegion(New NPOI.SS.Util.CellRangeAddress(0, 0, 2, 15))
+            '标题高度为两倍默认行高
+            tmpSheet.GetRow(0).Height = tmpSheet.GetRow(0).Height * 2
+
+            '另存为模板
+            Using tmpSaveFileStream = File.OpenWrite(AppSettingHelper.TemplateFilePath)
+                tmpWorkbook.Write(tmpSaveFileStream)
+            End Using
+
+        End Using
+
+    End Sub
+#End Region
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        Using tmpDialog As New SaveFileDialog With {
+            .Filter = "BON模板文件|*.xlsx",
+            .FileName = Now.ToString("yyyyMMddHHmmssfff")
+        }
+            If tmpDialog.ShowDialog() <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+        End Using
+
+    End Sub
 
 End Class
