@@ -1,7 +1,7 @@
 ﻿Imports System.Data.Common
 Imports System.Data.SQLite
 Imports System.IO
-Imports NPOI.XSSF.UserModel
+Imports OfficeOpenXml
 
 Public Class MainForm
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -9,6 +9,9 @@ Public Class MainForm
 
         Button2.Enabled = False
         Button3.Enabled = False
+
+        '设置使用方式为个人使用
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial
 
     End Sub
 
@@ -64,10 +67,14 @@ Public Class MainForm
                                 be.Write("制作提取模板")
                                 CreateTemplate(AppSettingHelper.SourceFilePath)
 
+                                be.Write("标记原始物料位置")
+
+
                             End Sub)
 
             If tmpDialog.Error IsNot Nothing Then
                 MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "解析出错")
+                Exit Sub
             End If
 
         End Using
@@ -141,48 +148,49 @@ delete from MaterialLinkInfo;"
 
         Dim headerLocation = FindHeaderLocation(filePath, "替代料品号集")
 
-        Using tmpFileStream = File.OpenRead(filePath)
-            Dim tmpWorkbook = New XSSFWorkbook(tmpFileStream)
-            Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+        Using readFS = File.OpenRead(filePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
 #Region "解析品号"
-            For rID = headerLocation.Y + 1 To tmpSheet.LastRowNum - 1
-                Dim tmpIRow = tmpSheet.GetRow(rID)
+                For rID = rowMinID + 1 To tmpWorkSheet.Dimension.End.Row
 
-                '空行跳过
-                If tmpIRow Is Nothing Then Continue For
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
 
-                Dim tmpICell = tmpIRow.GetCell(headerLocation.X)
+                    '单元格内容为空跳过
+                    If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
 
-                Dim tmpStr = tmpICell.ToString
-
-                '单元格内容为空跳过
-                If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
-
-                '查找到BOM表内容时停止
-                If tmpStr.Equals("规 格") Then
-                    Exit For
-                End If
-
-                '替换
-                tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-                tmpStr = tmpStr.ToLower
-                'tmpStr = tmpStr.Replace("AND", ",")
-                '分割
-                Dim tmpArray = tmpStr.Split(",")
-
-                '记录
-                For Each item In tmpArray
-                    If String.IsNullOrWhiteSpace(item) Then
-                        Continue For
+                    '查找到BOM表内容时停止
+                    If tmpStr.Equals("规 格") Then
+                        Exit For
                     End If
 
-                    tmpHashSet.Add(item.Trim.ToLower)
-                Next
+                    '统一字符格式
+                    tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
+                    tmpStr = tmpStr.ToLower
 
-            Next
+                    '分割
+                    Dim tmpArray = tmpStr.Split(",")
+
+                    '记录
+                    For Each item In tmpArray
+                        If String.IsNullOrWhiteSpace(item) Then
+                            Continue For
+                        End If
+
+                        tmpHashSet.Add(item.Trim.ToLower)
+                    Next
+
+                Next
 #End Region
 
+            End Using
         End Using
 
         Return tmpHashSet
@@ -200,52 +208,53 @@ delete from MaterialLinkInfo;"
 
         Dim headerLocation = FindHeaderLocation(filePath, "品 号")
 
-        Using tmpFileStream = File.OpenRead(filePath)
-            Dim tmpWorkbook = New XSSFWorkbook(tmpFileStream)
-            Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+        Using readFS = File.OpenRead(filePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
 #Region "遍历物料信息"
-            For rID = headerLocation.Y + 1 To tmpSheet.LastRowNum - 1
-                Dim tmpIRow = tmpSheet.GetRow(rID)
+                For rID = rowMinID + 1 To tmpWorkSheet.Dimension.End.Row
 
-                '空行跳过
-                If tmpIRow Is Nothing Then Continue For
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
 
-                Dim tmpICell = tmpIRow.GetCell(headerLocation.X)
+                    '单元格内容为空跳过
+                    If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
 
-                Dim tmpStr = tmpICell.ToString
-
-                '单元格内容为空跳过
-                If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
-
-                If values.Contains(tmpStr.ToLower) Then
-                    Dim addMaterialInfo = New MaterialInfo With {
+                    If values.Contains(tmpStr.ToLower) Then
+                        Dim addMaterialInfo = New MaterialInfo With {
                         .pID = tmpStr.ToUpper,
-                        .pName = tmpIRow.GetCell(headerLocation.X + 1).ToString,
-                        .pConfig = tmpIRow.GetCell(headerLocation.X + 2).ToString,
-                        .pUnit = tmpIRow.GetCell(headerLocation.X + 3).ToString,
-                        .pCount = Val(tmpIRow.GetCell(headerLocation.X + 4).ToString),
-                        .pUnitPrice = Val(tmpIRow.GetCell(headerLocation.X + 5).ToString)
+                        .pName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}",
+                        .pConfig = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}",
+                        .pUnit = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}",
+                        .pCount = Val($"{tmpWorkSheet.Cells(rID, headerLocation.X + 4).Value}"),
+                        .pUnitPrice = Val($"{tmpWorkSheet.Cells(rID, headerLocation.X + 5).Value}")
                     }
 
-                    '有内容为空则报错
-                    If String.IsNullOrWhiteSpace(addMaterialInfo.pID) OrElse
+                        '有内容为空则报错
+                        If String.IsNullOrWhiteSpace(addMaterialInfo.pID) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pName) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pConfig) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pUnit) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pCount) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pUnitPrice) Then
 
-                        Throw New Exception($"第 {rID + 1} 行 物料信息不完整")
+                            Throw New Exception($"第 {rID + 1} 行 物料信息不完整")
+                        End If
+
+                        values.Remove(tmpStr.ToLower)
+                        tmpList.Add(addMaterialInfo)
                     End If
 
-                    values.Remove(tmpStr.ToLower)
-                    tmpList.Add(addMaterialInfo)
-                End If
-
-            Next
+                Next
 #End Region
 
+            End Using
         End Using
 
         Return tmpList
@@ -313,34 +322,38 @@ values(
                                        filePath As String,
                                        headText As String) As Point
 
-        Using tmpFileStream = File.OpenRead(filePath)
-            Dim tmpWorkbook = New XSSFWorkbook(tmpFileStream)
-            Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+        Using readFS = File.OpenRead(filePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-            '逐行
-            For rID = 0 To tmpSheet.LastRowNum - 1
-                Dim tmpIRow = tmpSheet.GetRow(rID)
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
-                '空行跳过
-                If tmpIRow Is Nothing Then Continue For
+                '逐行
+                For rID = rowMinID To rowMaxID
+                    '逐列
+                    For cID = colMinID To colMaxID
+                        Dim valueStr = $"{tmpWorkSheet.Cells(rID, cID).Value}"
 
-                '逐列
-                For cID = 0 To tmpIRow.LastCellNum - 1
-                    Dim tmpICell = tmpIRow.GetCell(cID)
+                        '空单元格跳过
+                        If String.IsNullOrWhiteSpace(valueStr) Then
+                            Continue For
+                        End If
 
-                    '空单元格跳过
-                    If tmpICell Is Nothing Then Continue For
+                        If valueStr.Equals(headText) Then
+                            Return New Point(cID, rID)
+                        End If
 
-                    If tmpICell.ToString.Equals(headText) Then
-                        Return New Point(cID, rID)
-                    End If
+                    Next
 
                 Next
 
-            Next
+                Throw New Exception($"未找到 {headText}")
 
-            Throw New Exception($"未找到 {headText}")
-
+            End Using
         End Using
     End Function
 #End Region
@@ -350,27 +363,30 @@ values(
     ''' 查找表头位置
     ''' </summary>
     Private Function FindHeaderLocation(
-                                       wb As XSSFWorkbook,
+                                       wb As ExcelPackage,
                                        headText As String) As Point
 
-        Dim tmpWorkbook = wb
-        Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
         '逐行
-        For rID = 0 To tmpSheet.LastRowNum - 1
-            Dim tmpIRow = tmpSheet.GetRow(rID)
-
-            '空行跳过
-            If tmpIRow Is Nothing Then Continue For
-
+        For rID = rowMinID To rowMaxID
             '逐列
-            For cID = 0 To tmpIRow.LastCellNum - 1
-                Dim tmpICell = tmpIRow.GetCell(cID)
+            For cID = colMinID To colMaxID
+                Dim valueStr = $"{tmpWorkSheet.Cells(rID, cID).Value}"
 
                 '空单元格跳过
-                If tmpICell Is Nothing Then Continue For
+                If String.IsNullOrWhiteSpace(valueStr) Then
+                    Continue For
+                End If
 
-                If tmpICell.ToString.Equals(headText) Then
+                If valueStr.Equals(headText) Then
                     Return New Point(cID, rID)
                 End If
 
@@ -383,6 +399,7 @@ values(
     End Function
 #End Region
 
+#Region "转换配置表"
     ''' <summary>
     ''' 转换配置表
     ''' </summary>
@@ -403,153 +420,153 @@ values(
 
         Dim headerLocation = FindHeaderLocation(filePath, "产品配置选项")
 
-        Using tmpFileStream = File.OpenRead(filePath)
-            Dim tmpWorkbook = New XSSFWorkbook(tmpFileStream)
-            Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+        Using readFS = File.OpenRead(filePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-            Dim tmpRootNode As ConfigurationNodeInfo = Nothing
-            Dim tmpChildNode As ConfigurationNodeValueInfo = Nothing
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
-            Dim rootSortID As Integer = 0
-            Dim childSortID As Integer = 0
+                Dim tmpRootNode As ConfigurationNodeInfo = Nothing
+                Dim tmpChildNode As ConfigurationNodeValueInfo = Nothing
 
-            For rID = headerLocation.Y + 1 To tmpSheet.LastRowNum - 1
-                Dim tmpIRow = tmpSheet.GetRow(rID)
+                Dim rootSortID As Integer = 0
+                Dim childSortID As Integer = 0
 
-                '空行跳过
-                If tmpIRow Is Nothing Then Continue For
+                For rID = headerLocation.Y + 1 To tmpWorkSheet.Dimension.End.Row
 
-                Dim tmpICell = tmpIRow.GetCell(headerLocation.X)
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
 
-                Dim tmpStr = tmpICell.ToString
-
-                '结束解析
-                If tmpStr.Equals("说明") Then Exit For
+                    '结束解析
+                    If tmpStr.Equals("说明") Then Exit For
 
 #Region "解析配置选项及分类类型"
-                If Not String.IsNullOrWhiteSpace(tmpStr) Then
-                    '第一列内容不为空
-                    tmpRootNode = New ConfigurationNodeInfo With {
+                    If Not String.IsNullOrWhiteSpace(tmpStr) Then
+                        '第一列内容不为空
+                        tmpRootNode = New ConfigurationNodeInfo With {
                         .ID = Wangk.Resource.IDHelper.NewID,
                         .SortID = rootSortID,
                         .Name = tmpStr
                     }
-                    '查重
-                    If GetConfigurationNodeInfoByNameFromLocalDatabase(tmpStr) IsNot Nothing Then
-                        Throw New Exception($"配置选项 {tmpStr} 名称重复")
-                    End If
+                        '查重
+                        If GetConfigurationNodeInfoByNameFromLocalDatabase(tmpStr) IsNot Nothing Then
+                            Throw New Exception($"配置选项 {tmpStr} 名称重复")
+                        End If
 
-                    SaveConfigurationNodeInfoToLocalDatabase(tmpRootNode)
-                    rootSortID += 1
+                        SaveConfigurationNodeInfoToLocalDatabase(tmpRootNode)
+                        rootSortID += 1
 
 
-                    Dim tmpChildNodeName = tmpIRow.GetCell(headerLocation.X + 1).ToString
-                    tmpChildNode = New ConfigurationNodeValueInfo With {
+                        Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}"
+                        tmpChildNode = New ConfigurationNodeValueInfo With {
                         .ID = Wangk.Resource.IDHelper.NewID,
                         .ConfigurationNodeID = tmpRootNode.ID,
                         .SortID = childSortID,
                         .Value = If(String.IsNullOrWhiteSpace(tmpChildNodeName), $"{tmpRootNode.Name}默认配置", tmpChildNodeName)
                     }
-                    SaveConfigurationNodeValueInfoToLocalDatabase(tmpChildNode)
-                    childSortID += 1
+                        SaveConfigurationNodeValueInfoToLocalDatabase(tmpChildNode)
+                        childSortID += 1
 
-                Else
-                    '第一列内容为空
-                    If Not String.IsNullOrWhiteSpace(tmpIRow.GetCell(headerLocation.X + 1).ToString) Then
-                        '第二列内容不为空
-                        If tmpRootNode Is Nothing Then
-                            Throw New Exception($"第 {rID + 1} 行 分类类型 缺失 配置选项")
-                        End If
+                    Else
+                        '第一列内容为空
+                        If Not String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}") Then
+                            '第二列内容不为空
+                            If tmpRootNode Is Nothing Then
+                                Throw New Exception($"第 {rID + 1} 行 分类类型 缺失 配置选项")
+                            End If
 
-                        Dim tmpChildNodeName = tmpIRow.GetCell(headerLocation.X + 1).ToString
-                        tmpChildNode = New ConfigurationNodeValueInfo With {
+                            Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}"
+                            tmpChildNode = New ConfigurationNodeValueInfo With {
                             .ID = Wangk.Resource.IDHelper.NewID,
                             .ConfigurationNodeID = tmpRootNode.ID,
                             .SortID = childSortID,
                             .Value = tmpChildNodeName
                         }
-                        SaveConfigurationNodeValueInfoToLocalDatabase(tmpChildNode)
-                        childSortID += 1
+                            SaveConfigurationNodeValueInfoToLocalDatabase(tmpChildNode)
+                            childSortID += 1
 
-                    Else
-                        '第二列内容为空
+                        Else
+                            '第二列内容为空
+                        End If
                     End If
-                End If
 #End Region
 
+                    Dim tmpNodeStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}"
+                    '解析替代料品号集
+                    '转换为大写
+                    Dim materialStr As String = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}".ToUpper
+                    '转换为窄字符标点
+                    materialStr = StrConv(materialStr, VbStrConv.Narrow)
+                    If String.IsNullOrWhiteSpace(materialStr) Then
+                        Continue For
+                    End If
 
-                Dim tmpNodeStr = tmpIRow.GetCell(headerLocation.X + 2).ToString
-                '解析替代料品号集
-                '转换为大写
-                Dim materialStr As String = tmpIRow.GetCell(headerLocation.X + 3).ToString.ToUpper
-                '转换为窄字符标点
-                materialStr = StrConv(materialStr, VbStrConv.Narrow)
-                If String.IsNullOrWhiteSpace(materialStr) Then
-                    Continue For
-                End If
-
-                If String.IsNullOrWhiteSpace(tmpNodeStr) Then
-                    Continue For
-                End If
+                    If String.IsNullOrWhiteSpace(tmpNodeStr) Then
+                        Continue For
+                    End If
 
 #Region "解析细分选项"
-                Dim tmpNode = GetConfigurationNodeInfoByNameFromLocalDatabase(tmpNodeStr)
-                If tmpNode Is Nothing Then
-                    tmpNode = New ConfigurationNodeInfo With {
+                    Dim tmpNode = GetConfigurationNodeInfoByNameFromLocalDatabase(tmpNodeStr)
+                    If tmpNode Is Nothing Then
+                        tmpNode = New ConfigurationNodeInfo With {
                     .ID = Wangk.Resource.IDHelper.NewID,
                     .SortID = rootSortID,
                     .Name = tmpNodeStr,
                     .IsMaterial = True
                 }
-                    SaveConfigurationNodeInfoToLocalDatabase(tmpNode)
-                    rootSortID += 1
-                End If
+                        SaveConfigurationNodeInfoToLocalDatabase(tmpNode)
+                        rootSortID += 1
+                    End If
 #End Region
 
 #Region "解析等价替换"
-                '分割
-                Dim tmpMaterialArray = materialStr.Split(",")
+                    '分割
+                    Dim tmpMaterialArray = materialStr.Split(",")
 
-                '记录
-                For Each item In tmpMaterialArray
-                    If String.IsNullOrWhiteSpace(item) Then
-                        Continue For
-                    End If
-
-                    Dim tmpMaterialNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpNode.ID, item)
-                    '不存在则添加配置值信息
-                    If tmpMaterialNode Is Nothing Then
-
-                        Dim tmpMaterialInfo = GetMaterialInfoBypIDFromLocalDatabase(item)
-                        If tmpMaterialInfo Is Nothing Then
-                            Throw New Exception($"第 {rID + 1} 行 未找到品号对应物料信息")
+                    '记录
+                    For Each item In tmpMaterialArray
+                        If String.IsNullOrWhiteSpace(item) Then
+                            Continue For
                         End If
 
-                        tmpMaterialNode = New ConfigurationNodeValueInfo With {
+                        Dim tmpMaterialNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpNode.ID, item)
+                        '不存在则添加配置值信息
+                        If tmpMaterialNode Is Nothing Then
+
+                            Dim tmpMaterialInfo = GetMaterialInfoBypIDFromLocalDatabase(item)
+                            If tmpMaterialInfo Is Nothing Then
+                                Throw New Exception($"第 {rID + 1} 行 未找到品号对应物料信息")
+                            End If
+
+                            tmpMaterialNode = New ConfigurationNodeValueInfo With {
                             .ID = tmpMaterialInfo.ID,
                             .ConfigurationNodeID = tmpNode.ID,
                             .SortID = childSortID,
                             .Value = item
                         }
-                        SaveConfigurationNodeValueInfoToLocalDatabase(tmpMaterialNode)
-                        childSortID += 1
-                    End If
+                            SaveConfigurationNodeValueInfoToLocalDatabase(tmpMaterialNode)
+                            childSortID += 1
+                        End If
 
-                    '添加物料关联信息
-                    Dim tmpLinkNode = New MaterialLinkInfo With {
+                        '添加物料关联信息
+                        Dim tmpLinkNode = New MaterialLinkInfo With {
                         .ID = Wangk.Resource.IDHelper.NewID,
                         .NodeID = tmpChildNode.ConfigurationNodeID,
                         .NodeValueID = tmpChildNode.ID,
                         .LinkNodeID = tmpNode.ID,
                         .LinkNodeValueID = tmpMaterialNode.ID
                     }
-                    SaveMaterialLinkInfoToLocalDatabase(tmpLinkNode)
+                        SaveMaterialLinkInfoToLocalDatabase(tmpLinkNode)
 
-                Next
+                    Next
 #End Region
 
-            Next
+                Next
 
+            End Using
         End Using
     End Sub
 #End Region
@@ -562,68 +579,71 @@ values(
 
         Dim headerLocation = FindHeaderLocation(filePath, "料品固定搭配集")
 
-        Using tmpFileStream = File.OpenRead(filePath)
-            Dim tmpWorkbook = New XSSFWorkbook(tmpFileStream)
-            Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+        Using readFS = File.OpenRead(filePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-            For rID = headerLocation.Y + 1 To tmpSheet.LastRowNum - 1
-                Dim tmpIRow = tmpSheet.GetRow(rID)
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
-                '空行则跳过
-                If tmpIRow Is Nothing Then Continue For
+                For rID = headerLocation.Y + 1 To tmpWorkSheet.Dimension.End.Row
 
-                Dim tmpICell = tmpIRow.GetCell(headerLocation.X)
+                    '转换为大写
+                    Dim materialStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}".ToUpper
+                    '转换为窄字符标点
+                    materialStr = StrConv(materialStr, VbStrConv.Narrow)
 
-                '转换为大写
-                Dim materialStr = tmpICell.ToString.ToUpper
-                '转换为窄字符标点
-                materialStr = StrConv(materialStr, VbStrConv.Narrow)
-
-                '内容为空则跳过
-                If String.IsNullOrWhiteSpace(materialStr) Then Continue For
-                '结束解析
-                If materialStr.Equals("存货单位") Then Exit For
+                    '内容为空则跳过
+                    If String.IsNullOrWhiteSpace(materialStr) Then Continue For
+                    '结束解析
+                    If materialStr.Equals("存货单位") Then Exit For
 
 #Region "解析固定替换"
-                '分割
-                Dim tmpArray = materialStr.Split(",")
+                    '分割
+                    Dim tmpArray = materialStr.Split(",")
 
-                For Each item In tmpArray
-                    If String.IsNullOrWhiteSpace(item) Then
-                        Continue For
-                    End If
-
-                    Dim tmpStr = item.Replace("AND", ",")
-                    Dim tmpMaterialArray = tmpStr.Split(",")
-
-                    Dim parentNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(0).Trim())
-                    If parentNode Is Nothing Then
-                        Throw New Exception($"第 {rID + 1} 行 替换物料 {tmpMaterialArray(0).Trim()} 不存在")
-                    End If
-
-                    For i001 = 1 To tmpMaterialArray.Count - 1
-                        Dim linkNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(i001).Trim())
-                        If linkNode Is Nothing Then
-                            Throw New Exception($"第 {rID + 1} 行 替换物料 {tmpMaterialArray(i001).Trim()} 不存在")
+                    For Each item In tmpArray
+                        If String.IsNullOrWhiteSpace(item) Then
+                            Continue For
                         End If
 
-                        SaveMaterialLinkInfoToLocalDatabase(New MaterialLinkInfo With {
-                                                            .ID = Wangk.Resource.IDHelper.NewID,
-                                                            .NodeID = parentNode.ConfigurationNodeID,
-                                                            .NodeValueID = parentNode.ID,
-                                                            .LinkNodeID = linkNode.ConfigurationNodeID,
-                                                            .LinkNodeValueID = linkNode.ID
-                                                            })
+                        Dim tmpStr = item.Replace("AND", ",")
+                        Dim tmpMaterialArray = tmpStr.Split(",")
+
+                        Dim parentNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(0).Trim())
+                        If parentNode Is Nothing Then
+                            Throw New Exception($"第 {rID + 1} 行 替换物料 {tmpMaterialArray(0).Trim()} 不存在")
+                        End If
+
+                        For i001 = 1 To tmpMaterialArray.Count - 1
+                            Dim linkNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(i001).Trim())
+                            If linkNode Is Nothing Then
+                                Throw New Exception($"第 {rID + 1} 行 替换物料 {tmpMaterialArray(i001).Trim()} 不存在")
+                            End If
+
+                            SaveMaterialLinkInfoToLocalDatabase(New MaterialLinkInfo With {
+                                                                .ID = Wangk.Resource.IDHelper.NewID,
+                                                                .NodeID = parentNode.ConfigurationNodeID,
+                                                                .NodeValueID = parentNode.ID,
+                                                                .LinkNodeID = linkNode.ConfigurationNodeID,
+                                                                .LinkNodeValueID = linkNode.ID
+                                                                })
+
+                        Next
 
                     Next
-
-                Next
 #End Region
 
-            Next
+                Next
 
+            End Using
         End Using
     End Sub
+#End Region
+
 #End Region
 
 #Region "添加配置节点信息到临时数据库"
@@ -900,112 +920,108 @@ values(
     Private Sub CreateTemplate(filePath As String)
         Dim headerLocation = FindHeaderLocation(filePath, "显示屏规格")
 
-        Using tmpFileStream = File.OpenRead(AppSettingHelper.SourceFilePath)
-            Dim tmpWorkbook = New XSSFWorkbook(tmpFileStream)
-            Dim tmpSheet = tmpWorkbook.GetSheetAt(0)
+        Using readFS = File.OpenRead(AppSettingHelper.SourceFilePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-            '移除核价产品配置表
-            tmpSheet.ShiftRows(headerLocation.Y, tmpSheet.LastRowNum, -headerLocation.Y)
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
-            '查找阶层
-            headerLocation = FindHeaderLocation(tmpWorkbook, "阶层")
-            Dim levelCount = 0
-            '统计阶层层数
-            Dim tmpRow = tmpSheet.GetRow(headerLocation.Y + 1)
-            For i001 = 0 To 10
-                If tmpRow.GetCell(headerLocation.X + i001).ToString.Equals($"{i001 + 1}") Then
-                    levelCount += 1
-                Else
-                    Exit For
-                End If
-            Next
+                '移除核价产品配置表
+                tmpWorkSheet.DeleteRow(tmpWorkSheet.Dimension.Start.Row, headerLocation.Y - 1)
 
-            Dim MaterialID As Integer = 1
-
-#Region "移除多余替换料"
-            For rID = headerLocation.Y + 2 To tmpSheet.LastRowNum
-                Dim tmpIRow = tmpSheet.GetRow(rID)
-
-                '空行跳过
-                If tmpIRow Is Nothing Then Continue For
-
-                '跳过最后两行
-                Dim tmpICell = tmpIRow.GetCell(0)
-                If String.IsNullOrWhiteSpace(tmpICell.ToString) OrElse
-                    Val(tmpICell.ToString) > 0 Then
-
-                Else
-                    Continue For
-                End If
-
-                Dim isHaveNodeMaterial As Boolean = False
-                '判断是否是带节点物料
-                For cID = headerLocation.X To headerLocation.X + levelCount - 1
-                    Dim tmpLevelCell = tmpIRow.GetCell(cID)
-
-                    If tmpLevelCell Is Nothing Then
-                        Continue For
+                '查找阶层
+                headerLocation = FindHeaderLocation(tmpExcelPackage, "阶层")
+                Dim levelCount = 0
+                '统计阶层层数
+                For i001 = 0 To 10
+                    If $"{tmpWorkSheet.Cells(headerLocation.Y + 1, headerLocation.X + i001).Value}".Equals($"{i001 + 1}") Then
+                        levelCount += 1
+                    Else
+                        Exit For
                     End If
+                Next
 
-                    If Not String.IsNullOrWhiteSpace(tmpLevelCell.ToString) Then
-                        isHaveNodeMaterial = True
+                Dim MaterialID As Integer = 1
+
+#Region "移除多余替换物料"
+                For rID = rowMinID + 2 To rowMaxID
+                    If rID > tmpWorkSheet.Dimension.End.Row Then
                         Exit For
                     End If
 
+                    '跳过最后两行
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
+                    If String.IsNullOrWhiteSpace(tmpStr) OrElse
+                        Val(tmpStr) > 0 Then
+
+                    Else
+                        Continue For
+                    End If
+
+                    Dim isHaveNodeMaterial As Boolean = False
+                    '判断是否是带节点物料
+                    For cID = headerLocation.X To headerLocation.X + levelCount - 1
+                        tmpStr = $"{tmpWorkSheet.Cells(rID, cID).Value}"
+
+                        If Not String.IsNullOrWhiteSpace(tmpStr) Then
+                            isHaveNodeMaterial = True
+                            Exit For
+                        End If
+
+                    Next
+
+                    '更新序号
+                    If isHaveNodeMaterial Then
+                        tmpWorkSheet.Cells(rID, colMinID).Value = MaterialID
+                        MaterialID += 1
+                    Else
+                        tmpWorkSheet.Cells(rID, colMinID).Value = ""
+                    End If
+
+                    tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X + levelCount).Value}"
+                    '非替换料跳过
+                    If String.IsNullOrWhiteSpace(tmpStr) Then
+                        Continue For
+                    End If
+
+                    '跳过带节点物料
+                    If isHaveNodeMaterial Then
+                        Continue For
+                    End If
+
+                    '移除不带节点的替换物料
+                    tmpWorkSheet.DeleteRow(rID)
+
+                    rID -= 1
+
                 Next
-
-                '更新序号
-                If isHaveNodeMaterial Then
-                    tmpIRow.GetCell(0).SetCellValue(MaterialID)
-                    MaterialID += 1
-                Else
-                    tmpIRow.GetCell(0).SetCellValue("")
-                End If
-
-                tmpICell = tmpIRow.GetCell(headerLocation.X + levelCount)
-                '非替换料跳过
-                If String.IsNullOrWhiteSpace($"{tmpICell}") Then
-                    Continue For
-                End If
-
-                '跳过带节点物料
-                If isHaveNodeMaterial Then
-                    Continue For
-                End If
-
-                '移除不带节点的替换物料
-                tmpSheet.ShiftRows(rID + 1, tmpSheet.LastRowNum, -1)
-
-                rID -= 1
-
-            Next
 #End Region
 
-            '标题合并
-            tmpSheet.AddMergedRegion(New NPOI.SS.Util.CellRangeAddress(0, 0, 2, 15))
-            '标题高度为两倍默认行高
-            tmpSheet.GetRow(0).Height = tmpSheet.GetRow(0).Height * 2
+                '另存为模板
+                Using tmpSaveFileStream = File.Create(AppSettingHelper.TemplateFilePath)
+                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
+                End Using
 
-            '另存为模板
-            Using tmpSaveFileStream = File.OpenWrite(AppSettingHelper.TemplateFilePath)
-                tmpWorkbook.Write(tmpSaveFileStream)
             End Using
-
         End Using
 
     End Sub
 #End Region
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        Using tmpDialog As New SaveFileDialog With {
-            .Filter = "BON模板文件|*.xlsx",
-            .FileName = Now.ToString("yyyyMMddHHmmssfff")
-        }
-            If tmpDialog.ShowDialog() <> DialogResult.OK Then
-                Exit Sub
-            End If
+        'Using tmpDialog As New SaveFileDialog With {
+        '    .Filter = "BON模板文件|*.xlsx",
+        '    .FileName = Now.ToString("yyyyMMddHHmmssfff")
+        '}
+        '    If tmpDialog.ShowDialog() <> DialogResult.OK Then
+        '        Exit Sub
+        '    End If
 
-        End Using
+        'End Using
 
     End Sub
 
