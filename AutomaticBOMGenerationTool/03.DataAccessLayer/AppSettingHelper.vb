@@ -133,7 +133,8 @@ Public Class AppSettingHelper
     ''' <summary>
     ''' 源文件地址
     ''' </summary>
-    Public Shared SourceFilePath As String = ".\Data\SourceFile.xlsx"
+    <Newtonsoft.Json.JsonIgnore>
+    Public SourceFilePath As String '= ".\Data\SourceFile.xlsx"
 
     ''' <summary>
     ''' 模板文件地址

@@ -30,7 +30,7 @@ Public Class MainForm
             End If
 
             TextBox1.Text = tmpDialog.FileName
-
+            AppSettingHelper.GetInstance.SourceFilePath = TextBox1.Text
             Button2.Enabled = True
             Button3.Enabled = False
 
@@ -39,36 +39,38 @@ Public Class MainForm
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-            .Text = "解析数据",
-            .IsPercent = False
+            .Text = "解析数据"
         }
-            Dim filePath = TextBox1.Text
 
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+                                Dim stepCount = 9
 
-                                be.Write("复制文件")
-                                File.Copy(filePath, AppSettingHelper.SourceFilePath, True)
-
-                                be.Write("清空数据库")
+                                be.Write("清空数据库", 100 / stepCount * 0)
                                 ClearLocalDatabase()
 
-                                be.Write("获取替换物料品号")
-                                Dim tmpIDList = GetMaterialpIDList(AppSettingHelper.SourceFilePath)
+                                be.Write("获取替换物料品号", 100 / stepCount * 1)
+                                Dim tmpIDList = GetMaterialpIDList(AppSettingHelper.GetInstance.SourceFilePath)
 
-                                be.Write("获取替换物料信息")
-                                Dim tmpList = GetMaterialInfoList(AppSettingHelper.SourceFilePath, tmpIDList)
+                                be.Write("检测替换物料完整性", 100 / stepCount * 2)
+                                TestMaterialInfoCompleteness(AppSettingHelper.GetInstance.SourceFilePath, tmpIDList)
 
-                                be.Write("导入替换物料信息到临时数据库")
+                                be.Write("获取替换物料信息", 100 / stepCount * 3)
+                                Dim tmpList = GetMaterialInfoList(AppSettingHelper.GetInstance.SourceFilePath, tmpIDList)
+
+                                be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 4)
                                 SaveMaterialInfoToLocalDatabase(tmpList)
 
-                                be.Write("解析配置节点信息")
-                                TransformationConfigurationTable(AppSettingHelper.SourceFilePath)
+                                be.Write("解析配置节点信息", 100 / stepCount * 5)
+                                TransformationConfigurationTable(AppSettingHelper.GetInstance.SourceFilePath)
 
-                                be.Write("制作提取模板")
-                                CreateTemplate(AppSettingHelper.SourceFilePath)
+                                be.Write("制作提取模板", 100 / stepCount * 6)
+                                CreateTemplate(AppSettingHelper.GetInstance.SourceFilePath)
 
-                                be.Write("标记原始物料位置")
+                                be.Write("获取替换物料在模板中的位置", 100 / stepCount * 7)
+                                Dim tmpRowIDList = GetMaterialRowIDInTemplate(AppSettingHelper.TemplateFilePath)
 
+                                be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 8)
+                                SaveMaterialRowIDToLocalDatabase(tmpRowIDList)
 
                             End Sub)
 
@@ -129,6 +131,7 @@ Public Class MainForm
                 tmpCommand.CommandText = "
 delete from MaterialInfo;
 delete from ConfigurationNodeInfo;
+delete from ConfigurationNodeRowInfo;
 delete from ConfigurationNodeValueInfo;
 delete from MaterialLinkInfo;"
 
@@ -219,7 +222,7 @@ delete from MaterialLinkInfo;"
                 Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
 #Region "遍历物料信息"
-                For rID = rowMinID + 1 To tmpWorkSheet.Dimension.End.Row
+                For rID = headerLocation.Y + 2 To tmpWorkSheet.Dimension.End.Row
 
                     Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
 
@@ -244,7 +247,7 @@ delete from MaterialLinkInfo;"
                         String.IsNullOrWhiteSpace(addMaterialInfo.pCount) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pUnitPrice) Then
 
-                            Throw New Exception($"第 {rID + 1} 行 物料信息不完整")
+                            Throw New Exception($"{filePath} 第 {rID} 行 物料信息不完整")
                         End If
 
                         values.Remove(tmpStr.ToLower)
@@ -453,7 +456,7 @@ values(
                     }
                         '查重
                         If GetConfigurationNodeInfoByNameFromLocalDatabase(tmpStr) IsNot Nothing Then
-                            Throw New Exception($"配置选项 {tmpStr} 名称重复")
+                            Throw New Exception($"{filePath} 配置选项 {tmpStr} 名称重复")
                         End If
 
                         SaveConfigurationNodeInfoToLocalDatabase(tmpRootNode)
@@ -475,7 +478,7 @@ values(
                         If Not String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}") Then
                             '第二列内容不为空
                             If tmpRootNode Is Nothing Then
-                                Throw New Exception($"第 {rID + 1} 行 分类类型 缺失 配置选项")
+                                Throw New Exception($"{filePath} 第 {rID} 行 分类类型 缺失 配置选项")
                             End If
 
                             Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}"
@@ -538,7 +541,7 @@ values(
 
                             Dim tmpMaterialInfo = GetMaterialInfoBypIDFromLocalDatabase(item)
                             If tmpMaterialInfo Is Nothing Then
-                                Throw New Exception($"第 {rID + 1} 行 未找到品号对应物料信息")
+                                Throw New Exception($"{filePath} 第 {rID} 行 未找到品号对应物料信息")
                             End If
 
                             tmpMaterialNode = New ConfigurationNodeValueInfo With {
@@ -615,13 +618,13 @@ values(
 
                         Dim parentNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(0).Trim())
                         If parentNode Is Nothing Then
-                            Throw New Exception($"第 {rID + 1} 行 替换物料 {tmpMaterialArray(0).Trim()} 不存在")
+                            Throw New Exception($"{filePath} 第 {rID} 行 替换物料 {tmpMaterialArray(0).Trim()} 不存在")
                         End If
 
                         For i001 = 1 To tmpMaterialArray.Count - 1
                             Dim linkNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(i001).Trim())
                             If linkNode Is Nothing Then
-                                Throw New Exception($"第 {rID + 1} 行 替换物料 {tmpMaterialArray(i001).Trim()} 不存在")
+                                Throw New Exception($"{filePath} 第 {rID} 行 替换物料 {tmpMaterialArray(i001).Trim()} 不存在")
                             End If
 
                             SaveMaterialLinkInfoToLocalDatabase(New MaterialLinkInfo With {
@@ -847,6 +850,72 @@ where pID=@pID"
     End Function
 #End Region
 
+#Region "根据ID获取物料信息"
+    ''' <summary>
+    ''' 根据ID获取物料信息
+    ''' </summary>
+    Private Function GetMaterialInfoByIDFromLocalDatabase(id As String) As MaterialInfo
+
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "select * from MaterialInfo 
+where ID=@ID"
+            }
+            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = id})
+
+            Using reader As SQLiteDataReader = cmd.ExecuteReader()
+                If reader.Read Then
+                    Return New MaterialInfo With {
+                        .ID = reader(NameOf(MaterialInfo.ID)),
+                        .pID = reader(NameOf(MaterialInfo.pID)),
+                        .pName = reader(NameOf(MaterialInfo.pName)),
+                        .pConfig = reader(NameOf(MaterialInfo.pConfig)),
+                        .pUnit = reader(NameOf(MaterialInfo.pUnit)),
+                        .pCount = reader(NameOf(MaterialInfo.pCount)),
+                        .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
+                    }
+                End If
+            End Using
+
+        End Using
+
+        Return Nothing
+    End Function
+#End Region
+
+#Region "根据品号获取配置项ID"
+    ''' <summary>
+    ''' 根据品号获取配置项ID
+    ''' </summary>
+    Private Function GetConfigurationNodeIDByppIDFromLocalDatabase(pID As String) As String
+
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "select ConfigurationNodeID from ConfigurationNodeValueInfo 
+where Value=@pID"
+            }
+            cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = pID})
+
+            Using reader As SQLiteDataReader = cmd.ExecuteReader()
+                If reader.Read Then
+                    Return reader(0)
+                End If
+            End Using
+
+        End Using
+
+        Return Nothing
+    End Function
+#End Region
+
 #Region "添加物料关联信息到临时数据库"
     ''' <summary>
     ''' 添加物料关联信息到临时数据库
@@ -913,6 +982,53 @@ values(
     End Function
 #End Region
 
+#Region "检测替换物料完整性"
+    ''' <summary>
+    ''' 检测替换物料完整性
+    ''' </summary>
+    Private Sub TestMaterialInfoCompleteness(
+                                            filePath As String,
+                                            pIDList As HashSet(Of String))
+        Dim headerLocation = FindHeaderLocation(filePath, "品 号")
+
+        Using readFS = File.OpenRead(filePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+                For rID = headerLocation.Y + 2 To tmpWorkSheet.Dimension.End.Row
+
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
+
+                    '单元格内容为空跳过
+                    If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
+
+                    '跳过非替换物料
+                    If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, headerLocation.X - 1).Value}") Then
+                        Continue For
+                    End If
+
+                    '统一字符格式
+                    tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
+                    tmpStr = tmpStr.ToLower
+
+                    '判断品号是否在配置表中
+                    If Not pIDList.Contains(tmpStr) Then
+                        Throw New Exception($"{filePath} 第 {rID} 行 替换物料未在配置列表中出现")
+                    End If
+
+                Next
+
+            End Using
+        End Using
+    End Sub
+#End Region
+
 #Region "制作提取模板"
     ''' <summary>
     ''' 制作提取模板
@@ -920,7 +1036,7 @@ values(
     Private Sub CreateTemplate(filePath As String)
         Dim headerLocation = FindHeaderLocation(filePath, "显示屏规格")
 
-        Using readFS = File.OpenRead(AppSettingHelper.SourceFilePath)
+        Using readFS = File.OpenRead(filePath)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -948,17 +1064,18 @@ values(
                 Dim MaterialID As Integer = 1
 
 #Region "移除多余替换物料"
-                For rID = rowMinID + 2 To rowMaxID
+                For rID = headerLocation.Y + 2 To rowMaxID
                     If rID > tmpWorkSheet.Dimension.End.Row Then
                         Exit For
                     End If
 
                     '跳过最后两行
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X - 2).Value}"
                     If String.IsNullOrWhiteSpace(tmpStr) OrElse
                         Val(tmpStr) > 0 Then
 
                     Else
+                        Console.WriteLine($"{rID}:[{tmpStr}]")
                         Continue For
                     End If
 
@@ -1012,17 +1129,228 @@ values(
     End Sub
 #End Region
 
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        'Using tmpDialog As New SaveFileDialog With {
-        '    .Filter = "BON模板文件|*.xlsx",
-        '    .FileName = Now.ToString("yyyyMMddHHmmssfff")
-        '}
-        '    If tmpDialog.ShowDialog() <> DialogResult.OK Then
-        '        Exit Sub
-        '    End If
+#Region "获取替换物料在模板中的位置"
+    ''' <summary>
+    ''' 获取替换物料在模板中的位置
+    ''' </summary>
+    Private Function GetMaterialRowIDInTemplate(filePath As String) As List(Of ConfigurationNodeRowInfo)
+        Dim tmpList = New List(Of ConfigurationNodeRowInfo)
 
-        'End Using
+        Dim headerLocation = FindHeaderLocation(filePath, "品 号")
+
+        Using readFS = File.OpenRead(filePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+                For rID = headerLocation.Y + 2 To tmpWorkSheet.Dimension.End.Row
+
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
+
+                    '单元格内容为空跳过
+                    If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
+
+                    '跳过非替换物料
+                    If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, headerLocation.X - 1).Value}") Then
+                        Continue For
+                    End If
+
+                    '统一字符格式
+                    tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
+                    tmpStr = tmpStr.ToLower
+
+                    '查找品号对应配置项信息
+                    Dim tmpID = GetConfigurationNodeIDByppIDFromLocalDatabase(tmpStr)
+                    If String.IsNullOrWhiteSpace(tmpID) Then
+                        Throw New Exception($"{filePath} 第 {rID} 行 替换物料未在配置列表中出现")
+                    End If
+
+                    '记录
+                    tmpList.Add(New ConfigurationNodeRowInfo With {
+                                .ID = Wangk.Resource.IDHelper.NewID,
+                                .ConfigurationNodeID = tmpID,
+                                .MaterialRowID = rID
+                                })
+                Next
+
+            End Using
+        End Using
+
+        Return tmpList
+    End Function
+#End Region
+
+#Region "导入替换物料位置到临时数据库"
+    ''' <summary>
+    ''' 导入替换物料位置到临时数据库
+    ''' </summary>
+    Private Sub SaveMaterialRowIDToLocalDatabase(values As List(Of ConfigurationNodeRowInfo))
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            '使用事务提交
+            Using Transaction As DbTransaction = tmpConnection.BeginTransaction()
+                Dim cmd As New SQLiteCommand(tmpConnection) With {
+                    .CommandText = "insert into ConfigurationNodeRowInfo 
+values(
+@ID,
+@ConfigurationNodeID,
+@MaterialRowID
+)"
+                }
+                cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String))
+                cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String))
+                cmd.Parameters.Add(New SQLiteParameter("@MaterialRowID", DbType.Int32))
+
+                For Each item In values
+
+                    cmd.Parameters("@ID").Value = Wangk.Resource.IDHelper.NewID
+                    cmd.Parameters("@ConfigurationNodeID").Value = item.ConfigurationNodeID
+                    cmd.Parameters("@MaterialRowID").Value = item.MaterialRowID
+
+                    cmd.ExecuteNonQuery()
+                Next
+
+                '提交事务
+                Transaction.Commit()
+            End Using
+
+        End Using
+    End Sub
+#End Region
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        Dim outputFilePath As String
+
+        Using tmpDialog As New SaveFileDialog With {
+            .Filter = "BON文件|*.xlsx",
+            .FileName = Now.ToString("yyyyMMddHHmmssfff")
+        }
+            If tmpDialog.ShowDialog() <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+            outputFilePath = tmpDialog.FileName
+
+        End Using
+
+        '获取配置项信息
+        Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                               Where item.NodeInfo.IsMaterial = True
+                                               Select New ConfigurationNodeRowInfo() With {
+                                                   .ConfigurationNodeID = item.NodeInfo.ID,
+                                                   .SelectedValueID = item.SelectedValueID
+                                                   }
+                                                   ).ToList
+
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "导出数据"
+        }
+
+            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+                                Dim stepCount = 3
+
+                                be.Write("获取位置及物料信息", 100 / stepCount * 0)
+                                For Each item In tmpConfigurationNodeRowInfoList
+
+                                    item.MaterialRowIDList = GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
+                                    item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
+
+                                Next
+
+                                be.Write("替换物料并输出", 100 / stepCount * 1)
+                                ReplaceMaterial(outputFilePath, tmpConfigurationNodeRowInfoList)
+
+                                be.Write("打开保存文件夹", 100 / stepCount * 2)
+                                FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
+
+                            End Sub)
+
+            If tmpDialog.Error IsNot Nothing Then
+                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "导出出错")
+                Exit Sub
+            End If
+
+        End Using
 
     End Sub
+
+#Region "获取替换物料的位置"
+    ''' <summary>
+    ''' 获取替换物料的位置
+    ''' </summary>
+    Private Function GetMaterialRowIDInLocalDatabase(configurationNodeID As String) As List(Of Integer)
+        Dim tmpList As New List(Of Integer)
+
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "select MaterialRowID from ConfigurationNodeRowInfo 
+where ConfigurationNodeID=@ConfigurationNodeID"
+            }
+            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
+
+            Using reader As SQLiteDataReader = cmd.ExecuteReader()
+                While reader.Read()
+                    tmpList.Add(reader(0))
+                End While
+            End Using
+
+        End Using
+
+        Return tmpList
+    End Function
+#End Region
+
+#Region "替换物料并输出"
+    ''' <summary>
+    ''' 替换物料并输出
+    ''' </summary>
+    Private Sub ReplaceMaterial(
+                               outputFilePath As String,
+                               values As List(Of ConfigurationNodeRowInfo))
+
+        Dim headerLocation = FindHeaderLocation(AppSettingHelper.TemplateFilePath, "品 号")
+
+        Using readFS = File.OpenRead(AppSettingHelper.TemplateFilePath)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+                For Each node In values
+                    For Each item In node.MaterialRowIDList
+                        tmpWorkSheet.Cells(item, headerLocation.X).Value = node.MaterialValue.pID
+                        tmpWorkSheet.Cells(item, headerLocation.X + 1).Value = node.MaterialValue.pName
+                        tmpWorkSheet.Cells(item, headerLocation.X + 2).Value = node.MaterialValue.pConfig
+                        tmpWorkSheet.Cells(item, headerLocation.X + 3).Value = node.MaterialValue.pUnit
+                        tmpWorkSheet.Cells(item, headerLocation.X + 4).Value = node.MaterialValue.pCount
+                        tmpWorkSheet.Cells(item, headerLocation.X + 5).Value = node.MaterialValue.pUnitPrice
+                    Next
+                Next
+
+                '另存为
+                Using tmpSaveFileStream = File.Create(outputFilePath)
+                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
+                End Using
+
+            End Using
+        End Using
+    End Sub
+#End Region
 
 End Class

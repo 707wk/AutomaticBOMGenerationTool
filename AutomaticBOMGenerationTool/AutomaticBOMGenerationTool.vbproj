@@ -144,8 +144,10 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\MainForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="02.BusinessLogicLayer\FileHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeInfo.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationNodeRowInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeValueInfo.vb" />
     <Compile Include="03.DataAccessLayer\MaterialInfo.vb" />
     <Compile Include="03.DataAccessLayer\MaterialLinkInfo.vb" />
@@ -201,7 +203,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="01.UserInterfaceLayer\MainForm\ChildForm\" />
-    <Folder Include="02.BusinessLogicLayer\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo.ico" />
