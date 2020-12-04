@@ -5,7 +5,7 @@ Imports OfficeOpenXml
 
 Public Class MainForm
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.GetInstance.ProductVersion}"
+        Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.GetInstance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit"
 
         Button2.Enabled = False
         Button3.Enabled = False
@@ -1343,6 +1343,10 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                     Next
                 Next
 
+                '删除物料标记列
+                headerLocation = FindHeaderLocation(AppSettingHelper.TemplateFilePath, "替换料")
+                tmpWorkSheet.DeleteColumn(headerLocation.X)
+
                 '另存为
                 Using tmpSaveFileStream = File.Create(outputFilePath)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
@@ -1352,5 +1356,10 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         End Using
     End Sub
 #End Region
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        Dim tmpDialog As New ExportSettingsForm
+        tmpDialog.ShowDialog()
+    End Sub
 
 End Class
