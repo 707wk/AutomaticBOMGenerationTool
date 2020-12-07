@@ -25,12 +25,12 @@ Partial Class MainForm
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
         Me.Label1 = New System.Windows.Forms.Label()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.Button1 = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.Button3 = New System.Windows.Forms.Button()
         Me.Button4 = New System.Windows.Forms.Button()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -51,15 +51,6 @@ Partial Class MainForm
         Me.TextBox1.ReadOnly = True
         Me.TextBox1.Size = New System.Drawing.Size(433, 23)
         Me.TextBox1.TabIndex = 1
-        '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(496, 12)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(94, 26)
-        Me.Button1.TabIndex = 2
-        Me.Button1.Text = "选择文件..."
-        Me.Button1.UseVisualStyleBackColor = True
         '
         'Button2
         '
@@ -111,6 +102,15 @@ Partial Class MainForm
         Me.Button4.TabIndex = 6
         Me.Button4.Text = "导出设置..."
         Me.Button4.UseVisualStyleBackColor = True
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(496, 12)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(94, 26)
+        Me.Button1.TabIndex = 2
+        Me.Button1.Text = "选择文件..."
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'MainForm
         '

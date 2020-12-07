@@ -13,6 +13,8 @@ Public Class MainForm
         '设置使用方式为个人使用
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial
 
+        UIFormHelper.UIForm = Me
+
     End Sub
 
     Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
@@ -84,6 +86,8 @@ Public Class MainForm
         ShowConfigurationNodeControl()
 
         Button3.Enabled = True
+
+        UIFormHelper.ToastSuccess("解析完成")
 
     End Sub
 
@@ -1075,7 +1079,6 @@ values(
                         Val(tmpStr) > 0 Then
 
                     Else
-                        Console.WriteLine($"{rID}:[{tmpStr}]")
                         Continue For
                     End If
 
@@ -1255,7 +1258,7 @@ values(
         }
 
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                Dim stepCount = 3
+                                Dim stepCount = 4
 
                                 be.Write("获取位置及物料信息", 100 / stepCount * 0)
                                 For Each item In tmpConfigurationNodeRowInfoList
@@ -1265,10 +1268,13 @@ values(
 
                                 Next
 
-                                be.Write("替换物料并输出", 100 / stepCount * 1)
+                                be.Write("拼接BOM名称", 100 / stepCount * 1)
+                                'todo:拼接BOM名称
+
+                                be.Write("替换物料并输出", 100 / stepCount * 2)
                                 ReplaceMaterial(outputFilePath, tmpConfigurationNodeRowInfoList)
 
-                                be.Write("打开保存文件夹", 100 / stepCount * 2)
+                                be.Write("打开保存文件夹", 100 / stepCount * 3)
                                 FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
 
                             End Sub)

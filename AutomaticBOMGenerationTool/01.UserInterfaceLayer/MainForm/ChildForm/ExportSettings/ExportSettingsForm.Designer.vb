@@ -48,7 +48,7 @@ Partial Class ExportSettingsForm
         Me.TabControl1.Location = New System.Drawing.Point(12, 12)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(960, 444)
+        Me.TabControl1.Size = New System.Drawing.Size(984, 444)
         Me.TabControl1.TabIndex = 0
         '
         'TabPage1
@@ -58,7 +58,7 @@ Partial Class ExportSettingsForm
         Me.TabPage1.Location = New System.Drawing.Point(4, 26)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(952, 414)
+        Me.TabPage1.Size = New System.Drawing.Size(976, 414)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "导出BOM名称设置"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -94,7 +94,7 @@ Partial Class ExportSettingsForm
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(946, 381)
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(970, 381)
         Me.CheckBoxDataGridView1.TabIndex = 0
         '
         'ToolStrip1
@@ -103,7 +103,7 @@ Partial Class ExportSettingsForm
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2})
         Me.ToolStrip1.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(946, 27)
+        Me.ToolStrip1.Size = New System.Drawing.Size(970, 27)
         Me.ToolStrip1.TabIndex = 1
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -131,7 +131,7 @@ Partial Class ExportSettingsForm
         Me.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.CancelButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.no_16px
         Me.CancelButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CancelButton.Location = New System.Drawing.Point(876, 462)
+        Me.CancelButton.Location = New System.Drawing.Point(900, 462)
         Me.CancelButton.Name = "CancelButton"
         Me.CancelButton.Size = New System.Drawing.Size(96, 25)
         Me.CancelButton.TabIndex = 46
@@ -144,7 +144,7 @@ Partial Class ExportSettingsForm
         Me.AddOrSaveButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AddOrSaveButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.yes_16px
         Me.AddOrSaveButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.AddOrSaveButton.Location = New System.Drawing.Point(774, 462)
+        Me.AddOrSaveButton.Location = New System.Drawing.Point(798, 462)
         Me.AddOrSaveButton.Name = "AddOrSaveButton"
         Me.AddOrSaveButton.Size = New System.Drawing.Size(96, 25)
         Me.AddOrSaveButton.TabIndex = 45
@@ -156,7 +156,7 @@ Partial Class ExportSettingsForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(984, 499)
+        Me.ClientSize = New System.Drawing.Size(1008, 499)
         Me.Controls.Add(Me.CancelButton)
         Me.Controls.Add(Me.AddOrSaveButton)
         Me.Controls.Add(Me.TabControl1)
@@ -180,7 +180,7 @@ Partial Class ExportSettingsForm
 
     Friend WithEvents TabControl1 As TabControl
     Friend WithEvents TabPage1 As TabPage
-    Friend WithEvents CancelButton As Button
+    Friend Shadows WithEvents CancelButton As Button
     Friend WithEvents AddOrSaveButton As Button
     Friend WithEvents CheckBoxDataGridView1 As Wangk.Resource.CheckBoxDataGridView
     Friend WithEvents ToolStrip1 As ToolStrip

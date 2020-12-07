@@ -47,6 +47,10 @@ Public Class AppSettingHelper
             If instance Is Nothing Then
                 LoadFromLocaltion()
 
+                If instance.ExportConfigurationNodeInfoList Is Nothing Then
+                    instance.ExportConfigurationNodeInfoList = New List(Of ExportConfigurationNodeInfo)
+                End If
+
                 '程序集GUID
                 Dim guid_attr As Attribute = Attribute.GetCustomAttribute(Reflection.Assembly.GetExecutingAssembly(), GetType(Runtime.InteropServices.GuidAttribute))
                 instance._GUID = CType(guid_attr, Runtime.InteropServices.GuidAttribute).Value
@@ -81,7 +85,9 @@ Public Class AppSettingHelper
 
         Catch ex As Exception
             instance = New AppSettingHelper
+
             '设置默认参数
+            instance.ExportConfigurationNodeInfoList = New List(Of ExportConfigurationNodeInfo)
 
         End Try
 
@@ -146,5 +152,10 @@ Public Class AppSettingHelper
     ''' </summary>
     <Newtonsoft.Json.JsonIgnore>
     Public ConfigurationNodeControlTable As New Dictionary(Of String, ConfigurationNodeControl)
+
+    ''' <summary>
+    ''' 导出配置项设置信息
+    ''' </summary>
+    Public ExportConfigurationNodeInfoList As List(Of ExportConfigurationNodeInfo)
 
 End Class
