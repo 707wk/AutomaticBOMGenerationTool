@@ -180,7 +180,7 @@ delete from MaterialLinkInfo;"
 
                     '统一字符格式
                     tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-                    tmpStr = tmpStr.ToLower
+                    tmpStr = tmpStr.ToUpper
 
                     '分割
                     Dim tmpArray = tmpStr.Split(",")
@@ -191,7 +191,7 @@ delete from MaterialLinkInfo;"
                             Continue For
                         End If
 
-                        tmpHashSet.Add(item.Trim.ToLower)
+                        tmpHashSet.Add(item.Trim.ToUpper)
                     Next
 
                 Next
@@ -228,14 +228,14 @@ delete from MaterialLinkInfo;"
 #Region "遍历物料信息"
                 For rID = headerLocation.Y + 2 To tmpWorkSheet.Dimension.End.Row
 
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}".ToUpper
 
                     '单元格内容为空跳过
                     If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
 
-                    If values.Contains(tmpStr.ToLower) Then
+                    If values.Contains(tmpStr) Then
                         Dim addMaterialInfo = New MaterialInfo With {
-                        .pID = tmpStr.ToUpper,
+                        .pID = tmpStr,
                         .pName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}",
                         .pConfig = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}",
                         .pUnit = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}",
@@ -254,7 +254,7 @@ delete from MaterialLinkInfo;"
                             Throw New Exception($"{filePath} 第 {rID} 行 物料信息不完整")
                         End If
 
-                        values.Remove(tmpStr.ToLower)
+                        values.Remove(tmpStr)
                         tmpList.Add(addMaterialInfo)
                     End If
 
@@ -329,6 +329,8 @@ values(
                                        filePath As String,
                                        headText As String) As Point
 
+        Dim findStr = StrConv(headText, VbStrConv.Narrow).ToUpper
+
         Using readFS = File.OpenRead(filePath)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -343,14 +345,14 @@ values(
                 For rID = rowMinID To rowMaxID
                     '逐列
                     For cID = colMinID To colMaxID
-                        Dim valueStr = $"{tmpWorkSheet.Cells(rID, cID).Value}"
+                        Dim valueStr = StrConv($"{tmpWorkSheet.Cells(rID, cID).Value}", VbStrConv.Narrow).ToUpper
 
                         '空单元格跳过
                         If String.IsNullOrWhiteSpace(valueStr) Then
                             Continue For
                         End If
 
-                        If valueStr.Equals(headText) Then
+                        If valueStr.Equals(findStr) Then
                             Return New Point(cID, rID)
                         End If
 
@@ -373,6 +375,8 @@ values(
                                        wb As ExcelPackage,
                                        headText As String) As Point
 
+        Dim findStr = StrConv(headText, VbStrConv.Narrow).ToUpper
+
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -386,14 +390,14 @@ values(
         For rID = rowMinID To rowMaxID
             '逐列
             For cID = colMinID To colMaxID
-                Dim valueStr = $"{tmpWorkSheet.Cells(rID, cID).Value}"
+                Dim valueStr = StrConv($"{tmpWorkSheet.Cells(rID, cID).Value}", VbStrConv.Narrow).ToUpper
 
                 '空单元格跳过
                 If String.IsNullOrWhiteSpace(valueStr) Then
                     Continue For
                 End If
 
-                If valueStr.Equals(headText) Then
+                If valueStr.Equals(findStr) Then
                     Return New Point(cID, rID)
                 End If
 
@@ -466,7 +470,7 @@ values(
                         SaveConfigurationNodeInfoToLocalDatabase(tmpRootNode)
                         rootSortID += 1
 
-
+                        '第二列内容
                         Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}"
                         tmpChildNode = New ConfigurationNodeValueInfo With {
                         .ID = Wangk.Resource.IDHelper.NewID,
@@ -1019,7 +1023,7 @@ values(
 
                     '统一字符格式
                     tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-                    tmpStr = tmpStr.ToLower
+                    tmpStr = tmpStr.ToUpper
 
                     '判断品号是否在配置表中
                     If Not pIDList.Contains(tmpStr) Then
@@ -1165,7 +1169,7 @@ values(
 
                     '统一字符格式
                     tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-                    tmpStr = tmpStr.ToLower
+                    tmpStr = tmpStr.ToUpper
 
                     '查找品号对应配置项信息
                     Dim tmpID = GetConfigurationNodeIDByppIDFromLocalDatabase(tmpStr)
@@ -1244,23 +1248,40 @@ values(
 
         End Using
 
-        '获取配置项信息
-        Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
-                                               Where item.NodeInfo.IsMaterial = True
-                                               Select New ConfigurationNodeRowInfo() With {
-                                                   .ConfigurationNodeID = item.NodeInfo.ID,
-                                                   .SelectedValueID = item.SelectedValueID
-                                                   }
-                                                   ).ToList
-
         Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
             .Text = "导出数据"
         }
 
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                Dim stepCount = 4
+                                Dim stepCount = 5
 
-                                be.Write("获取位置及物料信息", 100 / stepCount * 0)
+                                be.Write("获取配置项信息", 100 / stepCount * 0)
+                                Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                                                       Where item.NodeInfo.IsMaterial = True
+                                                                       Select New ConfigurationNodeRowInfo() With {
+                                                   .ConfigurationNodeID = item.NodeInfo.ID,
+                                                   .SelectedValueID = item.SelectedValueID
+                                                   }
+                                                   ).ToList
+
+                                be.Write("获取导出项信息", 100 / stepCount * 1)
+                                For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                                    Dim findNode = (From node As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
+                                                    Select node).First()
+
+                                    If findNode Is Nothing Then Continue For
+
+                                    item.ValueID = findNode.SelectedValueID
+                                    item.Value = findNode.SelectedValue
+                                    item.IsMaterial = findNode.NodeInfo.IsMaterial
+                                    If item.IsMaterial Then
+                                        item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                                    End If
+
+                                Next
+
+                                be.Write("获取位置及物料信息", 100 / stepCount * 2)
                                 For Each item In tmpConfigurationNodeRowInfoList
 
                                     item.MaterialRowIDList = GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
@@ -1268,13 +1289,10 @@ values(
 
                                 Next
 
-                                be.Write("拼接BOM名称", 100 / stepCount * 1)
-                                'todo:拼接BOM名称
-
-                                be.Write("替换物料并输出", 100 / stepCount * 2)
+                                be.Write("处理物料信息", 100 / stepCount * 3)
                                 ReplaceMaterial(outputFilePath, tmpConfigurationNodeRowInfoList)
 
-                                be.Write("打开保存文件夹", 100 / stepCount * 3)
+                                be.Write("打开保存文件夹", 100 / stepCount * 4)
                                 FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
 
                             End Sub)
@@ -1353,6 +1371,11 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                 headerLocation = FindHeaderLocation(AppSettingHelper.TemplateFilePath, "替换料")
                 tmpWorkSheet.DeleteColumn(headerLocation.X)
 
+                '更新BOM名称
+                headerLocation = FindHeaderLocation(AppSettingHelper.TemplateFilePath, "显示屏规格")
+                Dim BOMName = JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
+                tmpWorkSheet.Cells(headerLocation.Y, headerLocation.X + 2).Value = BOMName
+
                 '另存为
                 Using tmpSaveFileStream = File.Create(outputFilePath)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
@@ -1361,6 +1384,80 @@ where ConfigurationNodeID=@ConfigurationNodeID"
             End Using
         End Using
     End Sub
+#End Region
+
+#Region "获取拼接的BOM名称"
+    ''' <summary>
+    ''' 获取拼接的BOM名称
+    ''' </summary>
+    Private Function JoinBOMName(
+                                wb As ExcelPackage,
+                                values As List(Of ExportConfigurationNodeInfo)) As String
+
+        Dim headerLocation = FindHeaderLocation(wb, "品  名")
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+        Dim nameStr = $"{tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value}"
+        '统一字符格式
+        nameStr = StrConv(nameStr, VbStrConv.Narrow)
+        nameStr = nameStr.ToUpper
+        nameStr = nameStr.Split(";").First
+
+        '根据选项拼接
+        For Each item In values
+            '跳过未出现在BOM中的配置项
+            If String.IsNullOrWhiteSpace(item.ValueID) Then
+                Continue For
+            End If
+
+            nameStr += "; "
+
+            nameStr += If(String.IsNullOrWhiteSpace(item.ExportPrefix), "", item.ExportPrefix)
+
+            If item.IsExportConfigurationNodeValue Then
+                nameStr += item.Value
+            End If
+
+            If item.IsExportpName Then
+                nameStr += item.MaterialValue.pName
+            End If
+
+            If item.IsExportpConfigFirstTerm Then
+                Dim tmpStr = StrConv(item.MaterialValue.pConfig, VbStrConv.Narrow)
+                nameStr += tmpStr.Split(";").First
+            End If
+
+            If item.IsExportMatchingValue Then
+                Dim matchValues = item.MatchingValues.Split(";")
+                Dim findValue As String = Nothing
+                For Each value In matchValues
+                    If item.MaterialValue.pConfig.Contains(value.Trim) Then
+                        findValue = value.Trim
+                        Exit For
+                    End If
+                Next
+
+                If String.IsNullOrWhiteSpace(findValue) Then
+                    Throw New Exception($"未匹配到 {item.Name} 的型号")
+                End If
+
+                nameStr += findValue
+
+            End If
+
+        Next
+
+        Return nameStr
+
+    End Function
 #End Region
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click

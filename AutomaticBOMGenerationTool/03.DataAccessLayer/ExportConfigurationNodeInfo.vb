@@ -3,9 +3,10 @@
 ''' </summary>
 Public Class ExportConfigurationNodeInfo
     ''' <summary>
-    ''' 选项名,与配置项同名
+    ''' 配置项名称
     ''' </summary>
     Public Name As String
+
     ''' <summary>
     ''' 导出前缀
     ''' </summary>
@@ -30,5 +31,26 @@ Public Class ExportConfigurationNodeInfo
     ''' 匹配型号列表,使用;分隔
     ''' </summary>
     Public MatchingValues As String
+
+    ''' <summary>
+    ''' 选项值ID
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public ValueID As String
+    ''' <summary>
+    ''' 选项值
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public Value As String
+    ''' <summary>
+    ''' 是否是物料节点
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public IsMaterial As Boolean
+    ''' <summary>
+    ''' 替换物料信息
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public MaterialValue As MaterialInfo
 
 End Class

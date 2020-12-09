@@ -78,7 +78,7 @@
                                                                              .IsExportpName = item.Cells(4).Value,
                                                                              .IsExportpConfigFirstTerm = item.Cells(5).Value,
                                                                              .IsExportMatchingValue = item.Cells(6).Value,
-                                                                             .MatchingValues = item.Cells(7).Value
+                                                                             .MatchingValues = StrConv(item.Cells(7).Value, VbStrConv.Narrow)
                                                                              })
         Next
 

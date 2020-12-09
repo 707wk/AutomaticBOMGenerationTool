@@ -11,6 +11,10 @@ Public Class ConfigurationNodeControl
     ''' 当前选择值ID
     ''' </summary>
     Public SelectedValueID As String
+    ''' <summary>
+    ''' 当前选择值
+    ''' </summary>
+    Public SelectedValue As String
 
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
@@ -273,6 +277,13 @@ order by ConfigurationNodeValueInfo.SortID"
         End If
 
         SelectedValueID = tmp.ID
+        If tmp.Cache Is Nothing Then
+            '选项
+            SelectedValue = tmp.Text
+        Else
+            '物料
+            SelectedValue = tmp.Cache.pName
+        End If
 
         Dim tmpList = GetLinkNodeIDList(tmp.ID)
         For Each item In tmpList

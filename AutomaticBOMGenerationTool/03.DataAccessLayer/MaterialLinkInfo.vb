@@ -4,14 +4,22 @@
 Public Class MaterialLinkInfo
     Public ID As String
 
-    '配置项
+    ''' <summary>
+    ''' 配置项
+    ''' </summary>
     Public NodeID As String
-    '配置值
+    ''' <summary>
+    ''' 配置值
+    ''' </summary>
     Public NodeValueID As String
 
-    '关联的配置项
+    ''' <summary>
+    ''' 关联的配置项
+    ''' </summary>
     Public LinkNodeID As String
-    '关联的配置项的配置值
+    ''' <summary>
+    ''' 关联的配置项的配置值
+    ''' </summary>
     Public LinkNodeValueID As String
 
 End Class
