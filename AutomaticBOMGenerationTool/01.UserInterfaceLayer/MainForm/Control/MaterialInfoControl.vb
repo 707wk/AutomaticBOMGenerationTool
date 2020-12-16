@@ -10,7 +10,7 @@
         End Get
         Set(ByVal value As MaterialInfo)
             _Cache = value
-            Me.Size = New Size(320, 80)
+            Me.Size = New Size(290, 80)
         End Set
     End Property
 

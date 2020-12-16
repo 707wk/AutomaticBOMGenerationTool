@@ -198,6 +198,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\MainForm.resx">
       <DependentUpon>MainForm.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -229,6 +230,11 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="logo.ico" />
+    <None Include="res\setting_32px.png" />
+    <None Include="res\all_32px.png" />
+    <None Include="res\analysis_32px.png" />
+    <None Include="res\saveFile_32px.png" />
+    <None Include="res\openFile_32px.png" />
     <None Include="res\toastSuccess_32px.png" />
     <None Include="res\toastInfo_32px.png" />
     <None Include="res\toastFail_32px.png" />

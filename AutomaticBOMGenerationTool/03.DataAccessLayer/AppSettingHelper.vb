@@ -1,4 +1,5 @@
-﻿Imports Newtonsoft.Json
+﻿Imports System.IO
+Imports Newtonsoft.Json
 ''' <summary>
 ''' 全局配置辅助类
 ''' </summary>
@@ -16,6 +17,20 @@ Public Class AppSettingHelper
     Public ReadOnly Property GUID As String
         Get
             Return _GUID
+        End Get
+    End Property
+#End Region
+
+#Region "临时文件夹路径"
+    <Newtonsoft.Json.JsonIgnore>
+    Private _TempDownloadPath As String
+    ''' <summary>
+    ''' 临时文件夹路径
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public ReadOnly Property TempDownloadPath As String
+        Get
+            Return _TempDownloadPath
         End Get
     End Property
 #End Region
@@ -54,6 +69,12 @@ Public Class AppSettingHelper
                 '程序集GUID
                 Dim guid_attr As Attribute = Attribute.GetCustomAttribute(Reflection.Assembly.GetExecutingAssembly(), GetType(Runtime.InteropServices.GuidAttribute))
                 instance._GUID = CType(guid_attr, Runtime.InteropServices.GuidAttribute).Value
+
+                '临时文件夹
+                instance._TempDownloadPath = IO.Path.Combine(
+                    IO.Path.GetTempPath,
+                    $"{{{instance.GUID}}}")
+                IO.Directory.CreateDirectory(IO.Path.Combine(IO.Path.GetTempPath, instance._TempDownloadPath))
 
                 '程序集文件版本
                 Dim assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location
@@ -129,6 +150,38 @@ Public Class AppSettingHelper
     ''' </summary>
     <Newtonsoft.Json.JsonIgnore>
     Public Logger As NLog.Logger = NLog.LogManager.GetCurrentClassLogger()
+#End Region
+
+#Region "清理临时文件"
+    ''' <summary>
+    ''' 清理临时文件
+    ''' </summary>
+    Public Sub ClearTempFiles()
+        For Each item In IO.Directory.EnumerateFiles(Me.TempDownloadPath)
+            Try
+                IO.File.Delete(item)
+            Catch ex As Exception
+            End Try
+        Next
+    End Sub
+#End Region
+
+#Region "获取临时文件大小"
+    ''' <summary>
+    ''' 获取临时文件大小
+    ''' </summary>
+    Public Function GetTempFilesSizeByMB() As Decimal
+        Dim sizeByMB As Decimal = 0
+
+        For Each item In Directory.EnumerateFiles(Me.TempDownloadPath)
+            Dim tmpFileInfo = New FileInfo(item)
+            sizeByMB += tmpFileInfo.Length
+        Next
+
+        sizeByMB = sizeByMB \ 1024 \ 1024
+
+        Return sizeByMB
+    End Function
 #End Region
 
     ''' <summary>

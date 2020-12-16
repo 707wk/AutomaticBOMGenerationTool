@@ -7,8 +7,10 @@ Public Class MainForm
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.GetInstance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit"
 
-        Button2.Enabled = False
-        Button3.Enabled = False
+        ButtonItem3.Enabled = False
+        ButtonItem4.Enabled = False
+        ButtonItem5.Enabled = False
+        ButtonItem6.Enabled = False
 
         '设置使用方式为个人使用
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial
@@ -21,7 +23,7 @@ Public Class MainForm
         'ShowConfigurationNodeControl()
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles ButtonItem2.Click
         Using tmpDialog As New OpenFileDialog With {
                             .Filter = "BON模板文件|*.xlsx",
                             .Multiselect = True
@@ -31,15 +33,17 @@ Public Class MainForm
                 Exit Sub
             End If
 
-            TextBox1.Text = tmpDialog.FileName
-            AppSettingHelper.GetInstance.SourceFilePath = TextBox1.Text
-            Button2.Enabled = True
-            Button3.Enabled = False
+            ToolStripStatusLabel1.Text = tmpDialog.FileName
+            AppSettingHelper.GetInstance.SourceFilePath = tmpDialog.FileName
+
+            ButtonItem4.Enabled = True
+
+            Button2_Click(Nothing, Nothing)
 
         End Using
     End Sub
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles ButtonItem4.Click
         Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
             .Text = "解析数据"
         }
@@ -78,6 +82,11 @@ Public Class MainForm
 
             If tmpDialog.Error IsNot Nothing Then
                 MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "解析出错")
+
+                ButtonItem3.Enabled = False
+                ButtonItem5.Enabled = False
+                ButtonItem6.Enabled = False
+
                 Exit Sub
             End If
 
@@ -85,7 +94,9 @@ Public Class MainForm
 
         ShowConfigurationNodeControl()
 
-        Button3.Enabled = True
+        ButtonItem3.Enabled = True
+        ButtonItem5.Enabled = True
+        ButtonItem6.Enabled = True
 
         UIFormHelper.ToastSuccess("解析完成")
 
@@ -104,8 +115,7 @@ Public Class MainForm
         For Each item In tmpNodeList
 
             Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
-                                          .NodeInfo = item,
-                                          .Width = FlowLayoutPanel1.Width - 32
+                                          .NodeInfo = item
                                           }
 
             FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
@@ -543,21 +553,23 @@ values(
                             Continue For
                         End If
 
-                        Dim tmpMaterialNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpNode.ID, item)
+                        Dim tmppID = item.Trim()
+
+                        Dim tmpMaterialNode = GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpNode.ID, tmppID)
                         '不存在则添加配置值信息
                         If tmpMaterialNode Is Nothing Then
 
-                            Dim tmpMaterialInfo = GetMaterialInfoBypIDFromLocalDatabase(item)
+                            Dim tmpMaterialInfo = GetMaterialInfoBypIDFromLocalDatabase(tmppID)
                             If tmpMaterialInfo Is Nothing Then
-                                Throw New Exception($"{filePath} 第 {rID} 行 未找到品号对应物料信息")
+                                Throw New Exception($"{filePath} 第 {rID} 行 未找到品号 {tmppID} 对应物料信息")
                             End If
 
                             tmpMaterialNode = New ConfigurationNodeValueInfo With {
-                            .ID = tmpMaterialInfo.ID,
-                            .ConfigurationNodeID = tmpNode.ID,
-                            .SortID = childSortID,
-                            .Value = item
-                        }
+                                .ID = tmpMaterialInfo.ID,
+                                .ConfigurationNodeID = tmpNode.ID,
+                                .SortID = childSortID,
+                                .Value = tmppID
+                            }
                             SaveConfigurationNodeValueInfoToLocalDatabase(tmpMaterialNode)
                             childSortID += 1
                         End If
@@ -744,7 +756,11 @@ values(
             cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value.Value})
             cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
 
-            cmd.ExecuteNonQuery()
+            Try
+                cmd.ExecuteNonQuery()
+            Catch ex As Exception
+                Throw New Exception($"品号 {value.Value} 在配置列表不同项中重复出现")
+            End Try
 
         End Using
     End Sub
@@ -1027,7 +1043,7 @@ values(
 
                     '判断品号是否在配置表中
                     If Not pIDList.Contains(tmpStr) Then
-                        Throw New Exception($"{filePath} 第 {rID} 行 替换物料未在配置列表中出现")
+                        Throw New Exception($"{filePath} 第 {rID} 行 替换物料 {tmpStr} 未在配置列表中出现")
                     End If
 
                 Next
@@ -1233,7 +1249,7 @@ values(
     End Sub
 #End Region
 
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles ButtonItem3.Click
         Dim outputFilePath As String
 
         Using tmpDialog As New SaveFileDialog With {
@@ -1460,9 +1476,12 @@ where ConfigurationNodeID=@ConfigurationNodeID"
     End Function
 #End Region
 
-    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles ButtonItem6.Click
         Dim tmpDialog As New ExportSettingsForm
         tmpDialog.ShowDialog()
     End Sub
 
+    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
+        UIFormHelper.ToastWarning("功能未开发")
+    End Sub
 End Class

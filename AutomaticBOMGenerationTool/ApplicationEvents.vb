@@ -24,7 +24,7 @@ Namespace My
 
         Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
             AppSettingHelper.SaveToLocaltion()
-
+            AppSettingHelper.GetInstance.ClearTempFiles()
         End Sub
 
     End Class
