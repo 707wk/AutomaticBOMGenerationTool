@@ -165,7 +165,7 @@ delete from MaterialLinkInfo;"
 
         Dim headerLocation = FindHeaderLocation(filePath, "替代料品号集")
 
-        Using readFS = File.OpenRead(filePath)
+        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -225,7 +225,7 @@ delete from MaterialLinkInfo;"
 
         Dim headerLocation = FindHeaderLocation(filePath, "品 号")
 
-        Using readFS = File.OpenRead(filePath)
+        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -341,7 +341,7 @@ values(
 
         Dim findStr = StrConv(headText, VbStrConv.Narrow).ToUpper
 
-        Using readFS = File.OpenRead(filePath)
+        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -441,7 +441,7 @@ values(
 
         Dim headerLocation = FindHeaderLocation(filePath, "产品配置选项")
 
-        Using readFS = File.OpenRead(filePath)
+        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -602,7 +602,7 @@ values(
 
         Dim headerLocation = FindHeaderLocation(filePath, "料品固定搭配集")
 
-        Using readFS = File.OpenRead(filePath)
+        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -1015,7 +1015,7 @@ values(
                                             pIDList As HashSet(Of String))
         Dim headerLocation = FindHeaderLocation(filePath, "品 号")
 
-        Using readFS = File.OpenRead(filePath)
+        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -1060,7 +1060,7 @@ values(
     Private Sub CreateTemplate(filePath As String)
         Dim headerLocation = FindHeaderLocation(filePath, "显示屏规格")
 
-        Using readFS = File.OpenRead(filePath)
+        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -1161,7 +1161,7 @@ values(
 
         Dim headerLocation = FindHeaderLocation(filePath, "品 号")
 
-        Using readFS = File.OpenRead(filePath)
+        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -1362,7 +1362,7 @@ where ConfigurationNodeID=@ConfigurationNodeID"
 
         Dim headerLocation = FindHeaderLocation(AppSettingHelper.TemplateFilePath, "品 号")
 
-        Using readFS = File.OpenRead(AppSettingHelper.TemplateFilePath)
+        Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First

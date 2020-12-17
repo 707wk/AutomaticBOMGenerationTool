@@ -384,11 +384,11 @@ group by MaterialLinkInfo.LinkNodeID"
             AddHandler item.CheckedChanged, AddressOf CheckedChanged
         Next
 
-        'If FlowLayoutPanel1.Controls.Count <> 0 Then
-        '默认选中第一项
-        Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
-        tmpMaterialInfoControl.Checked = True
-        'End If
+        If FlowLayoutPanel1.Controls.Count <> 0 Then
+            '默认选中第一项
+            Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
+            tmpMaterialInfoControl.Checked = True
+        End If
 
     End Sub
 #End Region
