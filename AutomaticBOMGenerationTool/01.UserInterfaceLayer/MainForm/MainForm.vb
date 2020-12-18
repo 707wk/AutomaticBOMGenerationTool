@@ -7,20 +7,35 @@ Public Class MainForm
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.GetInstance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit"
 
-        ButtonItem3.Enabled = False
-        ButtonItem4.Enabled = False
-        ButtonItem5.Enabled = False
-        ButtonItem6.Enabled = False
-
         '设置使用方式为个人使用
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial
 
         UIFormHelper.UIForm = Me
 
+        '待导出列表
+        With ExportBOMList
+            .EditMode = DataGridViewEditMode.EditOnEnter
+            .AllowDrop = True
+            .ReadOnly = True
+            .ColumnHeadersDefaultCellStyle.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
+            .RowHeadersWidth = 80
+
+            ExportBOMList.Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .Width = 800})
+            Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "单价(m²)", .Width = 120}
+            tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            ExportBOMList.Columns.Add(tmpDataGridViewTextBoxColumn)
+
+        End With
+
     End Sub
 
     Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         'ShowConfigurationNodeControl()
+
+        FlowLayoutPanel1_ControlRemoved(Nothing, Nothing)
+        ExportBOMList_RowsRemoved(Nothing, Nothing)
+        ToolStripStatusLabel1_TextChanged(Nothing, Nothing)
+
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles ButtonItem2.Click
@@ -36,14 +51,17 @@ Public Class MainForm
             ToolStripStatusLabel1.Text = tmpDialog.FileName
             AppSettingHelper.GetInstance.SourceFilePath = tmpDialog.FileName
 
-            ButtonItem4.Enabled = True
-
             Button2_Click(Nothing, Nothing)
 
         End Using
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles ButtonItem4.Click
+
+        AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Clear()
+        ExportBOMList.Rows.Clear()
+        FlowLayoutPanel1.Controls.Clear()
+
         Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
             .Text = "解析数据"
         }
@@ -82,21 +100,13 @@ Public Class MainForm
 
             If tmpDialog.Error IsNot Nothing Then
                 MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "解析出错")
-
-                ButtonItem3.Enabled = False
-                ButtonItem5.Enabled = False
-                ButtonItem6.Enabled = False
-
+                ToolStripStatusLabel1.Text = "文件解析出错"
                 Exit Sub
             End If
 
         End Using
 
         ShowConfigurationNodeControl()
-
-        ButtonItem3.Enabled = True
-        ButtonItem5.Enabled = True
-        ButtonItem6.Enabled = True
 
         UIFormHelper.ToastSuccess("解析完成")
 
@@ -109,14 +119,19 @@ Public Class MainForm
     Private Sub ShowConfigurationNodeControl()
 
         AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Clear()
-
+        ExportBOMList.Rows.Clear()
         FlowLayoutPanel1.Controls.Clear()
+
         Dim tmpNodeList = GetConfigurationNodeInfoItems()
+
+        Dim tmpIndex = 1
         For Each item In tmpNodeList
 
             Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
-                                          .NodeInfo = item
+                                          .NodeInfo = item,
+                                          .Index = tmpIndex
                                           }
+            tmpIndex += 1
 
             FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
 
@@ -127,6 +142,76 @@ Public Class MainForm
         For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
             item.Init()
         Next
+
+        ShowUnitPrice()
+
+    End Sub
+#End Region
+
+#Region "显示单价"
+    ''' <summary>
+    ''' 显示单价
+    ''' </summary>
+    Friend Sub ShowUnitPrice()
+
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "计算单价"
+        }
+
+            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+                                Dim stepCount = 4
+
+                                be.Write("获取配置项信息", 100 / stepCount * 0)
+                                Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                                                       Where item.NodeInfo.IsMaterial = True
+                                                                       Select New ConfigurationNodeRowInfo() With {
+                                                   .ConfigurationNodeID = item.NodeInfo.ID,
+                                                   .SelectedValueID = item.SelectedValueID
+                                                   }
+                                                   ).ToList
+
+                                be.Write("获取位置及物料信息", 100 / stepCount * 1)
+                                For Each item In tmpConfigurationNodeRowInfoList
+
+                                    item.MaterialRowIDList = GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
+                                    item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
+
+                                Next
+
+                                be.Write("处理物料信息", 100 / stepCount * 2)
+                                Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                                    Using tmpExcelPackage As New ExcelPackage(readFS)
+                                        Dim tmpWorkBook = tmpExcelPackage.Workbook
+                                        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                                        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                                        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                                        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                                        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+                                        ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
+
+                                        be.Write("计算单价", 100 / stepCount * 3)
+                                        CalculateUnitPrice(tmpExcelPackage)
+
+                                        Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "单价")
+
+                                        be.Result = $"{tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value:n2}"
+
+                                    End Using
+                                End Using
+
+                            End Sub)
+
+            If tmpDialog.Error IsNot Nothing Then
+                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "计算出错")
+                Exit Sub
+            End If
+
+            ToolStripLabel1.Text = $"当前单价: {tmpDialog.Result}/m²"
+            ToolStripLabel1.Tag = tmpDialog.Result
+
+        End Using
 
     End Sub
 #End Region
@@ -1249,7 +1334,7 @@ values(
     End Sub
 #End Region
 
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles ButtonItem3.Click
+    Private Sub ExportCurrentButton_Click(sender As Object, e As EventArgs) Handles ExportCurrentButton.Click
         Dim outputFilePath As String
 
         Using tmpDialog As New SaveFileDialog With {
@@ -1383,6 +1468,8 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                     Next
                 Next
 
+                CalculateUnitPrice(tmpExcelPackage)
+
                 '删除物料标记列
                 headerLocation = FindHeaderLocation(AppSettingHelper.TemplateFilePath, "替换料")
                 tmpWorkSheet.DeleteColumn(headerLocation.X)
@@ -1399,6 +1486,41 @@ where ConfigurationNodeID=@ConfigurationNodeID"
 
             End Using
         End Using
+    End Sub
+#End Region
+
+#Region "替换物料"
+    ''' <summary>
+    ''' 替换物料
+    ''' </summary>
+    Private Sub ReplaceMaterial(
+                               wb As ExcelPackage,
+                               values As List(Of ConfigurationNodeRowInfo))
+
+        Dim headerLocation = FindHeaderLocation(wb, "品 号")
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+        For Each node In values
+            For Each item In node.MaterialRowIDList
+                tmpWorkSheet.Cells(item, headerLocation.X).Value = node.MaterialValue.pID
+                tmpWorkSheet.Cells(item, headerLocation.X + 1).Value = node.MaterialValue.pName
+                tmpWorkSheet.Cells(item, headerLocation.X + 2).Value = node.MaterialValue.pConfig
+                tmpWorkSheet.Cells(item, headerLocation.X + 3).Value = node.MaterialValue.pUnit
+                tmpWorkSheet.Cells(item, headerLocation.X + 4).Value = node.MaterialValue.pCount
+                tmpWorkSheet.Cells(item, headerLocation.X + 5).Value = node.MaterialValue.pUnitPrice
+            Next
+        Next
+
+        CalculateUnitPrice(tmpExcelPackage)
+
     End Sub
 #End Region
 
@@ -1481,7 +1603,229 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         tmpDialog.ShowDialog()
     End Sub
 
-    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
-        UIFormHelper.ToastWarning("功能未开发")
+    Private Sub AddCurrentToExportBOMListButton_Click(sender As Object, e As EventArgs) Handles AddCurrentToExportBOMListButton.Click
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "导出数据"
+        }
+
+            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+                                Dim stepCount = 3
+
+                                be.Write("获取配置项信息", 100 / stepCount * 0)
+                                Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                                                       Where item.NodeInfo.IsMaterial = True
+                                                                       Select New ConfigurationNodeRowInfo() With {
+                                                   .ConfigurationNodeID = item.NodeInfo.ID,
+                                                   .SelectedValueID = item.SelectedValueID
+                                                   }
+                                                   ).ToList
+
+                                be.Write("获取导出项信息", 100 / stepCount * 1)
+                                For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                                    Dim findNode = (From node As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
+                                                    Select node).First()
+
+                                    If findNode Is Nothing Then Continue For
+
+                                    item.ValueID = findNode.SelectedValueID
+                                    item.Value = findNode.SelectedValue
+                                    item.IsMaterial = findNode.NodeInfo.IsMaterial
+                                    If item.IsMaterial Then
+                                        item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                                    End If
+
+                                Next
+
+                                be.Write("获取配置项信息", 100 / stepCount * 2)
+                                Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                                    Using tmpExcelPackage As New ExcelPackage(readFS)
+                                        Dim tmpWorkBook = tmpExcelPackage.Workbook
+                                        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                                        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                                        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                                        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                                        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+                                        be.Result = {
+                                        JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList),
+                                        tmpConfigurationNodeRowInfoList
+                                        }
+
+                                    End Using
+                                End Using
+
+                            End Sub)
+
+            If tmpDialog.Error IsNot Nothing Then
+                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "导出出错")
+                Exit Sub
+            End If
+
+            ExportBOMList.Rows.Add({False, tmpDialog.Result(0), 0})
+            ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpDialog.Result(1)
+
+        End Using
     End Sub
+
+    Private Sub ExportAllBOMButton_Click(sender As Object, e As EventArgs) Handles ExportAllBOMButton.Click
+
+    End Sub
+
+    Private Sub DeleteButton_Click(sender As Object, e As EventArgs) Handles DeleteButton.Click
+        Dim selectedCount As Integer = 0
+        For Each item As DataGridViewRow In ExportBOMList.Rows
+            If item.Cells(0).EditedFormattedValue Then
+                selectedCount += 1
+            End If
+        Next
+
+        If selectedCount = 0 Then
+            Exit Sub
+        End If
+
+        If MsgBox("确定移除选中项?", MsgBoxStyle.YesNo Or MsgBoxStyle.Question, DeleteButton.Text) <> MsgBoxResult.Yes Then
+            Exit Sub
+        End If
+
+        '删除
+        For rowID = ExportBOMList.Rows.Count - 1 To 0 Step -1
+            If ExportBOMList.Rows(rowID).Cells(0).EditedFormattedValue Then
+                ExportBOMList.Rows.RemoveAt(rowID)
+            End If
+        Next
+    End Sub
+
+#Region "控件状态管理"
+    Private Sub FlowLayoutPanel1_ControlAdded(sender As Object, e As ControlEventArgs) Handles FlowLayoutPanel1.ControlAdded
+        AddCurrentToExportBOMListButton.Enabled = True
+        ExportCurrentButton.Enabled = True
+    End Sub
+
+    Private Sub FlowLayoutPanel1_ControlRemoved(sender As Object, e As ControlEventArgs) Handles FlowLayoutPanel1.ControlRemoved
+        If FlowLayoutPanel1.Controls.Count = 0 Then
+            AddCurrentToExportBOMListButton.Enabled = False
+            ExportCurrentButton.Enabled = False
+        End If
+    End Sub
+
+    Private Sub ExportBOMList_RowsAdded(sender As Object, e As DataGridViewRowsAddedEventArgs) Handles ExportBOMList.RowsAdded
+        ExportAllBOMButton.Enabled = True
+        DeleteButton.Enabled = True
+    End Sub
+
+    Private Sub ExportBOMList_RowsRemoved(sender As Object, e As DataGridViewRowsRemovedEventArgs) Handles ExportBOMList.RowsRemoved
+        If ExportBOMList.Rows.Count = 0 Then
+            ExportAllBOMButton.Enabled = False
+            DeleteButton.Enabled = False
+        End If
+    End Sub
+
+    Private Sub ToolStripStatusLabel1_TextChanged(sender As Object, e As EventArgs) Handles ToolStripStatusLabel1.TextChanged
+        If ToolStripStatusLabel1.Text.Contains(":") Then
+            ButtonItem4.Enabled = True
+            ButtonItem6.Enabled = True
+        Else
+            ButtonItem4.Enabled = False
+            ButtonItem6.Enabled = False
+        End If
+    End Sub
+#End Region
+
+#Region "计算单价"
+    ''' <summary>
+    ''' 计算单价
+    ''' </summary>
+    Friend Sub CalculateUnitPrice(wb As ExcelPackage)
+        Dim headerLocation = FindHeaderLocation(wb, "阶层")
+        Dim maxLevel = FindHeaderLocation(wb, "替换料").X - headerLocation.X
+        Dim levelColID = headerLocation.X
+        Dim countColID = FindHeaderLocation(wb, "数量").X
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+        '从最底层纵向倒序遍历
+        For levelID = maxLevel To 1 Step -1
+
+            Dim tmpUnitPrice As Decimal = 0
+
+            For rowID = rowMaxID - 2 To headerLocation.Y + 1 Step -1
+
+                Dim nowRowLevel = GetLevel(wb, rowID, levelColID, maxLevel)
+
+                If nowRowLevel = levelID Then
+                    '当前节点与当前阶级相同
+                    tmpUnitPrice =
+                        tmpUnitPrice +
+                        Convert.ToDecimal($"0{tmpWorkSheet.Cells(rowID, countColID).Value}") *
+                        Convert.ToDecimal($"0{tmpWorkSheet.Cells(rowID, countColID + 1).Value}")
+
+                ElseIf nowRowLevel = 0 OrElse
+                    nowRowLevel > levelID Then
+                    '跳过空行和低于当前阶级的行
+
+                ElseIf nowRowLevel = levelID - 1 Then
+                    '上一级节点
+                    Dim lastRowLevel = GetLevel(wb, rowID + 1, levelColID, maxLevel)
+                    If lastRowLevel = levelID Then
+                        '如果是上一节点的父节点
+                        tmpWorkSheet.Cells(rowID, countColID + 1).Value = tmpUnitPrice
+                        tmpUnitPrice = 0
+                    Else
+                        '跳过当前行
+                    End If
+
+                End If
+
+            Next
+
+        Next
+
+    End Sub
+
+#Region "获取阶级等级,未找到则返回0"
+    ''' <summary>
+    ''' 获取阶级等级,未找到则返回0
+    ''' </summary>
+    Private Function GetLevel(
+                             wb As ExcelPackage,
+                             rowID As Integer,
+                             colID As Integer,
+                             maxLevel As Integer) As Integer
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+        Dim tmpLevel = 1
+
+        For i001 = colID To colID + maxLevel - 1
+            If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rowID, i001).Value}") Then
+                tmpLevel += 1
+            Else
+
+                Return tmpLevel
+            End If
+        Next
+
+        Return tmpLevel
+
+    End Function
+#End Region
+
+#End Region
+
 End Class

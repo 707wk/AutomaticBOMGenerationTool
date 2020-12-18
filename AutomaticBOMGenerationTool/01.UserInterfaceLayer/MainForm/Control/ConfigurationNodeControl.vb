@@ -16,9 +16,19 @@ Public Class ConfigurationNodeControl
     ''' </summary>
     Public SelectedValue As String
 
+    ''' <summary>
+    ''' 序号
+    ''' </summary>
+    Public Index As Integer
+
+    ''' <summary>
+    ''' 是否是手动点击的
+    ''' </summary>
+    Private IsUserChecked As Boolean = True
+
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        Me.Label1.Text = $"{NodeInfo.Name} :"
+        Me.Label1.Text = $"{Index}. {NodeInfo.Name} :"
 
     End Sub
 
@@ -30,6 +40,8 @@ Public Class ConfigurationNodeControl
         If GetLinkCount(NodeInfo.ID) > 0 Then
             Exit Sub
         End If
+
+        IsUserChecked = False
 
         '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
@@ -60,6 +72,7 @@ Public Class ConfigurationNodeControl
         Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
         tmpMaterialInfoControl.Checked = True
 
+        IsUserChecked = True
     End Sub
 #End Region
 
@@ -291,6 +304,10 @@ order by ConfigurationNodeValueInfo.SortID"
             tmpControl.UpdateValueWithOtherConfiguration()
         Next
 
+        If IsUserChecked Then
+            UIFormHelper.UIForm.ShowUnitPrice()
+        End If
+
     End Sub
 
 #Region "获取值关联的配置项"
@@ -330,6 +347,10 @@ group by MaterialLinkInfo.LinkNodeID"
     ''' 根据其他配置项更新自身选项
     ''' </summary>
     Private Sub UpdateValueWithOtherConfiguration()
+        IsUserChecked = False
+
+        SelectedValueID = Nothing
+        SelectedValue = Nothing
 
         Dim originHashSet = GetConfigurationNodeValueIDItems(NodeInfo.ID)
 
@@ -379,17 +400,20 @@ group by MaterialLinkInfo.LinkNodeID"
             Next
         End If
 
-        '添加事件绑定
-        For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
-            AddHandler item.CheckedChanged, AddressOf CheckedChanged
-        Next
 
-        If FlowLayoutPanel1.Controls.Count <> 0 Then
+        If FlowLayoutPanel1.Controls.Count > 0 Then
+
+            '添加事件绑定
+            For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
+                AddHandler item.CheckedChanged, AddressOf CheckedChanged
+            Next
+
             '默认选中第一项
             Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
             tmpMaterialInfoControl.Checked = True
         End If
 
+        IsUserChecked = True
     End Sub
 #End Region
 

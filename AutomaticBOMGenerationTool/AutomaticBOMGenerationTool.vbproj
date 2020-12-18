@@ -231,6 +231,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="logo.ico" />
+    <None Include="res\saveFile_20px.png" />
     <None Include="res\setting_32px.png" />
     <None Include="res\all_32px.png" />
     <None Include="res\analysis_32px.png" />

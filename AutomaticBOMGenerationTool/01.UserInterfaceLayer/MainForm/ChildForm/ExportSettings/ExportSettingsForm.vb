@@ -68,6 +68,11 @@
     End Sub
 
     Private Sub AddOrSaveButton_Click(sender As Object, e As EventArgs) Handles AddOrSaveButton.Click
+        If CheckBoxDataGridView1.Rows.Count = 0 Then
+            UIFormHelper.ToastWarning("至少需要一项数据", Me)
+            Exit Sub
+        End If
+
         AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList.Clear()
         For Each item As DataGridViewRow In CheckBoxDataGridView1.Rows
             AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList.Add(New ExportConfigurationNodeInfo With
