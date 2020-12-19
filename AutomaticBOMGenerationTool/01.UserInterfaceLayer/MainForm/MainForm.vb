@@ -21,7 +21,7 @@ Public Class MainForm
             .RowHeadersWidth = 80
 
             ExportBOMList.Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .Width = 800})
-            Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "单价(m²)", .Width = 120}
+            Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "单价", .Width = 120}
             tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             ExportBOMList.Columns.Add(tmpDataGridViewTextBoxColumn)
 
@@ -154,64 +154,60 @@ Public Class MainForm
     ''' </summary>
     Friend Sub ShowUnitPrice()
 
-        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-            .Text = "计算单价"
-        }
+        Try
+            '检测物料完整性
+            For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                If String.IsNullOrWhiteSpace(item.SelectedValueID) Then
+                    item.Select()
+                    Throw New Exception($"配置项 {item.NodeInfo.Name} 未找到可替换物料")
+                End If
+            Next
 
-            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                Dim stepCount = 4
+            '获取配置项信息
+            Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                                   Where item.NodeInfo.IsMaterial = True
+                                                   Select New ConfigurationNodeRowInfo() With {
+                                                       .ConfigurationNodeID = item.NodeInfo.ID,
+                                                       .SelectedValueID = item.SelectedValueID
+                                                       }
+                                                       ).ToList
 
-                                be.Write("获取配置项信息", 100 / stepCount * 0)
-                                Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
-                                                                       Where item.NodeInfo.IsMaterial = True
-                                                                       Select New ConfigurationNodeRowInfo() With {
-                                                   .ConfigurationNodeID = item.NodeInfo.ID,
-                                                   .SelectedValueID = item.SelectedValueID
-                                                   }
-                                                   ).ToList
+            '获取位置及物料信息
+            For Each item In tmpConfigurationNodeRowInfoList
 
-                                be.Write("获取位置及物料信息", 100 / stepCount * 1)
-                                For Each item In tmpConfigurationNodeRowInfoList
+                item.MaterialRowIDList = GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
+                item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
 
-                                    item.MaterialRowIDList = GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
-                                    item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
+            Next
 
-                                Next
+            '处理物料信息
+            Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                Using tmpExcelPackage As New ExcelPackage(readFS)
+                    Dim tmpWorkBook = tmpExcelPackage.Workbook
+                    Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                                be.Write("处理物料信息", 100 / stepCount * 2)
-                                Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-                                    Using tmpExcelPackage As New ExcelPackage(readFS)
-                                        Dim tmpWorkBook = tmpExcelPackage.Workbook
-                                        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+                    Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
+                    Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
+                    Dim colMaxID = tmpWorkSheet.Dimension.End.Column
+                    Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
-                                        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
-                                        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
-                                        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
-                                        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+                    ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
 
-                                        ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
+                    '计算单价
+                    CalculateUnitPrice(tmpExcelPackage)
 
-                                        be.Write("计算单价", 100 / stepCount * 3)
-                                        CalculateUnitPrice(tmpExcelPackage)
+                    Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "单价")
 
-                                        Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "单价")
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value:n4}"
+                    ToolStripLabel1.Text = $"当前单价: ￥{tmpStr}"
+                    ToolStripLabel1.Tag = tmpStr
 
-                                        be.Result = $"{tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value:n2}"
+                End Using
+            End Using
 
-                                    End Using
-                                End Using
-
-                            End Sub)
-
-            If tmpDialog.Error IsNot Nothing Then
-                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "计算出错")
-                Exit Sub
-            End If
-
-            ToolStripLabel1.Text = $"当前单价: {tmpDialog.Result}/m²"
-            ToolStripLabel1.Tag = tmpDialog.Result
-
-        End Using
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "计算出错")
+        End Try
 
     End Sub
 #End Region
@@ -1354,9 +1350,16 @@ values(
         }
 
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                Dim stepCount = 5
+                                Dim stepCount = 6
 
-                                be.Write("获取配置项信息", 100 / stepCount * 0)
+                                be.Write("检测物料完整性", 100 / stepCount * 0)
+                                For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                    If String.IsNullOrWhiteSpace(item.SelectedValueID) Then
+                                        Throw New Exception($"配置项 {item.NodeInfo.Name} 未找到可替换物料")
+                                    End If
+                                Next
+
+                                be.Write("获取配置项信息", 100 / stepCount * 1)
                                 Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
                                                                        Where item.NodeInfo.IsMaterial = True
                                                                        Select New ConfigurationNodeRowInfo() With {
@@ -1365,7 +1368,7 @@ values(
                                                    }
                                                    ).ToList
 
-                                be.Write("获取导出项信息", 100 / stepCount * 1)
+                                be.Write("获取导出项信息", 100 / stepCount * 2)
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
                                     Dim findNode = (From node As ConfigurationNodeControl In FlowLayoutPanel1.Controls
                                                     Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
@@ -1382,7 +1385,7 @@ values(
 
                                 Next
 
-                                be.Write("获取位置及物料信息", 100 / stepCount * 2)
+                                be.Write("获取位置及物料信息", 100 / stepCount * 3)
                                 For Each item In tmpConfigurationNodeRowInfoList
 
                                     item.MaterialRowIDList = GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
@@ -1390,10 +1393,10 @@ values(
 
                                 Next
 
-                                be.Write("处理物料信息", 100 / stepCount * 3)
+                                be.Write("处理物料信息", 100 / stepCount * 4)
                                 ReplaceMaterial(outputFilePath, tmpConfigurationNodeRowInfoList)
 
-                                be.Write("打开保存文件夹", 100 / stepCount * 4)
+                                be.Write("打开保存文件夹", 100 / stepCount * 5)
                                 FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
 
                             End Sub)
@@ -1609,9 +1612,16 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         }
 
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                Dim stepCount = 3
+                                Dim stepCount = 4
 
-                                be.Write("获取配置项信息", 100 / stepCount * 0)
+                                be.Write("检测物料完整性", 100 / stepCount * 0)
+                                For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                    If String.IsNullOrWhiteSpace(item.SelectedValueID) Then
+                                        Throw New Exception($"配置项 {item.NodeInfo.Name} 未找到可替换物料")
+                                    End If
+                                Next
+
+                                be.Write("获取配置项信息", 100 / stepCount * 1)
                                 Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
                                                                        Where item.NodeInfo.IsMaterial = True
                                                                        Select New ConfigurationNodeRowInfo() With {
@@ -1620,7 +1630,7 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                                                    }
                                                    ).ToList
 
-                                be.Write("获取导出项信息", 100 / stepCount * 1)
+                                be.Write("获取导出项信息", 100 / stepCount * 2)
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
                                     Dim findNode = (From node As ConfigurationNodeControl In FlowLayoutPanel1.Controls
                                                     Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
@@ -1637,7 +1647,7 @@ where ConfigurationNodeID=@ConfigurationNodeID"
 
                                 Next
 
-                                be.Write("获取配置项信息", 100 / stepCount * 2)
+                                be.Write("计算BOM名称", 100 / stepCount * 3)
                                 Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
                                     Using tmpExcelPackage As New ExcelPackage(readFS)
                                         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1663,7 +1673,7 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                 Exit Sub
             End If
 
-            ExportBOMList.Rows.Add({False, tmpDialog.Result(0), 0})
+            ExportBOMList.Rows.Add({False, tmpDialog.Result(0), $"￥{ToolStripLabel1.Tag}"})
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpDialog.Result(1)
 
         End Using
@@ -1810,18 +1820,16 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         Dim colMaxID = tmpWorkSheet.Dimension.End.Column
         Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
-        Dim tmpLevel = 1
-
         For i001 = colID To colID + maxLevel - 1
             If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rowID, i001).Value}") Then
-                tmpLevel += 1
+
             Else
 
-                Return tmpLevel
+                Return i001 - colID + 1
             End If
         Next
 
-        Return tmpLevel
+        Return 0
 
     End Function
 #End Region

@@ -411,6 +411,10 @@ group by MaterialLinkInfo.LinkNodeID"
             '默认选中第一项
             Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
             tmpMaterialInfoControl.Checked = True
+
+            Me.Label1.BackColor = Me.BackColor
+        Else
+            Me.Label1.BackColor = UIFormHelper.ErrorColor
         End If
 
         IsUserChecked = True

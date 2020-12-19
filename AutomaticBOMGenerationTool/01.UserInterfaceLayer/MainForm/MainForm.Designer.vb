@@ -125,10 +125,11 @@ Partial Class MainForm
         '
         'ToolStripLabel1
         '
+        Me.ToolStripLabel1.BackColor = System.Drawing.SystemColors.Control
         Me.ToolStripLabel1.Font = New System.Drawing.Font("Microsoft YaHei UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.ToolStripLabel1.Name = "ToolStripLabel1"
-        Me.ToolStripLabel1.Size = New System.Drawing.Size(91, 24)
-        Me.ToolStripLabel1.Text = "当前单价: 0/m²"
+        Me.ToolStripLabel1.Size = New System.Drawing.Size(75, 24)
+        Me.ToolStripLabel1.Text = "当前单价: 无"
         '
         'RibbonControl1
         '
