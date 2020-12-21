@@ -1151,6 +1151,14 @@ values(
                 Dim colMaxID = tmpWorkSheet.Dimension.End.Column
                 Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
+                '清除单元格背景色
+                For rid = rowMinID To rowMaxID
+                    For cid = colMinID To colMaxID
+                        tmpWorkSheet.Cells(rid, cid).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                        tmpWorkSheet.Cells(rid, cid).Style.Fill.BackgroundColor.SetColor(Color.White)
+                    Next
+                Next
+
                 '移除核价产品配置表
                 tmpWorkSheet.DeleteRow(tmpWorkSheet.Dimension.Start.Row, headerLocation.Y - 1)
 
@@ -1361,24 +1369,29 @@ values(
 
                                 be.Write("获取配置项信息", 100 / stepCount * 1)
                                 Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
-                                                                       Where item.NodeInfo.IsMaterial = True
                                                                        Select New ConfigurationNodeRowInfo() With {
-                                                   .ConfigurationNodeID = item.NodeInfo.ID,
-                                                   .SelectedValueID = item.SelectedValueID
-                                                   }
-                                                   ).ToList
+                                                                           .ConfigurationNodeID = item.NodeInfo.ID,
+                                                                           .ConfigurationNodeName = item.NodeInfo.Name,
+                                                                           .SelectedValueID = item.SelectedValueID,
+                                                                           .SelectedValue = item.SelectedValue,
+                                                                           .IsMaterial = item.NodeInfo.IsMaterial
+                                                                           }
+                                                                           ).ToList
 
                                 be.Write("获取导出项信息", 100 / stepCount * 2)
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
-                                    Dim findNode = (From node As ConfigurationNodeControl In FlowLayoutPanel1.Controls
-                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
+                                    item.Exist = False
+
+                                    Dim findNode = (From node In tmpConfigurationNodeRowInfoList
+                                                    Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
                                                     Select node).First()
 
                                     If findNode Is Nothing Then Continue For
 
+                                    item.Exist = True
                                     item.ValueID = findNode.SelectedValueID
                                     item.Value = findNode.SelectedValue
-                                    item.IsMaterial = findNode.NodeInfo.IsMaterial
+                                    item.IsMaterial = findNode.IsMaterial
                                     If item.IsMaterial Then
                                         item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
                                     End If
@@ -1387,6 +1400,9 @@ values(
 
                                 be.Write("获取位置及物料信息", 100 / stepCount * 3)
                                 For Each item In tmpConfigurationNodeRowInfoList
+                                    If Not item.IsMaterial Then
+                                        Continue For
+                                    End If
 
                                     item.MaterialRowIDList = GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
                                     item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
@@ -1461,6 +1477,10 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                 Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
                 For Each node In values
+                    If Not node.IsMaterial Then
+                        Continue For
+                    End If
+
                     For Each item In node.MaterialRowIDList
                         tmpWorkSheet.Cells(item, headerLocation.X).Value = node.MaterialValue.pID
                         tmpWorkSheet.Cells(item, headerLocation.X + 1).Value = node.MaterialValue.pName
@@ -1481,6 +1501,14 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                 headerLocation = FindHeaderLocation(AppSettingHelper.TemplateFilePath, "显示屏规格")
                 Dim BOMName = JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
                 tmpWorkSheet.Cells(headerLocation.Y, headerLocation.X + 2).Value = BOMName
+
+                '自动调整行高
+                For rid = tmpWorkSheet.Dimension.Start.Row To tmpWorkSheet.Dimension.End.Row
+                    tmpWorkSheet.Row(rid).CustomHeight = False
+                Next
+
+                '更改焦点
+                tmpWorkSheet.Select(tmpWorkSheet.Cells(1, 1).Address, True)
 
                 '另存为
                 Using tmpSaveFileStream = File.Create(outputFilePath)
@@ -1555,7 +1583,7 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         '根据选项拼接
         For Each item In values
             '跳过未出现在BOM中的配置项
-            If String.IsNullOrWhiteSpace(item.ValueID) Then
+            If Not item.Exist Then
                 Continue For
             End If
 
@@ -1623,24 +1651,29 @@ where ConfigurationNodeID=@ConfigurationNodeID"
 
                                 be.Write("获取配置项信息", 100 / stepCount * 1)
                                 Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
-                                                                       Where item.NodeInfo.IsMaterial = True
                                                                        Select New ConfigurationNodeRowInfo() With {
-                                                   .ConfigurationNodeID = item.NodeInfo.ID,
-                                                   .SelectedValueID = item.SelectedValueID
-                                                   }
-                                                   ).ToList
+                                                                           .ConfigurationNodeID = item.NodeInfo.ID,
+                                                                           .ConfigurationNodeName = item.NodeInfo.Name,
+                                                                           .SelectedValueID = item.SelectedValueID,
+                                                                           .SelectedValue = item.SelectedValue,
+                                                                           .IsMaterial = item.NodeInfo.IsMaterial
+                                                                           }
+                                                                           ).ToList
 
                                 be.Write("获取导出项信息", 100 / stepCount * 2)
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
-                                    Dim findNode = (From node As ConfigurationNodeControl In FlowLayoutPanel1.Controls
-                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
+                                    item.Exist = False
+
+                                    Dim findNode = (From node In tmpConfigurationNodeRowInfoList
+                                                    Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
                                                     Select node).First()
 
                                     If findNode Is Nothing Then Continue For
 
+                                    item.Exist = True
                                     item.ValueID = findNode.SelectedValueID
                                     item.Value = findNode.SelectedValue
-                                    item.IsMaterial = findNode.NodeInfo.IsMaterial
+                                    item.IsMaterial = findNode.IsMaterial
                                     If item.IsMaterial Then
                                         item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
                                     End If
@@ -1680,6 +1713,89 @@ where ConfigurationNodeID=@ConfigurationNodeID"
     End Sub
 
     Private Sub ExportAllBOMButton_Click(sender As Object, e As EventArgs) Handles ExportAllBOMButton.Click
+        Dim saveFolderPath As String
+
+        Using tmpDialog As New FolderBrowserDialog
+            If tmpDialog.ShowDialog <> DialogResult.OK Then
+                Exit Sub
+            End If
+            saveFolderPath = tmpDialog.SelectedPath
+        End Using
+
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "导出数据"
+        }
+
+            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+
+                                be.Write("获取导出项")
+                                For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                                    item.Exist = False
+
+                                    Dim findNode = (From node As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
+                                                    Select node).First()
+
+                                    If findNode Is Nothing Then Continue For
+
+                                    item.Exist = True
+
+                                Next
+
+                                be.Write("导出中")
+
+                                Dim tmpBOMList = CType(be.Args, List(Of List(Of ConfigurationNodeRowInfo)))
+                                For i001 = 0 To tmpBOMList.Count - 1
+                                    Dim tmpConfigurationNodeRowInfoList = tmpBOMList(i001)
+
+                                    be.Write($"导出第 {i001 + 1} 个", CInt(100 / tmpBOMList.Count * i001))
+
+                                    For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                                        If Not item.Exist Then
+                                            Continue For
+                                        End If
+
+                                        Dim findNode = (From node In tmpConfigurationNodeRowInfoList
+                                                        Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
+                                                        Select node).First()
+
+                                        If findNode Is Nothing Then Continue For
+
+                                        item.ValueID = findNode.SelectedValueID
+                                        item.Value = findNode.SelectedValue
+                                        item.IsMaterial = findNode.IsMaterial
+                                        If item.IsMaterial Then
+                                            item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                                        End If
+
+                                    Next
+
+                                    For Each item In tmpConfigurationNodeRowInfoList
+                                        If Not item.IsMaterial Then
+                                            Continue For
+                                        End If
+
+                                        item.MaterialRowIDList = GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
+                                        item.MaterialValue = GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
+
+                                    Next
+
+                                    ReplaceMaterial(Path.Combine(saveFolderPath, $"{Now:yyyyMMddHHmmssfff}.xlsx"), tmpConfigurationNodeRowInfoList)
+
+                                    Threading.Thread.Sleep(10)
+                                Next
+
+                            End Sub, (From item In ExportBOMList.Rows
+                                      Select CType(item.tag, List(Of ConfigurationNodeRowInfo))).ToList)
+
+            If tmpDialog.Error IsNot Nothing Then
+                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "导出出错")
+                Exit Sub
+            End If
+
+            FileHelper.Open(saveFolderPath)
+
+        End Using
 
     End Sub
 

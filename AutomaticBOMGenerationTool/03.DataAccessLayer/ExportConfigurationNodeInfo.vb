@@ -53,4 +53,10 @@ Public Class ExportConfigurationNodeInfo
     <Newtonsoft.Json.JsonIgnore>
     Public MaterialValue As MaterialInfo
 
+    ''' <summary>
+    ''' 是否在当前模板中
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public Exist As Boolean
+
 End Class
