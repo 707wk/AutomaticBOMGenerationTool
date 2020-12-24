@@ -29,6 +29,7 @@ Public Class ConfigurationNodeControl
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         Me.Label1.Text = $"{Index}. {NodeInfo.Name} :"
+        'Me.Label1.Text = NodeInfo.Name
 
     End Sub
 
@@ -141,7 +142,6 @@ order by MaterialInfo.pUnitPrice"
                         .pName = reader(NameOf(MaterialInfo.pName)),
                         .pConfig = reader(NameOf(MaterialInfo.pConfig)),
                         .pUnit = reader(NameOf(MaterialInfo.pUnit)),
-                        .pCount = reader(NameOf(MaterialInfo.pCount)),
                         .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
                     })
                 End While
@@ -186,7 +186,6 @@ order by MaterialInfo.pUnitPrice"
                         .pName = reader(NameOf(MaterialInfo.pName)),
                         .pConfig = reader(NameOf(MaterialInfo.pConfig)),
                         .pUnit = reader(NameOf(MaterialInfo.pUnit)),
-                        .pCount = reader(NameOf(MaterialInfo.pCount)),
                         .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
                     })
                 End While
@@ -307,6 +306,12 @@ order by ConfigurationNodeValueInfo.SortID"
         If IsUserChecked Then
             UIFormHelper.UIForm.ShowUnitPrice()
         End If
+
+        'If Me.FlowLayoutPanel1.Controls.Count = 1 Then
+        '    Me.Hide()
+        'Else
+        '    Me.Show()
+        'End If
 
     End Sub
 

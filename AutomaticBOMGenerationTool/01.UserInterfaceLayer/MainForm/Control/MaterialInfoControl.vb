@@ -10,6 +10,14 @@
         End Get
         Set(ByVal value As MaterialInfo)
             _Cache = value
+
+            If _Cache IsNot Nothing AndAlso
+                _Cache.pUnitPrice = 0 Then
+                Me.BackColor = UIFormHelper.ErrorColor
+            Else
+                Me.BackColor = Color.White
+            End If
+
             Me.Size = New Size(290, 80)
         End Set
     End Property
@@ -30,12 +38,26 @@
     Private Sub ConfigurationNodeValueControl_CheckedChanged(sender As Object, e As EventArgs) Handles Me.CheckedChanged
         If Me.Checked Then
             Me.FlatAppearance.BorderColor = Color.FromArgb(0, 122, 204)
-            Me.BackColor = Color.FromArgb(240, 248, 255)
             Me.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
+
+            If _Cache IsNot Nothing AndAlso
+                _Cache.pUnitPrice = 0 Then
+                Me.BackColor = UIFormHelper.ErrorColor
+            Else
+                Me.BackColor = Color.FromArgb(240, 248, 255)
+            End If
+
         Else
             Me.FlatAppearance.BorderColor = Color.FromArgb(173, 173, 173)
-            Me.BackColor = Color.White
             Me.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Regular)
+
+            If _Cache IsNot Nothing AndAlso
+                _Cache.pUnitPrice = 0 Then
+                Me.BackColor = UIFormHelper.ErrorColor
+            Else
+                Me.BackColor = Color.White
+            End If
+
         End If
     End Sub
 

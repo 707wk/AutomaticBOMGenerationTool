@@ -145,6 +145,12 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ExportSettingsForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.Designer.vb">
+      <DependentUpon>ShowTxtContentForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.Designer.vb">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
     </Compile>
@@ -194,6 +200,9 @@
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ExportSettingsForm.resx">
       <DependentUpon>ExportSettingsForm.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.resx">
+      <DependentUpon>ShowTxtContentForm.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.resx">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
     </EmbeddedResource>
@@ -230,7 +239,12 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Data\ConfigurationRule.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="logo.ico" />
+    <None Include="res\book_32px.png" />
+    <None Include="res\help_32px.png" />
     <None Include="res\saveFile_20px.png" />
     <None Include="res\setting_32px.png" />
     <None Include="res\all_32px.png" />

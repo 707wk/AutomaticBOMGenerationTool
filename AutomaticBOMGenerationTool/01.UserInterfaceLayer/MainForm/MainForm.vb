@@ -330,7 +330,6 @@ delete from MaterialLinkInfo;"
                         .pName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}",
                         .pConfig = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}",
                         .pUnit = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}",
-                        .pCount = Val($"{tmpWorkSheet.Cells(rID, headerLocation.X + 4).Value}"),
                         .pUnitPrice = Val($"{tmpWorkSheet.Cells(rID, headerLocation.X + 5).Value}")
                     }
 
@@ -339,7 +338,6 @@ delete from MaterialLinkInfo;"
                         String.IsNullOrWhiteSpace(addMaterialInfo.pName) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pConfig) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pUnit) OrElse
-                        String.IsNullOrWhiteSpace(addMaterialInfo.pCount) OrElse
                         String.IsNullOrWhiteSpace(addMaterialInfo.pUnitPrice) Then
 
                             Throw New Exception($"{filePath} 第 {rID} 行 物料信息不完整")
@@ -379,7 +377,6 @@ values(
 @pName,
 @pConfig,
 @pUnit,
-@pCount,
 @pUnitPrice
 )"
                 }
@@ -388,7 +385,6 @@ values(
                 cmd.Parameters.Add(New SQLiteParameter("@pName", DbType.String))
                 cmd.Parameters.Add(New SQLiteParameter("@pConfig", DbType.String))
                 cmd.Parameters.Add(New SQLiteParameter("@pUnit", DbType.String))
-                cmd.Parameters.Add(New SQLiteParameter("@pCount", DbType.Double))
                 cmd.Parameters.Add(New SQLiteParameter("@pUnitPrice", DbType.Double))
 
                 For Each item In values
@@ -398,7 +394,6 @@ values(
                     cmd.Parameters("@pName").Value = item.pName
                     cmd.Parameters("@pConfig").Value = item.pConfig
                     cmd.Parameters("@pUnit").Value = item.pUnit
-                    cmd.Parameters("@pCount").Value = item.pCount
                     cmd.Parameters("@pUnitPrice").Value = item.pUnitPrice
 
                     cmd.ExecuteNonQuery()
@@ -943,7 +938,6 @@ where pID=@pID"
                         .pName = reader(NameOf(MaterialInfo.pName)),
                         .pConfig = reader(NameOf(MaterialInfo.pConfig)),
                         .pUnit = reader(NameOf(MaterialInfo.pUnit)),
-                        .pCount = reader(NameOf(MaterialInfo.pCount)),
                         .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
                     }
                 End If
@@ -980,7 +974,6 @@ where ID=@ID"
                         .pName = reader(NameOf(MaterialInfo.pName)),
                         .pConfig = reader(NameOf(MaterialInfo.pConfig)),
                         .pUnit = reader(NameOf(MaterialInfo.pUnit)),
-                        .pCount = reader(NameOf(MaterialInfo.pCount)),
                         .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
                     }
                 End If
@@ -1486,7 +1479,6 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                         tmpWorkSheet.Cells(item, headerLocation.X + 1).Value = node.MaterialValue.pName
                         tmpWorkSheet.Cells(item, headerLocation.X + 2).Value = node.MaterialValue.pConfig
                         tmpWorkSheet.Cells(item, headerLocation.X + 3).Value = node.MaterialValue.pUnit
-                        tmpWorkSheet.Cells(item, headerLocation.X + 4).Value = node.MaterialValue.pCount
                         tmpWorkSheet.Cells(item, headerLocation.X + 5).Value = node.MaterialValue.pUnitPrice
                     Next
                 Next
@@ -1545,7 +1537,6 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                 tmpWorkSheet.Cells(item, headerLocation.X + 1).Value = node.MaterialValue.pName
                 tmpWorkSheet.Cells(item, headerLocation.X + 2).Value = node.MaterialValue.pConfig
                 tmpWorkSheet.Cells(item, headerLocation.X + 3).Value = node.MaterialValue.pUnit
-                tmpWorkSheet.Cells(item, headerLocation.X + 4).Value = node.MaterialValue.pCount
                 tmpWorkSheet.Cells(item, headerLocation.X + 5).Value = node.MaterialValue.pUnitPrice
             Next
         Next
@@ -1600,11 +1591,19 @@ where ConfigurationNodeID=@ConfigurationNodeID"
             End If
 
             If item.IsExportpConfigFirstTerm Then
+                If Not item.IsMaterial Then
+                    Throw New Exception($"BOM名称: {item.Name} 不是物料配置项")
+                End If
+
                 Dim tmpStr = StrConv(item.MaterialValue.pConfig, VbStrConv.Narrow)
                 nameStr += tmpStr.Split(";").First
             End If
 
             If item.IsExportMatchingValue Then
+                If Not item.IsMaterial Then
+                    Throw New Exception($"BOM名称: {item.Name} 不是物料配置项")
+                End If
+
                 Dim matchValues = item.MatchingValues.Split(";")
                 Dim findValue As String = Nothing
                 For Each value In matchValues
@@ -1615,7 +1614,7 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                 Next
 
                 If String.IsNullOrWhiteSpace(findValue) Then
-                    Throw New Exception($"未匹配到 {item.Name} 的型号")
+                    Throw New Exception($"BOM名称: 未匹配到 {item.Name} 的型号")
                 End If
 
                 nameStr += findValue
@@ -1948,8 +1947,18 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         Return 0
 
     End Function
+
 #End Region
 
 #End Region
+
+    Private Sub ButtonItem1_Click(sender As Object, e As EventArgs) Handles ButtonItem1.Click
+        Using tmpDialog As New ShowTxtContentForm With {
+                .Text = ButtonItem1.Text,
+                .filePath = ".\Data\ConfigurationRule.txt"
+            }
+            tmpDialog.ShowDialog()
+        End Using
+    End Sub
 
 End Class

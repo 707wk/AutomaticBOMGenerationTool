@@ -24,10 +24,10 @@ Public Class MaterialInfo
     ''' </summary>
     Public pUnit As String
 
-    ''' <summary>
-    ''' 所需数量
-    ''' </summary>
-    Public pCount As Double
+    '''' <summary>
+    '''' 所需数量
+    '''' </summary>
+    'Public pCount As Double
 
     ''' <summary>
     ''' 单价
