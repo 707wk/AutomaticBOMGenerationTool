@@ -11,12 +11,12 @@
         Set(ByVal value As MaterialInfo)
             _Cache = value
 
-            If _Cache IsNot Nothing AndAlso
-                _Cache.pUnitPrice = 0 Then
-                Me.BackColor = UIFormHelper.ErrorColor
-            Else
-                Me.BackColor = Color.White
-            End If
+            'If _Cache IsNot Nothing AndAlso
+            '    _Cache.pUnitPrice = 0 Then
+            '    Me.BackColor = UIFormHelper.ErrorColor
+            'Else
+            '    Me.BackColor = Color.White
+            'End If
 
             Me.Size = New Size(290, 80)
         End Set
@@ -40,27 +40,28 @@
             Me.FlatAppearance.BorderColor = Color.FromArgb(0, 122, 204)
             Me.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
 
-            If _Cache IsNot Nothing AndAlso
-                _Cache.pUnitPrice = 0 Then
-                Me.BackColor = UIFormHelper.ErrorColor
-            Else
-                Me.BackColor = Color.FromArgb(240, 248, 255)
-            End If
+            'If _Cache IsNot Nothing AndAlso
+            '    _Cache.pUnitPrice = 0 Then
+            '    Me.BackColor = UIFormHelper.ErrorColor
+            'Else
+            Me.BackColor = Color.FromArgb(240, 248, 255)
+            'End If
 
         Else
             Me.FlatAppearance.BorderColor = Color.FromArgb(173, 173, 173)
             Me.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Regular)
 
-            If _Cache IsNot Nothing AndAlso
-                _Cache.pUnitPrice = 0 Then
-                Me.BackColor = UIFormHelper.ErrorColor
-            Else
-                Me.BackColor = Color.White
-            End If
+            'If _Cache IsNot Nothing AndAlso
+            '    _Cache.pUnitPrice = 0 Then
+            '    Me.BackColor = UIFormHelper.ErrorColor
+            'Else
+            Me.BackColor = Color.White
+            'End If
 
         End If
     End Sub
 
+    Private ReadOnly ZeroUnitPriceSolidBrush As New SolidBrush(UIFormHelper.ErrorColor)
     Private ReadOnly TitleFontSolidBrush As New SolidBrush(Color.Black)
     Private ReadOnly ContextFontSolidBrush As New SolidBrush(Color.DimGray)
     Private ReadOnly StringFormatFar As New StringFormat()
@@ -71,6 +72,10 @@
         If _Cache IsNot Nothing Then
 
             Dim tmpFontSize = e.Graphics.MeasureString("品号", Me.Font)
+
+            If _Cache.pUnitPrice = 0 Then
+                e.Graphics.FillRectangle(ZeroUnitPriceSolidBrush, 0, 0, Me.Width, tmpFontSize.Height)
+            End If
 
             e.Graphics.DrawString($"{_Cache.pName}", Me.Font, TitleFontSolidBrush, 1, 1)
             e.Graphics.DrawString($"￥{_Cache.pUnitPrice}", Me.Font, TitleFontSolidBrush, Me.Width - 2, 1, StringFormatFar)

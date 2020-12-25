@@ -151,6 +151,12 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupControl.Designer.vb">
+      <DependentUpon>ConfigurationGroupControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupControl.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.Designer.vb">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
     </Compile>
@@ -169,6 +175,7 @@
     <Compile Include="02.BusinessLogicLayer\FileHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationGroupInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeRowInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeValueInfo.vb" />
@@ -202,6 +209,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.resx">
       <DependentUpon>ShowTxtContentForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupControl.resx">
+      <DependentUpon>ConfigurationGroupControl.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.resx">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
@@ -243,6 +253,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="logo.ico" />
+    <None Include="res\fold_20px.png" />
+    <None Include="res\expand_20px.png" />
+    <None Include="res\fold_16px.png" />
+    <None Include="res\expand_16px.png" />
     <None Include="res\book_32px.png" />
     <None Include="res\help_32px.png" />
     <None Include="res\saveFile_20px.png" />

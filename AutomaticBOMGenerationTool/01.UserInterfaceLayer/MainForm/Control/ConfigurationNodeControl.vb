@@ -28,8 +28,8 @@ Public Class ConfigurationNodeControl
 
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        Me.Label1.Text = $"{Index}. {NodeInfo.Name} :"
-        'Me.Label1.Text = NodeInfo.Name
+        'Me.Label1.Text = $"▶ {NodeInfo.Name} :"
+        Me.Label1.Text = NodeInfo.Name
 
     End Sub
 
@@ -417,7 +417,7 @@ group by MaterialLinkInfo.LinkNodeID"
             Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
             tmpMaterialInfoControl.Checked = True
 
-            Me.Label1.BackColor = Me.BackColor
+            Me.Label1.BackColor = SystemColors.Control
         Else
             Me.Label1.BackColor = UIFormHelper.ErrorColor
         End If

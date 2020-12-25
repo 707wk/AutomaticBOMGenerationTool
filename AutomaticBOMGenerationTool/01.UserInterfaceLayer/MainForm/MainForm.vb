@@ -60,7 +60,7 @@ Public Class MainForm
 
         AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Clear()
         ExportBOMList.Rows.Clear()
-        FlowLayoutPanel1.Controls.Clear()
+        ConfigurationGroupList.Controls.Clear()
 
         Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
             .Text = "解析数据"
@@ -120,26 +120,40 @@ Public Class MainForm
 
         AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Clear()
         ExportBOMList.Rows.Clear()
-        FlowLayoutPanel1.Controls.Clear()
+        ConfigurationGroupList.Controls.Clear()
+
+        Dim tmpGroupList = GetConfigurationGroupInfoItems()
+        Dim tmpGroupDict = New Dictionary(Of String, ConfigurationGroupControl)
 
         Dim tmpNodeList = GetConfigurationNodeInfoItems()
 
-        Dim tmpIndex = 1
+        For Each item In tmpGroupList
+            Dim addConfigurationGroupControl = New ConfigurationGroupControl With {
+                .GroupInfo = item
+            }
+
+            ConfigurationGroupList.Controls.Add(addConfigurationGroupControl)
+
+            tmpGroupDict.Add(item.ID, addConfigurationGroupControl)
+        Next
+
+        'Dim tmpIndex = 1
         For Each item In tmpNodeList
 
-            Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
-                                          .NodeInfo = item,
-                                          .Index = tmpIndex
-                                          }
-            tmpIndex += 1
+            Dim tmpConfigurationGroupControl = tmpGroupDict(item.GroupID)
 
-            FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
+            Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
+                                          .NodeInfo = item
+                                          }
+            'tmpIndex += 1
+
+            tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
 
             AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Add(item.ID, addConfigurationNodeControl)
 
         Next
 
-        For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+        For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
             item.Init()
         Next
 
@@ -156,7 +170,7 @@ Public Class MainForm
 
         Try
             '检测物料完整性
-            For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+            For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                 If String.IsNullOrWhiteSpace(item.SelectedValueID) Then
                     item.Select()
                     Throw New Exception($"配置项 {item.NodeInfo.Name} 未找到可替换物料")
@@ -164,7 +178,7 @@ Public Class MainForm
             Next
 
             '获取配置项信息
-            Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+            Dim tmpConfigurationNodeRowInfoList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                                    Where item.NodeInfo.IsMaterial = True
                                                    Select New ConfigurationNodeRowInfo() With {
                                                        .ConfigurationNodeID = item.NodeInfo.ID,
@@ -228,7 +242,8 @@ delete from MaterialInfo;
 delete from ConfigurationNodeInfo;
 delete from ConfigurationNodeRowInfo;
 delete from ConfigurationNodeValueInfo;
-delete from MaterialLinkInfo;"
+delete from MaterialLinkInfo;
+delete from ConfigurationGroupInfo;"
 
                 tmpCommand.ExecuteNonQuery()
             End Using
@@ -530,6 +545,7 @@ values(
                 Dim tmpRootNode As ConfigurationNodeInfo = Nothing
                 Dim tmpChildNode As ConfigurationNodeValueInfo = Nothing
 
+                Dim groupSortID As Integer = 0
                 Dim rootSortID As Integer = 0
                 Dim childSortID As Integer = 0
 
@@ -546,7 +562,8 @@ values(
                         tmpRootNode = New ConfigurationNodeInfo With {
                         .ID = Wangk.Resource.IDHelper.NewID,
                         .SortID = rootSortID,
-                        .Name = tmpStr
+                        .Name = tmpStr,
+                        .GroupID = .ID
                     }
                         '查重
                         If GetConfigurationNodeInfoByNameFromLocalDatabase(tmpStr) IsNot Nothing Then
@@ -555,6 +572,13 @@ values(
 
                         SaveConfigurationNodeInfoToLocalDatabase(tmpRootNode)
                         rootSortID += 1
+
+                        SaveConfigurationGroupInfoToLocalDatabase(New ConfigurationGroupInfo With {
+                                                                  .ID = tmpRootNode.ID,
+                                                                  .Name = tmpRootNode.Name,
+                                                                  .SortID = groupSortID
+                                                                  })
+                        groupSortID += 1
 
                         '第二列内容
                         Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}"
@@ -612,7 +636,8 @@ values(
                     .ID = Wangk.Resource.IDHelper.NewID,
                     .SortID = rootSortID,
                     .Name = tmpNodeStr,
-                    .IsMaterial = True
+                    .IsMaterial = True,
+                    .GroupID = tmpRootNode.ID
                 }
                         SaveConfigurationNodeInfoToLocalDatabase(tmpNode)
                         rootSortID += 1
@@ -745,6 +770,34 @@ values(
 
 #End Region
 
+#Region "添加分组信息到临时数据库"
+    ''' <summary>
+    ''' 添加分组信息到临时数据库
+    ''' </summary>
+    Private Sub SaveConfigurationGroupInfoToLocalDatabase(value As ConfigurationGroupInfo)
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "insert into ConfigurationGroupInfo 
+values(
+@ID,
+@Name,
+@SortID
+)"
+            }
+            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
+            cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = value.Name})
+            cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
+
+            cmd.ExecuteNonQuery()
+
+        End Using
+    End Sub
+#End Region
+
 #Region "添加配置节点信息到临时数据库"
     ''' <summary>
     ''' 添加配置节点信息到临时数据库
@@ -761,13 +814,15 @@ values(
 @ID,
 @Name,
 @SortID,
-@IsMaterial
+@IsMaterial,
+@GroupID
 )"
             }
             cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
             cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = value.Name})
             cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
             cmd.Parameters.Add(New SQLiteParameter("@IsMaterial", DbType.Boolean) With {.Value = value.IsMaterial})
+            cmd.Parameters.Add(New SQLiteParameter("@GroupID", DbType.String) With {.Value = value.GroupID})
 
             cmd.ExecuteNonQuery()
 
@@ -879,9 +934,9 @@ where ConfigurationNodeID=@ConfigurationNodeID and Value=@Value"
     End Function
 #End Region
 
-#Region "根据配置值获取配置值信息"
+#Region "根据配置值获取配置值信息(仅限物料只与一个配置项关联的情况)"
     ''' <summary>
-    ''' 根据配置值获取配置值信息
+    ''' 根据配置值获取配置值信息(仅限物料只与一个配置项关联的情况)
     ''' </summary>
     Private Function GetConfigurationNodeValueInfoByValueFromLocalDatabase(value As String) As ConfigurationNodeValueInfo
 
@@ -985,9 +1040,9 @@ where ID=@ID"
     End Function
 #End Region
 
-#Region "根据品号获取配置项ID"
+#Region "根据品号获取配置项ID(仅限物料只与一个配置项关联的情况)"
     ''' <summary>
-    ''' 根据品号获取配置项ID
+    ''' 根据品号获取配置项ID(仅限物料只与一个配置项关联的情况)
     ''' </summary>
     Private Function GetConfigurationNodeIDByppIDFromLocalDatabase(pID As String) As String
 
@@ -1069,7 +1124,41 @@ values(
                         .ID = reader(NameOf(ConfigurationNodeInfo.ID)),
                         .SortID = reader(NameOf(ConfigurationNodeInfo.SortID)),
                         .Name = reader(NameOf(ConfigurationNodeInfo.Name)),
-                        .IsMaterial = reader(NameOf(ConfigurationNodeInfo.IsMaterial))
+                        .IsMaterial = reader(NameOf(ConfigurationNodeInfo.IsMaterial)),
+                        .GroupID = reader(NameOf(ConfigurationNodeInfo.GroupID))
+                    })
+                End While
+            End Using
+
+        End Using
+
+        Return tmpList
+    End Function
+#End Region
+
+#Region "获取分组信息"
+    ''' <summary>
+    ''' 获取分组信息
+    ''' </summary>
+    Private Function GetConfigurationGroupInfoItems() As List(Of ConfigurationGroupInfo)
+
+        Dim tmpList = New List(Of ConfigurationGroupInfo)
+
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "select * from ConfigurationGroupInfo order by SortID"
+            }
+
+            Using reader As SQLiteDataReader = cmd.ExecuteReader()
+                While reader.Read
+                    tmpList.Add(New ConfigurationGroupInfo With {
+                        .ID = reader(NameOf(ConfigurationGroupInfo.ID)),
+                        .SortID = reader(NameOf(ConfigurationGroupInfo.SortID)),
+                        .Name = reader(NameOf(ConfigurationGroupInfo.Name))
                     })
                 End While
             End Using
@@ -1331,6 +1420,7 @@ values(
     End Sub
 #End Region
 
+#Region "导出当前配置"
     Private Sub ExportCurrentButton_Click(sender As Object, e As EventArgs) Handles ExportCurrentButton.Click
         Dim outputFilePath As String
 
@@ -1354,14 +1444,14 @@ values(
                                 Dim stepCount = 6
 
                                 be.Write("检测物料完整性", 100 / stepCount * 0)
-                                For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                     If String.IsNullOrWhiteSpace(item.SelectedValueID) Then
                                         Throw New Exception($"配置项 {item.NodeInfo.Name} 未找到可替换物料")
                                     End If
                                 Next
 
                                 be.Write("获取配置项信息", 100 / stepCount * 1)
-                                Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                Dim tmpConfigurationNodeRowInfoList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                                                        Select New ConfigurationNodeRowInfo() With {
                                                                            .ConfigurationNodeID = item.NodeInfo.ID,
                                                                            .ConfigurationNodeName = item.NodeInfo.Name,
@@ -1418,6 +1508,7 @@ values(
         End Using
 
     End Sub
+#End Region
 
 #Region "获取替换物料的位置"
     ''' <summary>
@@ -1498,6 +1589,9 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                 For rid = tmpWorkSheet.Dimension.Start.Row To tmpWorkSheet.Dimension.End.Row
                     tmpWorkSheet.Row(rid).CustomHeight = False
                 Next
+
+                '设置标题行行高
+                tmpWorkSheet.Row(1).Height = 32
 
                 '更改焦点
                 tmpWorkSheet.Select(tmpWorkSheet.Cells(1, 1).Address, True)
@@ -1633,6 +1727,7 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         tmpDialog.ShowDialog()
     End Sub
 
+#Region "添加当前配置到待导出BOM列表"
     Private Sub AddCurrentToExportBOMListButton_Click(sender As Object, e As EventArgs) Handles AddCurrentToExportBOMListButton.Click
         Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
             .Text = "导出数据"
@@ -1642,14 +1737,14 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                                 Dim stepCount = 4
 
                                 be.Write("检测物料完整性", 100 / stepCount * 0)
-                                For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                     If String.IsNullOrWhiteSpace(item.SelectedValueID) Then
                                         Throw New Exception($"配置项 {item.NodeInfo.Name} 未找到可替换物料")
                                     End If
                                 Next
 
                                 be.Write("获取配置项信息", 100 / stepCount * 1)
-                                Dim tmpConfigurationNodeRowInfoList = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                Dim tmpConfigurationNodeRowInfoList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                                                        Select New ConfigurationNodeRowInfo() With {
                                                                            .ConfigurationNodeID = item.NodeInfo.ID,
                                                                            .ConfigurationNodeName = item.NodeInfo.Name,
@@ -1711,6 +1806,9 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         End Using
     End Sub
 
+#End Region
+
+#Region "导出待导出BOM列表"
     Private Sub ExportAllBOMButton_Click(sender As Object, e As EventArgs) Handles ExportAllBOMButton.Click
         Dim saveFolderPath As String
 
@@ -1731,7 +1829,7 @@ where ConfigurationNodeID=@ConfigurationNodeID"
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
                                     item.Exist = False
 
-                                    Dim findNode = (From node As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+                                    Dim findNode = (From node In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                                     Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
                                                     Select node).First()
 
@@ -1781,7 +1879,6 @@ where ConfigurationNodeID=@ConfigurationNodeID"
 
                                     ReplaceMaterial(Path.Combine(saveFolderPath, $"{Now:yyyyMMddHHmmssfff}.xlsx"), tmpConfigurationNodeRowInfoList)
 
-                                    Threading.Thread.Sleep(10)
                                 Next
 
                             End Sub, (From item In ExportBOMList.Rows
@@ -1797,7 +1894,9 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         End Using
 
     End Sub
+#End Region
 
+#Region "从待导出BOM列表移除"
     Private Sub DeleteButton_Click(sender As Object, e As EventArgs) Handles DeleteButton.Click
         Dim selectedCount As Integer = 0
         For Each item As DataGridViewRow In ExportBOMList.Rows
@@ -1821,15 +1920,16 @@ where ConfigurationNodeID=@ConfigurationNodeID"
             End If
         Next
     End Sub
+#End Region
 
 #Region "控件状态管理"
-    Private Sub FlowLayoutPanel1_ControlAdded(sender As Object, e As ControlEventArgs) Handles FlowLayoutPanel1.ControlAdded
+    Private Sub FlowLayoutPanel1_ControlAdded(sender As Object, e As ControlEventArgs) Handles ConfigurationGroupList.ControlAdded
         AddCurrentToExportBOMListButton.Enabled = True
         ExportCurrentButton.Enabled = True
     End Sub
 
-    Private Sub FlowLayoutPanel1_ControlRemoved(sender As Object, e As ControlEventArgs) Handles FlowLayoutPanel1.ControlRemoved
-        If FlowLayoutPanel1.Controls.Count = 0 Then
+    Private Sub FlowLayoutPanel1_ControlRemoved(sender As Object, e As ControlEventArgs) Handles ConfigurationGroupList.ControlRemoved
+        If ConfigurationGroupList.Controls.Count = 0 Then
             AddCurrentToExportBOMListButton.Enabled = False
             ExportCurrentButton.Enabled = False
         End If
@@ -1961,4 +2061,15 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         End Using
     End Sub
 
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.CheckBox1.Checked = True
+        Next
+    End Sub
+
+    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.CheckBox1.Checked = False
+        Next
+    End Sub
 End Class

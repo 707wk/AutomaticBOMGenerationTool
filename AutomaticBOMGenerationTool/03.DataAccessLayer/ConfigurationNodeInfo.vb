@@ -16,4 +16,9 @@ Public Class ConfigurationNodeInfo
     ''' </summary>
     Public IsMaterial As Boolean
 
+    ''' <summary>
+    ''' 分组ID
+    ''' </summary>
+    Public GroupID As String
+
 End Class
