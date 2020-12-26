@@ -2,7 +2,8 @@
 ''' <summary>
 ''' 文件操作辅助模块
 ''' </summary>
-Public Class FileHelper
+Public NotInheritable Class FileHelper
+    <Flags>
     Public Enum ShowCommands
         SW_HIDE = 0
         SW_SHOWNORMAL = 1

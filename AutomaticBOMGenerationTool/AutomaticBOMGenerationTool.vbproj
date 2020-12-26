@@ -172,7 +172,9 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\MainForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="02.BusinessLogicLayer\EPPlusHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\FileHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\LocalDatabaseHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationGroupInfo.vb" />
