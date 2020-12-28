@@ -829,7 +829,7 @@ Public NotInheritable Class EPPlusHelper
 
         '根据选项拼接
         For Each item In values
-            nameStr += JoinConfigurationName(item)
+            nameStr += $";{JoinConfigurationName(item)}"
         Next
 
         Return nameStr

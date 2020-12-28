@@ -601,8 +601,8 @@ group by MaterialLinkInfo.LinkNodeID"
     ''' <summary>
     ''' 获取配置项值ID列表
     ''' </summary>
-    Public Shared Function GetConfigurationNodeValueIDItems(configurationNodeID As String) As HashSet(Of String)
-        Dim tmpHashSet As New HashSet(Of String)
+    Public Shared Function GetConfigurationNodeValueIDItems(configurationNodeID As String) As Dictionary(Of String, Integer)
+        Dim tmpDictionary As New Dictionary(Of String, Integer)
 
         Using tmpConnection As New SQLite.SQLiteConnection With {
             .ConnectionString = AppSettingHelper.SQLiteConnection
@@ -610,22 +610,33 @@ group by MaterialLinkInfo.LinkNodeID"
             tmpConnection.Open()
 
             Dim cmd As New SQLiteCommand(tmpConnection) With {
-                .CommandText = "select ID
-from ConfigurationNodeValueInfo
-where ConfigurationNodeID=@ConfigurationNodeID
-group by ID"
+                .CommandText = "select MaterialLinkInfo.LinkNodeValueID,count(MaterialLinkInfo.LinkNodeValueID)
+from  MaterialLinkInfo
+inner join ConfigurationNodeInfo
+on MaterialLinkInfo.NodeID=ConfigurationNodeInfo.ID
+and ConfigurationNodeInfo.IsMaterial=false
+where MaterialLinkInfo.LinkNodeID=@ConfigurationNodeID
+group by MaterialLinkInfo.LinkNodeValueID"
             }
+
+            '                .CommandText = "select ConfigurationNodeValueInfo.ID,count(ConfigurationNodeValueInfo.ID)
+            'from ConfigurationNodeValueInfo
+            'left outer join MaterialLinkInfo
+            'on ConfigurationNodeValueInfo.ID=MaterialLinkInfo.LinkNodeValueID 
+            'where ConfigurationNodeValueInfo.ConfigurationNodeID=@ConfigurationNodeID
+            'group by ConfigurationNodeValueInfo.ID"
+
             cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
             Using reader As SQLiteDataReader = cmd.ExecuteReader()
                 While reader.Read
-                    tmpHashSet.Add(reader(0))
+                    tmpDictionary.Add(reader(0), reader(1))
                 End While
             End Using
 
         End Using
 
-        Return tmpHashSet
+        Return tmpDictionary
     End Function
 #End Region
 
@@ -860,7 +871,7 @@ order by MaterialInfo.pUnitPrice"
     ''' <summary>
     ''' 获取物料信息
     ''' </summary>
-    Public Shared Function GetMaterialInfoItems(values As HashSet(Of String)) As List(Of MaterialInfo)
+    Public Shared Function GetMaterialInfoItems(values As List(Of String)) As List(Of MaterialInfo)
 
         Dim tmpIDArray = From item In values Select $"'{item}'"
 
@@ -946,7 +957,7 @@ order by ConfigurationNodeValueInfo.SortID"
     ''' <summary>
     ''' 获取节点值信息
     ''' </summary>
-    Public Shared Function GetConfigurationNodeValueInfoItems(values As HashSet(Of String)) As List(Of ConfigurationNodeValueInfo)
+    Public Shared Function GetConfigurationNodeValueInfoItems(values As List(Of String)) As List(Of ConfigurationNodeValueInfo)
 
         Dim tmpIDArray = From item In values Select $"'{item}'"
 

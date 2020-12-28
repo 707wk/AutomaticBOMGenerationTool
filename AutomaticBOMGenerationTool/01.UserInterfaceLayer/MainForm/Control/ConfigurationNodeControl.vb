@@ -128,14 +128,12 @@ Public Class ConfigurationNodeControl
         SelectedValueID = Nothing
         SelectedValue = Nothing
 
-        Dim originHashSet = LocalDatabaseHelper.GetConfigurationNodeValueIDItems(NodeInfo.ID)
+        Dim originDictionary = LocalDatabaseHelper.GetConfigurationNodeValueIDItems(NodeInfo.ID)
 
         Dim tmpParentNodeValueIDList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                         Where ParentNodeIDHashSet.Contains(item.NodeInfo.ID)
                                         Select item.SelectedValueID).ToList
-        If NodeInfo.Name.Contains("电源出航插") Then
-            Console.WriteLine()
-        End If
+
         If LocalDatabaseHelper.IsHaveParentValueLink(tmpParentNodeValueIDList, NodeInfo.ID) Then
             '有关联,取交集
             '遍历其他配置项当前值
@@ -147,7 +145,15 @@ Public Class ConfigurationNodeControl
                 Dim tmpHashSet = LocalDatabaseHelper.GetConfigurationNodeValueIDItems(item.SelectedValueID, NodeInfo.ID)
 
                 '取交集
-                originHashSet.IntersectWith(tmpHashSet)
+                'originHashSet.IntersectWith(tmpHashSet)
+                Dim tmpKeys = originDictionary.Keys.ToList
+                For Each key In tmpKeys
+                    If tmpHashSet.Contains(key) Then
+
+                    Else
+                        originDictionary.Remove(key)
+                    End If
+                Next
 
             Next
 
@@ -162,8 +168,22 @@ Public Class ConfigurationNodeControl
                 Dim tmpHashSet = LocalDatabaseHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
 
                 '排除
-                originHashSet.ExceptWith(tmpHashSet)
+                'originHashSet.ExceptWith(tmpHashSet)
+                For Each key In tmpHashSet
+                    If originDictionary.ContainsKey(key) Then
 
+                        Dim count = originDictionary(key)
+                        count -= 1
+                        originDictionary(key) = count
+                        If count <= 0 Then
+                            originDictionary.Remove(key)
+                        End If
+
+                    Else
+
+                    End If
+
+                Next
             Next
 
         End If
@@ -177,7 +197,7 @@ Public Class ConfigurationNodeControl
 
         '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
-            Dim tmpList = LocalDatabaseHelper.GetMaterialInfoItems(originHashSet)
+            Dim tmpList = LocalDatabaseHelper.GetMaterialInfoItems(originDictionary.Keys.ToList)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -187,7 +207,7 @@ Public Class ConfigurationNodeControl
             Next
 
         Else
-            Dim tmpList = LocalDatabaseHelper.GetConfigurationNodeValueInfoItems(originHashSet)
+            Dim tmpList = LocalDatabaseHelper.GetConfigurationNodeValueInfoItems(originDictionary.Keys.ToList)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {

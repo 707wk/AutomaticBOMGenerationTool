@@ -20,10 +20,14 @@ Public Class MainForm
             .ColumnHeadersDefaultCellStyle.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
             .RowHeadersWidth = 80
 
-            ExportBOMList.Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .Width = 800})
+            .DefaultCellStyle.WrapMode = DataGridViewTriState.True
+            .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
+
+            ExportBOMList.Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
             Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "单价", .Width = 120}
             tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             ExportBOMList.Columns.Add(tmpDataGridViewTextBoxColumn)
+            ExportBOMList.Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
 
         End With
 
@@ -54,6 +58,10 @@ Public Class MainForm
             Button2_Click(Nothing, Nothing)
 
         End Using
+    End Sub
+
+    Private Sub ButtonItem3_Click(sender As Object, e As EventArgs) Handles ButtonItem3.Click
+        FileHelper.Open(ToolStripStatusLabel1.Text)
     End Sub
 
 #Region "解析模板"
@@ -306,7 +314,7 @@ Public Class MainForm
             '保存单价
             tmpBOMConfigurationInfo.UnitPrice = ToolStripLabel1.Tag
 
-            ExportBOMList.Rows.Add({False, tmpBOMConfigurationInfo.Name, $"￥{tmpBOMConfigurationInfo.UnitPrice:n4}"})
+            ExportBOMList.Rows.Add({False, tmpBOMConfigurationInfo.Name, $"￥{tmpBOMConfigurationInfo.UnitPrice:n4}", "查看配置"})
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpBOMConfigurationInfo
 
         End Using
@@ -656,5 +664,20 @@ Public Class MainForm
 
     End Sub
 #End Region
+
+    Private Sub ExportBOMList_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles ExportBOMList.CellContentClick
+        If e.RowIndex < 0 Then
+            Exit Sub
+        End If
+
+        Select Case e.ColumnIndex
+
+            Case 3
+#Region "查看配置"
+
+#End Region
+
+        End Select
+    End Sub
 
 End Class
