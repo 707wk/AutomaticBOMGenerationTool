@@ -213,9 +213,9 @@ Public Class MainForm
 
                 Dim headerLocation = EPPlusHelper.FindHeaderLocation(tmpExcelPackage, "单价")
 
-                Dim tmpStr = $"{tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value:n4}"
-                ToolStripLabel1.Text = $"当前单价: ￥{tmpStr}"
-                ToolStripLabel1.Tag = tmpStr
+                Dim tmpValue = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
+                ToolStripLabel1.Text = $"当前单价: ￥{tmpValue:n4}"
+                ToolStripLabel1.Tag = tmpValue
 
             End Using
         End Using
@@ -244,22 +244,24 @@ Public Class MainForm
                                 '    End If
                                 'Next
 
+                                Dim tmpResult = New BOMConfigurationInfo
+
                                 be.Write("获取配置项信息", 100 / stepCount * 1)
-                                Dim tmpConfigurationNodeRowInfoList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
-                                                                       Select New ConfigurationNodeRowInfo() With {
-                                                                           .ConfigurationNodeID = item.NodeInfo.ID,
-                                                                           .ConfigurationNodeName = item.NodeInfo.Name,
-                                                                           .SelectedValueID = item.SelectedValueID,
-                                                                           .SelectedValue = item.SelectedValue,
-                                                                           .IsMaterial = item.NodeInfo.IsMaterial
-                                                                           }
-                                                                           ).ToList
+                                tmpResult.ConfigurationItems = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+                                                                Select New ConfigurationNodeRowInfo() With {
+                                                                    .ConfigurationNodeID = item.NodeInfo.ID,
+                                                                    .ConfigurationNodeName = item.NodeInfo.Name,
+                                                                    .SelectedValueID = item.SelectedValueID,
+                                                                    .SelectedValue = item.SelectedValue,
+                                                                    .IsMaterial = item.NodeInfo.IsMaterial
+                                                                    }
+                                                                    ).ToList
 
                                 be.Write("获取导出项信息", 100 / stepCount * 2)
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
                                     item.Exist = False
 
-                                    Dim findNode = (From node In tmpConfigurationNodeRowInfoList
+                                    Dim findNode = (From node In tmpResult.ConfigurationItems
                                                     Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
                                                     Select node).First()
 
@@ -286,13 +288,12 @@ Public Class MainForm
                                         Dim colMaxID = tmpWorkSheet.Dimension.End.Column
                                         Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
-                                        be.Result = {
-                                        EPPlusHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList),
-                                        tmpConfigurationNodeRowInfoList
-                                        }
+                                        tmpResult.Name = EPPlusHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
 
                                     End Using
                                 End Using
+
+                                be.Result = tmpResult
 
                             End Sub)
 
@@ -301,8 +302,12 @@ Public Class MainForm
                 Exit Sub
             End If
 
-            ExportBOMList.Rows.Add({False, tmpDialog.Result(0), $"￥{ToolStripLabel1.Tag}"})
-            ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpDialog.Result(1)
+            Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = tmpDialog.Result
+            '保存单价
+            tmpBOMConfigurationInfo.UnitPrice = ToolStripLabel1.Tag
+
+            ExportBOMList.Rows.Add({False, tmpBOMConfigurationInfo.Name, $"￥{tmpBOMConfigurationInfo.UnitPrice:n4}"})
+            ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpBOMConfigurationInfo
 
         End Using
     End Sub
@@ -417,8 +422,10 @@ Public Class MainForm
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
 
                                 be.Write("获取导出项")
+                                Dim ColIndex = 0
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
                                     item.Exist = False
+                                    item.ColIndex = 0
 
                                     Dim findNode = (From node In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                                     Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
@@ -427,14 +434,23 @@ Public Class MainForm
                                     If findNode Is Nothing Then Continue For
 
                                     item.Exist = True
-
+                                    item.ColIndex = ColIndex
+                                    ColIndex += 1
                                 Next
 
-                                be.Write("导出中")
+                                Dim tmpBOMList = CType(be.Args, List(Of BOMConfigurationInfo))
 
-                                Dim tmpBOMList = CType(be.Args, List(Of List(Of ConfigurationNodeRowInfo)))
+                                '设置文件名
                                 For i001 = 0 To tmpBOMList.Count - 1
-                                    Dim tmpConfigurationNodeRowInfoList = tmpBOMList(i001)
+                                    tmpBOMList(i001).FileName = $"配置{i001 + 1}.xlsx"
+                                Next
+
+                                be.Write("生成配置清单")
+                                CreateConfigurationListFile(Path.Combine(saveFolderPath, $"_文件配置清单.xlsx"), tmpBOMList)
+
+                                be.Write("导出中")
+                                For i001 = 0 To tmpBOMList.Count - 1
+                                    Dim tmpBOMConfigurationInfo = tmpBOMList(i001)
 
                                     be.Write($"导出第 {i001 + 1} 个", CInt(100 / tmpBOMList.Count * i001))
 
@@ -443,7 +459,7 @@ Public Class MainForm
                                             Continue For
                                         End If
 
-                                        Dim findNode = (From node In tmpConfigurationNodeRowInfoList
+                                        Dim findNode = (From node In tmpBOMConfigurationInfo.ConfigurationItems
                                                         Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
                                                         Select node).First()
 
@@ -458,7 +474,7 @@ Public Class MainForm
 
                                     Next
 
-                                    For Each item In tmpConfigurationNodeRowInfoList
+                                    For Each item In tmpBOMConfigurationInfo.ConfigurationItems
                                         If Not item.IsMaterial Then
                                             Continue For
                                         End If
@@ -468,12 +484,12 @@ Public Class MainForm
 
                                     Next
 
-                                    EPPlusHelper.ReplaceMaterial(Path.Combine(saveFolderPath, $"{Now:yyyyMMddHHmmssfff}.xlsx"), tmpConfigurationNodeRowInfoList)
+                                    EPPlusHelper.ReplaceMaterial(Path.Combine(saveFolderPath, tmpBOMConfigurationInfo.FileName), tmpBOMConfigurationInfo.ConfigurationItems)
 
                                 Next
 
                             End Sub, (From item In ExportBOMList.Rows
-                                      Select CType(item.tag, List(Of ConfigurationNodeRowInfo))).ToList)
+                                      Select CType(item.tag, BOMConfigurationInfo)).ToList)
 
             If tmpDialog.Error IsNot Nothing Then
                 MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "导出出错")
@@ -569,4 +585,76 @@ Public Class MainForm
             item.CheckBox1.Checked = False
         Next
     End Sub
+
+#Region "生成文件配置清单文件"
+    ''' <summary>
+    ''' 生成文件配置清单文件
+    ''' </summary>
+    Private Sub CreateConfigurationListFile(
+                                           outputFilePath As String,
+                                           BOMList As List(Of BOMConfigurationInfo))
+
+        Using tmpExcelPackage As New ExcelPackage()
+            Dim tmpWorkBook = tmpExcelPackage.Workbook
+            Dim tmpWorkSheet = tmpWorkBook.Worksheets.Add(IO.Path.GetFileNameWithoutExtension(outputFilePath))
+
+            '创建列标题
+            tmpWorkSheet.Cells(1, 1).Value = "文件名"
+            tmpWorkSheet.Cells(1, 2).Value = "操作"
+            Dim tmpID = 3
+            For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                If Not item.Exist Then
+                    Continue For
+                End If
+                tmpWorkSheet.Cells(1, tmpID).Value = item.Name
+                tmpID += 1
+            Next
+            tmpWorkSheet.Cells(1, tmpID).Value = "单价"
+
+            For i001 = 0 To BOMList.Count - 1
+                Dim tmpBOMConfigurationInfo = BOMList(i001)
+
+                '文件名
+                tmpWorkSheet.Cells(i001 + 1 + 1, 1).Value = tmpBOMConfigurationInfo.FileName
+                tmpWorkSheet.Cells(i001 + 1 + 1, 2).Formula = $"=HYPERLINK(""{tmpBOMConfigurationInfo.FileName}"",""查看文件"")"
+                tmpWorkSheet.Cells(i001 + 1 + 1, 2).Style.Font.Color.SetColor(UIFormHelper.NormalColor)
+
+                '配置
+                For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                    If Not item.Exist Then
+                        Continue For
+                    End If
+
+                    Dim findNode = (From node In tmpBOMConfigurationInfo.ConfigurationItems
+                                    Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
+                                    Select node).First()
+
+                    If findNode Is Nothing Then Continue For
+
+                    item.ValueID = findNode.SelectedValueID
+                    item.Value = findNode.SelectedValue
+                    item.IsMaterial = findNode.IsMaterial
+                    If item.IsMaterial Then
+                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                    End If
+
+                    tmpWorkSheet.Cells(i001 + 1 + 1, item.ColIndex + 3).Value = EPPlusHelper.JoinConfigurationName(item)
+
+                Next
+
+                '单价
+                tmpWorkSheet.Cells(i001 + 1 + 1, tmpID).Value = $"{tmpBOMConfigurationInfo.UnitPrice:n4}"
+
+            Next
+
+            tmpWorkSheet.Cells.AutoFitColumns()
+
+            Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
+                tmpExcelPackage.SaveAs(tmpSaveFileStream)
+            End Using
+        End Using
+
+    End Sub
+#End Region
+
 End Class

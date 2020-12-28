@@ -615,7 +615,7 @@ Public NotInheritable Class EPPlusHelper
 #End Region
 
                 '另存为模板
-                Using tmpSaveFileStream = File.Create(AppSettingHelper.TemplateFilePath)
+                Using tmpSaveFileStream = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
                 End Using
 
@@ -749,7 +749,7 @@ Public NotInheritable Class EPPlusHelper
                 tmpWorkSheet.Select(tmpWorkSheet.Cells(1, 1).Address, True)
 
                 '另存为
-                Using tmpSaveFileStream = File.Create(outputFilePath)
+                Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
                 End Using
 
@@ -829,63 +829,71 @@ Public NotInheritable Class EPPlusHelper
 
         '根据选项拼接
         For Each item In values
-            '跳过未出现在BOM中的配置项
-            If Not item.Exist Then
-                Continue For
-            End If
-
-            '跳过没有选项值的
-            If String.IsNullOrWhiteSpace(item.ValueID) Then
-                Continue For
-            End If
-
-            nameStr += "; "
-
-            nameStr += If(String.IsNullOrWhiteSpace(item.ExportPrefix), "", item.ExportPrefix)
-
-            If item.IsExportConfigurationNodeValue Then
-                nameStr += item.Value
-            End If
-
-            If item.IsExportpName Then
-                nameStr += item.MaterialValue.pName
-            End If
-
-            If item.IsExportpConfigFirstTerm Then
-                If Not item.IsMaterial Then
-                    Throw New Exception($"BOM名称: {item.Name} 不是物料配置项")
-                End If
-
-                Dim tmpStr = StrConv(item.MaterialValue.pConfig, VbStrConv.Narrow)
-                nameStr += tmpStr.Split(";").First
-            End If
-
-            If item.IsExportMatchingValue Then
-                If Not item.IsMaterial Then
-                    Throw New Exception($"BOM名称: {item.Name} 不是物料配置项")
-                End If
-
-                Dim matchValues = item.MatchingValues.Split(";")
-                Dim findValue As String = Nothing
-                For Each value In matchValues
-                    If item.MaterialValue.pConfig.Contains(value.Trim) Then
-                        findValue = value.Trim
-                        Exit For
-                    End If
-                Next
-
-                If String.IsNullOrWhiteSpace(findValue) Then
-                    Throw New Exception($"BOM名称: 未匹配到 {item.Name} 的型号")
-                End If
-
-                nameStr += findValue
-
-            End If
-
+            nameStr += JoinConfigurationName(item)
         Next
 
         Return nameStr
 
+    End Function
+#End Region
+
+#Region "获取拼接的配置项名称"
+    ''' <summary>
+    ''' 获取拼接的配置项名称
+    ''' </summary>
+    Public Shared Function JoinConfigurationName(value As ExportConfigurationNodeInfo) As String
+        '跳过未出现在BOM中的配置项
+        If Not value.Exist Then
+            Return ""
+        End If
+
+        '跳过没有选项值的
+        If String.IsNullOrWhiteSpace(value.ValueID) Then
+            Return ""
+        End If
+
+        Dim nameStr = If(String.IsNullOrWhiteSpace(value.ExportPrefix), "", value.ExportPrefix)
+
+        If value.IsExportConfigurationNodeValue Then
+            nameStr += value.Value
+        End If
+
+        If value.IsExportpName Then
+            nameStr += value.MaterialValue.pName
+        End If
+
+        If value.IsExportpConfigFirstTerm Then
+            If Not value.IsMaterial Then
+                Throw New Exception($"BOM名称: {value.Name} 不是物料配置项")
+            End If
+
+            Dim tmpStr = StrConv(value.MaterialValue.pConfig, VbStrConv.Narrow)
+            nameStr += tmpStr.Split(";").First
+        End If
+
+        If value.IsExportMatchingValue Then
+            If Not value.IsMaterial Then
+                Throw New Exception($"BOM名称: {value.Name} 不是物料配置项")
+            End If
+
+            Dim matchValues = value.MatchingValues.Split(";")
+            Dim findValue As String = Nothing
+            For Each item In matchValues
+                If value.MaterialValue.pConfig.Contains(item.Trim) Then
+                    findValue = item.Trim
+                    Exit For
+                End If
+            Next
+
+            If String.IsNullOrWhiteSpace(findValue) Then
+                Throw New Exception($"BOM名称: 未匹配到 {value.Name} 的型号")
+            End If
+
+            nameStr += findValue
+
+        End If
+
+        Return nameStr
     End Function
 #End Region
 

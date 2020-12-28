@@ -59,4 +59,10 @@ Public Class ExportConfigurationNodeInfo
     <Newtonsoft.Json.JsonIgnore>
     Public Exist As Boolean
 
+    ''' <summary>
+    ''' 所在列号
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public ColIndex As Integer
+
 End Class

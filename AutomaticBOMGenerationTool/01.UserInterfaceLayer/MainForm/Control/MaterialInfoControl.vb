@@ -90,4 +90,14 @@
         End If
 
     End Sub
+
+    Private Sub MaterialInfoControl_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
+        ZeroUnitPriceSolidBrush?.Dispose()
+        TitleFontSolidBrush?.Dispose()
+        ContextFontSolidBrush?.Dispose()
+        StringFormatFar?.Dispose()
+        BorderPen?.Dispose()
+        OldFont?.Dispose()
+    End Sub
+
 End Class

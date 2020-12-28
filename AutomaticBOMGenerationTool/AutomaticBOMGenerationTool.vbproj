@@ -97,7 +97,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite">
-      <HintPath>..\..\..\DotNetDLL\Sqlite3\System.Data.SQLite.dll</HintPath>
+      <HintPath>..\..\..\DotNetDLL\Sqlite3_32Bit\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -177,6 +177,7 @@
     <Compile Include="02.BusinessLogicLayer\LocalDatabaseHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
+    <Compile Include="03.DataAccessLayer\BOMConfigurationInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationGroupInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeRowInfo.vb" />

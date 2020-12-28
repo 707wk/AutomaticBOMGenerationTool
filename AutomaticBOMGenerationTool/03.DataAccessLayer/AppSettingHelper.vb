@@ -105,10 +105,10 @@ Public Class AppSettingHelper
                                            System.Text.Encoding.UTF8))
 
         Catch ex As Exception
-            instance = New AppSettingHelper
-
             '设置默认参数
-            instance.ExportConfigurationNodeInfoList = New List(Of ExportConfigurationNodeInfo)
+            instance = New AppSettingHelper With {
+                .ExportConfigurationNodeInfoList = New List(Of ExportConfigurationNodeInfo)
+            }
 
         End Try
 
