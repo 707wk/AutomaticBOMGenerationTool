@@ -706,7 +706,6 @@ group by NodeValueID"
 
             Using reader As SQLiteDataReader = cmd.ExecuteReader()
                 If reader.Read Then
-                    Console.WriteLine(reader(0))
                     Return CInt(reader(0)) > 0
                 End If
             End Using

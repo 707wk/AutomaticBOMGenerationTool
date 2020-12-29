@@ -62,10 +62,6 @@ Public Class AppSettingHelper
             If instance Is Nothing Then
                 LoadFromLocaltion()
 
-                If instance.ExportConfigurationNodeInfoList Is Nothing Then
-                    instance.ExportConfigurationNodeInfoList = New List(Of ExportConfigurationNodeInfo)
-                End If
-
                 '程序集GUID
                 Dim guid_attr As Attribute = Attribute.GetCustomAttribute(Reflection.Assembly.GetExecutingAssembly(), GetType(Runtime.InteropServices.GuidAttribute))
                 instance._GUID = CType(guid_attr, Runtime.InteropServices.GuidAttribute).Value
@@ -106,9 +102,7 @@ Public Class AppSettingHelper
 
         Catch ex As Exception
             '设置默认参数
-            instance = New AppSettingHelper With {
-                .ExportConfigurationNodeInfoList = New List(Of ExportConfigurationNodeInfo)
-            }
+            instance = New AppSettingHelper
 
         End Try
 
@@ -192,8 +186,7 @@ Public Class AppSettingHelper
     ''' <summary>
     ''' 源文件地址
     ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public SourceFilePath As String '= ".\Data\SourceFile.xlsx"
+    Public SourceFilePath As String
 
     ''' <summary>
     ''' 模板文件地址
@@ -209,6 +202,11 @@ Public Class AppSettingHelper
     ''' <summary>
     ''' 导出配置项设置信息
     ''' </summary>
-    Public ExportConfigurationNodeInfoList As List(Of ExportConfigurationNodeInfo)
+    Public ExportConfigurationNodeInfoList As New List(Of ExportConfigurationNodeInfo)
+
+    ''' <summary>
+    ''' 待导出BOM列表
+    ''' </summary>
+    Public ExportBOMList As New List(Of BOMConfigurationInfo)
 
 End Class

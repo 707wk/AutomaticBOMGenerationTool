@@ -44,10 +44,11 @@ Partial Class MainForm
         Me.RibbonBar3 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem6 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar2 = New DevComponents.DotNetBar.RibbonBar()
-        Me.ButtonItem4 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem5 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar1 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem2 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem3 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem4 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonTabItem1 = New DevComponents.DotNetBar.RibbonTabItem()
         Me.QatCustomizeItem1 = New DevComponents.DotNetBar.QatCustomizeItem()
         Me.StyleManager1 = New DevComponents.DotNetBar.StyleManager(Me.components)
@@ -136,8 +137,8 @@ Partial Class MainForm
         Me.AddCurrentToExportBOMListButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.AddCurrentToExportBOMListButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.AddCurrentToExportBOMListButton.Name = "AddCurrentToExportBOMListButton"
-        Me.AddCurrentToExportBOMListButton.Size = New System.Drawing.Size(206, 24)
-        Me.AddCurrentToExportBOMListButton.Text = "添加当前配置到待导出BOM列表"
+        Me.AddCurrentToExportBOMListButton.Size = New System.Drawing.Size(158, 24)
+        Me.AddCurrentToExportBOMListButton.Text = "添加到待导出BOM列表"
         '
         'ExportCurrentButton
         '
@@ -145,8 +146,8 @@ Partial Class MainForm
         Me.ExportCurrentButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ExportCurrentButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ExportCurrentButton.Name = "ExportCurrentButton"
-        Me.ExportCurrentButton.Size = New System.Drawing.Size(155, 24)
-        Me.ExportCurrentButton.Text = "导出当前配置的BOM..."
+        Me.ExportCurrentButton.Size = New System.Drawing.Size(113, 24)
+        Me.ExportCurrentButton.Text = "导出当前配置..."
         '
         'ToolStripSeparator1
         '
@@ -241,7 +242,7 @@ Partial Class MainForm
         Me.RibbonBar4.DragDropSupport = True
         Me.RibbonBar4.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem1})
         Me.RibbonBar4.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar4.Location = New System.Drawing.Point(566, 0)
+        Me.RibbonBar4.Location = New System.Drawing.Point(687, 0)
         Me.RibbonBar4.Name = "RibbonBar4"
         Me.RibbonBar4.Size = New System.Drawing.Size(124, 86)
         Me.RibbonBar4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
@@ -281,7 +282,7 @@ Partial Class MainForm
         Me.RibbonBar3.DragDropSupport = True
         Me.RibbonBar3.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem6})
         Me.RibbonBar3.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar3.Location = New System.Drawing.Point(440, 0)
+        Me.RibbonBar3.Location = New System.Drawing.Point(561, 0)
         Me.RibbonBar3.Name = "RibbonBar3"
         Me.RibbonBar3.Size = New System.Drawing.Size(126, 86)
         Me.RibbonBar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
@@ -319,11 +320,11 @@ Partial Class MainForm
         Me.RibbonBar2.ContainerControlProcessDialogKey = True
         Me.RibbonBar2.Dock = System.Windows.Forms.DockStyle.Left
         Me.RibbonBar2.DragDropSupport = True
-        Me.RibbonBar2.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem4})
+        Me.RibbonBar2.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem5})
         Me.RibbonBar2.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar2.Location = New System.Drawing.Point(312, 0)
+        Me.RibbonBar2.Location = New System.Drawing.Point(369, 0)
         Me.RibbonBar2.Name = "RibbonBar2"
-        Me.RibbonBar2.Size = New System.Drawing.Size(128, 86)
+        Me.RibbonBar2.Size = New System.Drawing.Size(192, 86)
         Me.RibbonBar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar2.TabIndex = 1
         Me.RibbonBar2.Text = "物料搭配"
@@ -336,14 +337,14 @@ Partial Class MainForm
         '
         Me.RibbonBar2.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square
         '
-        'ButtonItem4
+        'ButtonItem5
         '
-        Me.ButtonItem4.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem4.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.analysis_32px
-        Me.ButtonItem4.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem4.Name = "ButtonItem4"
-        Me.ButtonItem4.SubItemsExpandWidth = 14
-        Me.ButtonItem4.Text = "解析模板"
+        Me.ButtonItem5.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem5.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.link_32px
+        Me.ButtonItem5.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem5.Name = "ButtonItem5"
+        Me.ButtonItem5.SubItemsExpandWidth = 14
+        Me.ButtonItem5.Text = "预留"
         '
         'RibbonBar1
         '
@@ -359,11 +360,11 @@ Partial Class MainForm
         Me.RibbonBar1.ContainerControlProcessDialogKey = True
         Me.RibbonBar1.Dock = System.Windows.Forms.DockStyle.Left
         Me.RibbonBar1.DragDropSupport = True
-        Me.RibbonBar1.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem2, Me.ButtonItem3})
+        Me.RibbonBar1.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem2, Me.ButtonItem3, Me.ButtonItem4})
         Me.RibbonBar1.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
         Me.RibbonBar1.Location = New System.Drawing.Point(3, 0)
         Me.RibbonBar1.Name = "RibbonBar1"
-        Me.RibbonBar1.Size = New System.Drawing.Size(309, 86)
+        Me.RibbonBar1.Size = New System.Drawing.Size(366, 86)
         Me.RibbonBar1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar1.TabIndex = 0
         Me.RibbonBar1.Text = "文件"
@@ -393,6 +394,15 @@ Partial Class MainForm
         Me.ButtonItem3.Name = "ButtonItem3"
         Me.ButtonItem3.SubItemsExpandWidth = 14
         Me.ButtonItem3.Text = "查看BOM模板"
+        '
+        'ButtonItem4
+        '
+        Me.ButtonItem4.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem4.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.analysis_32px
+        Me.ButtonItem4.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem4.Name = "ButtonItem4"
+        Me.ButtonItem4.SubItemsExpandWidth = 14
+        Me.ButtonItem4.Text = "重新解析BOM模板"
         '
         'RibbonTabItem1
         '
@@ -569,7 +579,6 @@ Partial Class MainForm
     Friend WithEvents ButtonItem2 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents RibbonBar3 As DevComponents.DotNetBar.RibbonBar
     Friend WithEvents RibbonBar2 As DevComponents.DotNetBar.RibbonBar
-    Friend WithEvents ButtonItem4 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents ButtonItem6 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents ToolStripStatusLabel1 As ToolStripStatusLabel
@@ -591,4 +600,6 @@ Partial Class MainForm
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
     Friend WithEvents ButtonItem3 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
+    Friend WithEvents ButtonItem4 As DevComponents.DotNetBar.ButtonItem
+    Friend WithEvents ButtonItem5 As DevComponents.DotNetBar.ButtonItem
 End Class

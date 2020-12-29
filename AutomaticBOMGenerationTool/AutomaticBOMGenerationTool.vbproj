@@ -232,7 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\LocalDatabase.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
@@ -252,9 +252,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="Data\ConfigurationRule.txt">
+    <None Include="res\link_32px.png" />
+    <None Include="Data\ConfigurationRule.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
     <Content Include="logo.ico" />
     <None Include="res\view_32px.png" />
     <None Include="res\fold_20px.png" />

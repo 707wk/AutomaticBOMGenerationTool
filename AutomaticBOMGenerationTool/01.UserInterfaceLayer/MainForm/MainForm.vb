@@ -34,12 +34,37 @@ Public Class MainForm
     End Sub
 
     Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        'ShowConfigurationNodeControl()
+
+        If Not String.IsNullOrWhiteSpace(AppSettingHelper.GetInstance.SourceFilePath) Then
+            ToolStripStatusLabel1.Text = AppSettingHelper.GetInstance.SourceFilePath
+            ShowConfigurationNodeControl()
+        End If
 
         FlowLayoutPanel1_ControlRemoved(Nothing, Nothing)
         ExportBOMList_RowsRemoved(Nothing, Nothing)
         ToolStripStatusLabel1_TextChanged(Nothing, Nothing)
 
+        ShowExportBOMListData()
+
+    End Sub
+
+    Private Sub MainForm_Closing(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles Me.Closing
+        GetExportBOMListData()
+    End Sub
+
+    Private Sub ShowExportBOMListData()
+        For Each item In AppSettingHelper.GetInstance.ExportBOMList
+            ExportBOMList.Rows.Add({False, item.Name, $"￥{item.UnitPrice:n4}", "查看配置"})
+            ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = item
+        Next
+    End Sub
+
+    Private Sub GetExportBOMListData()
+        AppSettingHelper.GetInstance.ExportBOMList.Clear()
+        AppSettingHelper.GetInstance.ExportBOMList.AddRange(
+            From item As DataGridViewRow In ExportBOMList.Rows
+            Select CType(item.Tag, BOMConfigurationInfo)
+                )
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles ButtonItem2.Click
@@ -52,16 +77,15 @@ Public Class MainForm
                 Exit Sub
             End If
 
-            ToolStripStatusLabel1.Text = tmpDialog.FileName
             AppSettingHelper.GetInstance.SourceFilePath = tmpDialog.FileName
-
+            ToolStripStatusLabel1.Text = AppSettingHelper.GetInstance.SourceFilePath
             Button2_Click(Nothing, Nothing)
 
         End Using
     End Sub
 
     Private Sub ButtonItem3_Click(sender As Object, e As EventArgs) Handles ButtonItem3.Click
-        FileHelper.Open(ToolStripStatusLabel1.Text)
+        FileHelper.Open(AppSettingHelper.GetInstance.SourceFilePath)
     End Sub
 
 #Region "解析模板"
@@ -564,9 +588,11 @@ Public Class MainForm
 
     Private Sub ToolStripStatusLabel1_TextChanged(sender As Object, e As EventArgs) Handles ToolStripStatusLabel1.TextChanged
         If ToolStripStatusLabel1.Text.Contains(":") Then
+            ButtonItem3.Enabled = True
             ButtonItem4.Enabled = True
             ButtonItem6.Enabled = True
         Else
+            ButtonItem3.Enabled = False
             ButtonItem4.Enabled = False
             ButtonItem6.Enabled = False
         End If
@@ -678,6 +704,10 @@ Public Class MainForm
 #End Region
 
         End Select
+    End Sub
+
+    Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
+        UIFormHelper.ToastWarning("功能未开发")
     End Sub
 
 End Class
