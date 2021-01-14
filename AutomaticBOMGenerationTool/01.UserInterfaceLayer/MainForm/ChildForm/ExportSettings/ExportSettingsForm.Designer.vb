@@ -22,9 +22,9 @@ Partial Class ExportSettingsForm
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle11 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle12 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.CheckBoxDataGridView1 = New Wangk.Resource.CheckBoxDataGridView()
@@ -33,6 +33,8 @@ Partial Class ExportSettingsForm
         Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         Me.CancelButton = New System.Windows.Forms.Button()
         Me.AddOrSaveButton = New System.Windows.Forms.Button()
+        Me.ExportSettingsButton = New System.Windows.Forms.Button()
+        Me.ImportSettingsButton = New System.Windows.Forms.Button()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -67,32 +69,32 @@ Partial Class ExportSettingsForm
         '
         Me.CheckBoxDataGridView1.AllowUserToAddRows = False
         Me.CheckBoxDataGridView1.AllowUserToDeleteRows = False
-        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control
-        Me.CheckBoxDataGridView1.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control
+        Me.CheckBoxDataGridView1.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle10
         Me.CheckBoxDataGridView1.BackgroundColor = System.Drawing.Color.White
         Me.CheckBoxDataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None
-        DataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle5.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        DataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.CheckBoxDataGridView1.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle5
+        DataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle11.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.CheckBoxDataGridView1.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle11
         Me.CheckBoxDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.CheckBoxDataGridView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.CheckBoxDataGridView1.GridColor = System.Drawing.Color.FromArgb(CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer))
         Me.CheckBoxDataGridView1.Location = New System.Drawing.Point(3, 30)
         Me.CheckBoxDataGridView1.Name = "CheckBoxDataGridView1"
         Me.CheckBoxDataGridView1.ReadOnly = True
-        DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-        DataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle6.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        DataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle6
+        DataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+        DataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle12.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle12
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
         Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(970, 381)
         Me.CheckBoxDataGridView1.TabIndex = 0
@@ -152,11 +154,33 @@ Partial Class ExportSettingsForm
         Me.AddOrSaveButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.AddOrSaveButton.UseVisualStyleBackColor = True
         '
+        'ExportSettingsButton
+        '
+        Me.ExportSettingsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ExportSettingsButton.Location = New System.Drawing.Point(12, 462)
+        Me.ExportSettingsButton.Name = "ExportSettingsButton"
+        Me.ExportSettingsButton.Size = New System.Drawing.Size(96, 25)
+        Me.ExportSettingsButton.TabIndex = 47
+        Me.ExportSettingsButton.Text = "导出设置..."
+        Me.ExportSettingsButton.UseVisualStyleBackColor = True
+        '
+        'ImportSettingsButton
+        '
+        Me.ImportSettingsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ImportSettingsButton.Location = New System.Drawing.Point(114, 462)
+        Me.ImportSettingsButton.Name = "ImportSettingsButton"
+        Me.ImportSettingsButton.Size = New System.Drawing.Size(96, 25)
+        Me.ImportSettingsButton.TabIndex = 47
+        Me.ImportSettingsButton.Text = "导入设置..."
+        Me.ImportSettingsButton.UseVisualStyleBackColor = True
+        '
         'ExportSettingsForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1008, 499)
+        Me.Controls.Add(Me.ImportSettingsButton)
+        Me.Controls.Add(Me.ExportSettingsButton)
         Me.Controls.Add(Me.CancelButton)
         Me.Controls.Add(Me.AddOrSaveButton)
         Me.Controls.Add(Me.TabControl1)
@@ -186,4 +210,6 @@ Partial Class ExportSettingsForm
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents ToolStripButton2 As ToolStripButton
+    Friend WithEvents ExportSettingsButton As Button
+    Friend WithEvents ImportSettingsButton As Button
 End Class

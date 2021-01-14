@@ -35,16 +35,18 @@ Public Class MainForm
 
     Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
 
-        If Not String.IsNullOrWhiteSpace(AppSettingHelper.GetInstance.SourceFilePath) Then
-            ToolStripStatusLabel1.Text = AppSettingHelper.GetInstance.SourceFilePath
-            ShowConfigurationNodeControl()
-        End If
+        If LocalDatabaseHelper.HaveData() Then
+            If File.Exists(AppSettingHelper.GetInstance.SourceFilePath) Then
+                ToolStripStatusLabel1.Text = AppSettingHelper.GetInstance.SourceFilePath
+            End If
 
-        FlowLayoutPanel1_ControlRemoved(Nothing, Nothing)
+            ShowConfigurationNodeControl()
+                ShowExportBOMListData()
+            End If
+
+            FlowLayoutPanel1_ControlRemoved(Nothing, Nothing)
         ExportBOMList_RowsRemoved(Nothing, Nothing)
         ToolStripStatusLabel1_TextChanged(Nothing, Nothing)
-
-        ShowExportBOMListData()
 
     End Sub
 
@@ -700,7 +702,7 @@ Public Class MainForm
 
             Case 3
 #Region "查看配置"
-
+                UIFormHelper.ToastWarning("功能未开发")
 #End Region
 
         End Select

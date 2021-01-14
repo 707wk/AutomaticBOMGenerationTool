@@ -737,20 +737,20 @@ Public NotInheritable Class EPPlusHelper
                 Dim BOMName = JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
                 tmpWorkSheet.Cells(headerLocation.Y, headerLocation.X + 2).Value = BOMName
 
-                '设置数量列条件格式
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "数量")
-                Using rng = tmpWorkSheet.Cells($"{tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address}:{tmpWorkSheet.Cells(tmpWorkSheet.Dimension.End.Row, headerLocation.X).Address}")
-                    Dim condSumLn = tmpWorkSheet.ConditionalFormatting.AddExpression(rng)
-                    condSumLn.Style.Fill.BackgroundColor.Color = UIFormHelper.ErrorColor
-                    condSumLn.Formula = $"=IF(ISBLANK({tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address}),FALSE,if(VALUE({tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address})<>0,FALSE,TRUE))"
-                End Using
-                '设置单价列条件格式
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "单价")
-                Using rng = tmpWorkSheet.Cells($"{tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address}:{tmpWorkSheet.Cells(tmpWorkSheet.Dimension.End.Row, headerLocation.X).Address}")
-                    Dim condSumLn = tmpWorkSheet.ConditionalFormatting.AddExpression(rng)
-                    condSumLn.Style.Fill.BackgroundColor.Color = UIFormHelper.ErrorColor
-                    condSumLn.Formula = $"=IF(ISBLANK({tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address}),FALSE,if(VALUE({tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address})<>0,FALSE,TRUE))"
-                End Using
+                ''设置数量列条件格式
+                'headerLocation = FindHeaderLocation(tmpExcelPackage, "数量")
+                'Using rng = tmpWorkSheet.Cells($"{tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address}:{tmpWorkSheet.Cells(tmpWorkSheet.Dimension.End.Row, headerLocation.X).Address}")
+                '    Dim condSumLn = tmpWorkSheet.ConditionalFormatting.AddExpression(rng)
+                '    condSumLn.Style.Fill.BackgroundColor.Color = UIFormHelper.ErrorColor
+                '    condSumLn.Formula = $"=IF(ISBLANK({tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address}),FALSE,if(VALUE({tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address})<>0,FALSE,TRUE))"
+                'End Using
+                ''设置单价列条件格式
+                'headerLocation = FindHeaderLocation(tmpExcelPackage, "单价")
+                'Using rng = tmpWorkSheet.Cells($"{tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address}:{tmpWorkSheet.Cells(tmpWorkSheet.Dimension.End.Row, headerLocation.X).Address}")
+                '    Dim condSumLn = tmpWorkSheet.ConditionalFormatting.AddExpression(rng)
+                '    condSumLn.Style.Fill.BackgroundColor.Color = UIFormHelper.ErrorColor
+                '    condSumLn.Formula = $"=IF(ISBLANK({tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address}),FALSE,if(VALUE({tmpWorkSheet.Cells(tmpWorkSheet.Dimension.Start.Row, headerLocation.X).Address})<>0,FALSE,TRUE))"
+                'End Using
 
                 '自动调整行高
                 For rid = tmpWorkSheet.Dimension.Start.Row To tmpWorkSheet.Dimension.End.Row

@@ -82,7 +82,7 @@ Partial Class MainForm
         Me.ConfigurationGroupList.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ConfigurationGroupList.Location = New System.Drawing.Point(3, 46)
         Me.ConfigurationGroupList.Name = "ConfigurationGroupList"
-        Me.ConfigurationGroupList.Size = New System.Drawing.Size(1254, 575)
+        Me.ConfigurationGroupList.Size = New System.Drawing.Size(1378, 359)
         Me.ConfigurationGroupList.TabIndex = 3
         '
         'GroupBox1
@@ -93,7 +93,7 @@ Partial Class MainForm
         Me.GroupBox1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBox1.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(1260, 624)
+        Me.GroupBox1.Size = New System.Drawing.Size(1384, 408)
         Me.GroupBox1.TabIndex = 4
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "BOM配置选择"
@@ -104,7 +104,7 @@ Partial Class MainForm
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator2, Me.AddCurrentToExportBOMListButton, Me.ExportCurrentButton, Me.ToolStripSeparator1, Me.ToolStripLabel1})
         Me.ToolStrip1.Location = New System.Drawing.Point(3, 19)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1254, 27)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1378, 27)
         Me.ToolStrip1.TabIndex = 4
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -304,7 +304,7 @@ Partial Class MainForm
         Me.ButtonItem6.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
         Me.ButtonItem6.Name = "ButtonItem6"
         Me.ButtonItem6.SubItemsExpandWidth = 14
-        Me.ButtonItem6.Text = "导出设置..."
+        Me.ButtonItem6.Text = "设置"
         '
         'RibbonBar2
         '
@@ -438,9 +438,10 @@ Partial Class MainForm
         'SplitContainer1
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
+        Me.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2
         Me.SplitContainer1.Location = New System.Drawing.Point(0, 115)
         Me.SplitContainer1.Name = "SplitContainer1"
+        Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
         '
         'SplitContainer1.Panel1
         '
@@ -450,7 +451,7 @@ Partial Class MainForm
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.GroupBox2)
         Me.SplitContainer1.Size = New System.Drawing.Size(1384, 624)
-        Me.SplitContainer1.SplitterDistance = 1260
+        Me.SplitContainer1.SplitterDistance = 408
         Me.SplitContainer1.TabIndex = 10
         '
         'GroupBox2
@@ -460,7 +461,7 @@ Partial Class MainForm
         Me.GroupBox2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBox2.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(120, 624)
+        Me.GroupBox2.Size = New System.Drawing.Size(1384, 212)
         Me.GroupBox2.TabIndex = 0
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "待导出BOM列表"
@@ -496,7 +497,7 @@ Partial Class MainForm
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.ExportBOMList.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.ExportBOMList.RowTemplate.Height = 30
-        Me.ExportBOMList.Size = New System.Drawing.Size(114, 575)
+        Me.ExportBOMList.Size = New System.Drawing.Size(1378, 163)
         Me.ExportBOMList.TabIndex = 0
         '
         'ToolStrip2
@@ -505,7 +506,7 @@ Partial Class MainForm
         Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExportAllBOMButton, Me.DeleteButton})
         Me.ToolStrip2.Location = New System.Drawing.Point(3, 19)
         Me.ToolStrip2.Name = "ToolStrip2"
-        Me.ToolStrip2.Size = New System.Drawing.Size(114, 27)
+        Me.ToolStrip2.Size = New System.Drawing.Size(1378, 27)
         Me.ToolStrip2.TabIndex = 1
         Me.ToolStrip2.Text = "ToolStrip2"
         '
