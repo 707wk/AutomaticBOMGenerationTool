@@ -42,8 +42,9 @@ Public Class ConfigurationNodeControl
 
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        'Me.Label1.Text = $"▶ {NodeInfo.Name} :"
         Me.Label1.Text = NodeInfo.Name
+        Me.Label1.ProgressBarWidth = 800
+        Me.Label1.NodeInfo = _NodeInfo
 
     End Sub
 
@@ -237,6 +238,10 @@ Public Class ConfigurationNodeControl
         IsUserChecked = True
     End Sub
 #End Region
+
+    Public Sub UpdateTotalPrice()
+        Me.Label1.UpdatePrice()
+    End Sub
 
     Private Sub ConfigurationNodeControl_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
 

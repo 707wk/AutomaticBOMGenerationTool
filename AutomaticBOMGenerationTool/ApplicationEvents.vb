@@ -23,6 +23,8 @@ Namespace My
         End Sub
 
         Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
+            LocalDatabaseHelper.Close()
+
             AppSettingHelper.SaveToLocaltion()
             AppSettingHelper.GetInstance.ClearTempFiles()
         End Sub

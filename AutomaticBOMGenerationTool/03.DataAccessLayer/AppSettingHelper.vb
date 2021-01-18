@@ -226,6 +226,10 @@ Public Class AppSettingHelper
     ''' 源文件地址
     ''' </summary>
     Public SourceFilePath As String
+    ''' <summary>
+    ''' 临时文件地址,存放处理后的源文件
+    ''' </summary>
+    Public Shared TempfilePath As String = ".\Data\Tempfile.xlsx"
 
     ''' <summary>
     ''' 模板文件地址
@@ -247,5 +251,32 @@ Public Class AppSettingHelper
     ''' 待导出BOM列表
     ''' </summary>
     Public ExportBOMList As New List(Of BOMConfigurationInfo)
+
+    ''' <summary>
+    ''' 当前BOM最大阶层数
+    ''' </summary>
+    Public BOMLevelCount As Integer
+    ''' <summary>
+    ''' 当前BOM阶层首层所在列ID
+    ''' </summary>
+    Public BOMlevelColumnID As Integer
+    ''' <summary>
+    ''' 当前BOM品号所在列ID
+    ''' </summary>
+    Public BOMpIDColumnID As Integer
+
+    ''' <summary>
+    ''' BOM第一个物料行号
+    ''' </summary>
+    Public BOMMaterialRowMinID As Integer
+    ''' <summary>
+    ''' BOM最后一个物料行号
+    ''' </summary>
+    Public BOMMaterialRowMaxID As Integer
+
+    ''' <summary>
+    ''' 总价
+    ''' </summary>
+    Public TotalPrice As Decimal
 
 End Class

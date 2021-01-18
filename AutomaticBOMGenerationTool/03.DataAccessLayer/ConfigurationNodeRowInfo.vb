@@ -40,4 +40,9 @@ Public Class ConfigurationNodeRowInfo
     ''' </summary>
     Public SelectedValue As String
 
+    ''' <summary>
+    ''' 单项总价
+    ''' </summary>
+    Public TotalPrice As Decimal
+
 End Class

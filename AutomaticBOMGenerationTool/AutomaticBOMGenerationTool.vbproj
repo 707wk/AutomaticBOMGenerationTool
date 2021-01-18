@@ -166,6 +166,9 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeLabel.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\MaterialInfoControl.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -255,6 +258,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="res\message_32px.png" />
     <None Include="res\link_32px.png" />
     <None Include="Data\ConfigurationRule.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

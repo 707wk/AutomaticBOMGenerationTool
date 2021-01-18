@@ -5,27 +5,44 @@ Imports System.Data.SQLite
 ''' </summary>
 Public NotInheritable Class LocalDatabaseHelper
 
+    Private Shared _DatabaseConnection As SQLite.SQLiteConnection
+
+    Private Shared ReadOnly Property DatabaseConnection() As SQLiteConnection
+        Get
+            If _DatabaseConnection Is Nothing Then
+                _DatabaseConnection = New SQLite.SQLiteConnection With {
+                    .ConnectionString = AppSettingHelper.SQLiteConnection
+                }
+                _DatabaseConnection.Open()
+
+            End If
+
+            Return _DatabaseConnection
+        End Get
+    End Property
+
+    Public Shared Sub Close()
+        Try
+            _DatabaseConnection.Close()
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
 #Region "是否有数据"
     ''' <summary>
     ''' 是否有数据
     ''' </summary>
     Public Shared Function HaveData() As Boolean
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select count(ID) from ConfigurationGroupInfo"
             }
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return reader(0) > 0
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return reader(0) > 0
+            End If
         End Using
 
         Return False
@@ -39,13 +56,8 @@ Public NotInheritable Class LocalDatabaseHelper
     ''' </summary>
     Public Shared Sub ClearLocalDatabase()
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Using tmpCommand As New SQLite.SQLiteCommand(tmpConnection)
-                tmpCommand.CommandText = "
+        Using tmpCommand As New SQLite.SQLiteCommand(DatabaseConnection)
+            tmpCommand.CommandText = "
 delete from MaterialInfo;
 delete from ConfigurationNodeInfo;
 delete from ConfigurationNodeRowInfo;
@@ -53,9 +65,7 @@ delete from ConfigurationNodeValueInfo;
 delete from MaterialLinkInfo;
 delete from ConfigurationGroupInfo;"
 
-                tmpCommand.ExecuteNonQuery()
-            End Using
-
+            tmpCommand.ExecuteNonQuery()
         End Using
 
     End Sub
@@ -67,14 +77,9 @@ delete from ConfigurationGroupInfo;"
     ''' </summary>
     Public Shared Sub SaveMaterialInfoToLocalDatabase(values As List(Of MaterialInfo))
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            '使用事务提交
-            Using Transaction As DbTransaction = tmpConnection.BeginTransaction()
-                Dim cmd As New SQLiteCommand(tmpConnection) With {
+        '使用事务提交
+        Using Transaction As DbTransaction = DatabaseConnection.BeginTransaction()
+            Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                     .CommandText = "insert into MaterialInfo 
 values(
 @ID,
@@ -85,29 +90,27 @@ values(
 @pUnitPrice
 )"
                 }
-                cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String))
-                cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String))
-                cmd.Parameters.Add(New SQLiteParameter("@pName", DbType.String))
-                cmd.Parameters.Add(New SQLiteParameter("@pConfig", DbType.String))
-                cmd.Parameters.Add(New SQLiteParameter("@pUnit", DbType.String))
-                cmd.Parameters.Add(New SQLiteParameter("@pUnitPrice", DbType.Double))
+            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String))
+            cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String))
+            cmd.Parameters.Add(New SQLiteParameter("@pName", DbType.String))
+            cmd.Parameters.Add(New SQLiteParameter("@pConfig", DbType.String))
+            cmd.Parameters.Add(New SQLiteParameter("@pUnit", DbType.String))
+            cmd.Parameters.Add(New SQLiteParameter("@pUnitPrice", DbType.Double))
 
-                For Each item In values
+            For Each item In values
 
-                    cmd.Parameters("@ID").Value = Wangk.Resource.IDHelper.NewID
-                    cmd.Parameters("@pID").Value = item.pID
-                    cmd.Parameters("@pName").Value = item.pName
-                    cmd.Parameters("@pConfig").Value = item.pConfig
-                    cmd.Parameters("@pUnit").Value = item.pUnit
-                    cmd.Parameters("@pUnitPrice").Value = item.pUnitPrice
+                cmd.Parameters("@ID").Value = Wangk.Resource.IDHelper.NewID
+                cmd.Parameters("@pID").Value = item.pID
+                cmd.Parameters("@pName").Value = item.pName
+                cmd.Parameters("@pConfig").Value = item.pConfig
+                cmd.Parameters("@pUnit").Value = item.pUnit
+                cmd.Parameters("@pUnitPrice").Value = item.pUnitPrice
 
-                    cmd.ExecuteNonQuery()
-                Next
+                cmd.ExecuteNonQuery()
+            Next
 
-                '提交事务
-                Transaction.Commit()
-            End Using
-
+            '提交事务
+            Transaction.Commit()
         End Using
 
     End Sub
@@ -119,12 +122,7 @@ values(
     ''' </summary>
     Public Shared Sub SaveConfigurationGroupInfoToLocalDatabase(value As ConfigurationGroupInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "insert into ConfigurationGroupInfo 
 values(
 @ID,
@@ -132,13 +130,11 @@ values(
 @SortID
 )"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
-            cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = value.Name})
-            cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
+        cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
+        cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = value.Name})
+        cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
 
-            cmd.ExecuteNonQuery()
-
-        End Using
+        cmd.ExecuteNonQuery()
 
     End Sub
 #End Region
@@ -149,12 +145,7 @@ values(
     ''' </summary>
     Public Shared Sub SaveConfigurationNodeInfoToLocalDatabase(value As ConfigurationNodeInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "insert into ConfigurationNodeInfo 
 values(
 @ID,
@@ -164,15 +155,13 @@ values(
 @GroupID
 )"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
-            cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = value.Name})
-            cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
-            cmd.Parameters.Add(New SQLiteParameter("@IsMaterial", DbType.Boolean) With {.Value = value.IsMaterial})
-            cmd.Parameters.Add(New SQLiteParameter("@GroupID", DbType.String) With {.Value = value.GroupID})
+        cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
+        cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = value.Name})
+        cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
+        cmd.Parameters.Add(New SQLiteParameter("@IsMaterial", DbType.Boolean) With {.Value = value.IsMaterial})
+        cmd.Parameters.Add(New SQLiteParameter("@GroupID", DbType.String) With {.Value = value.GroupID})
 
-            cmd.ExecuteNonQuery()
-
-        End Using
+        cmd.ExecuteNonQuery()
 
     End Sub
 #End Region
@@ -183,27 +172,20 @@ values(
     ''' </summary>
     Public Shared Function GetConfigurationNodeInfoByNameFromLocalDatabase(name As String) As ConfigurationNodeInfo
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from ConfigurationNodeInfo 
 where Name=@Name"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = name})
+        cmd.Parameters.Add(New SQLiteParameter("@Name", DbType.String) With {.Value = name})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return New ConfigurationNodeInfo With {
-                        .ID = reader(NameOf(ConfigurationNodeInfo.ID)),
-                        .Name = reader(NameOf(ConfigurationNodeInfo.Name)),
-                        .SortID = reader(NameOf(ConfigurationNodeInfo.SortID))
-                    }
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return New ConfigurationNodeInfo With {
+                    .ID = reader(NameOf(ConfigurationNodeInfo.ID)),
+                    .Name = reader(NameOf(ConfigurationNodeInfo.Name)),
+                    .SortID = reader(NameOf(ConfigurationNodeInfo.SortID))
+                }
+            End If
         End Using
 
         Return Nothing
@@ -216,12 +198,7 @@ where Name=@Name"
     ''' </summary>
     Public Shared Sub SaveConfigurationNodeValueInfoToLocalDatabase(value As ConfigurationNodeValueInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "insert into ConfigurationNodeValueInfo 
 values(
 @ID,
@@ -230,18 +207,16 @@ values(
 @SortID
 )"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = value.ConfigurationNodeID})
-            cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value.Value})
-            cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
+        cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = value.ConfigurationNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value.Value})
+        cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
 
-            Try
-                cmd.ExecuteNonQuery()
-            Catch ex As Exception
-                Throw New Exception($"品号 {value.Value} 在配置列表不同项中重复出现")
-            End Try
-
-        End Using
+        Try
+            cmd.ExecuteNonQuery()
+        Catch ex As Exception
+            Throw New Exception($"品号 {value.Value} 在配置列表不同项中重复出现")
+        End Try
 
     End Sub
 #End Region
@@ -254,29 +229,22 @@ values(
                                                                                 configurationNodeID As String,
                                                                                 value As String) As ConfigurationNodeValueInfo
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from ConfigurationNodeValueInfo 
 where ConfigurationNodeID=@ConfigurationNodeID and Value=@Value"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
-            cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value})
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return New ConfigurationNodeValueInfo With {
-                        .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
-                        .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
-                        .Value = reader(NameOf(ConfigurationNodeValueInfo.Value)),
-                        .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID))
-                    }
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return New ConfigurationNodeValueInfo With {
+                    .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
+                    .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
+                    .Value = reader(NameOf(ConfigurationNodeValueInfo.Value)),
+                    .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID))
+                }
+            End If
         End Using
 
         Return Nothing
@@ -289,28 +257,21 @@ where ConfigurationNodeID=@ConfigurationNodeID and Value=@Value"
     ''' </summary>
     Public Shared Function GetConfigurationNodeValueInfoByValueFromLocalDatabase(value As String) As ConfigurationNodeValueInfo
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from ConfigurationNodeValueInfo 
 where Value=@Value"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value})
+        cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return New ConfigurationNodeValueInfo With {
-                        .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
-                        .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
-                        .Value = reader(NameOf(ConfigurationNodeValueInfo.Value)),
-                        .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID))
-                    }
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return New ConfigurationNodeValueInfo With {
+                    .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
+                    .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
+                    .Value = reader(NameOf(ConfigurationNodeValueInfo.Value)),
+                    .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID))
+                }
+            End If
         End Using
 
         Return Nothing
@@ -323,30 +284,23 @@ where Value=@Value"
     ''' </summary>
     Public Shared Function GetMaterialInfoBypIDFromLocalDatabase(pID As String) As MaterialInfo
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from MaterialInfo 
 where pID=@pID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = pID})
+        cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = pID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return New MaterialInfo With {
-                        .ID = reader(NameOf(MaterialInfo.ID)),
-                        .pID = reader(NameOf(MaterialInfo.pID)),
-                        .pName = reader(NameOf(MaterialInfo.pName)),
-                        .pConfig = reader(NameOf(MaterialInfo.pConfig)),
-                        .pUnit = reader(NameOf(MaterialInfo.pUnit)),
-                        .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
-                    }
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return New MaterialInfo With {
+                    .ID = reader(NameOf(MaterialInfo.ID)),
+                    .pID = reader(NameOf(MaterialInfo.pID)),
+                    .pName = reader(NameOf(MaterialInfo.pName)),
+                    .pConfig = reader(NameOf(MaterialInfo.pConfig)),
+                    .pUnit = reader(NameOf(MaterialInfo.pUnit)),
+                    .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
+                }
+            End If
         End Using
 
         Return Nothing
@@ -359,30 +313,23 @@ where pID=@pID"
     ''' </summary>
     Public Shared Function GetMaterialInfoByIDFromLocalDatabase(id As String) As MaterialInfo
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from MaterialInfo 
 where ID=@ID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = id})
+        cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = id})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return New MaterialInfo With {
-                        .ID = reader(NameOf(MaterialInfo.ID)),
-                        .pID = reader(NameOf(MaterialInfo.pID)),
-                        .pName = reader(NameOf(MaterialInfo.pName)),
-                        .pConfig = reader(NameOf(MaterialInfo.pConfig)),
-                        .pUnit = reader(NameOf(MaterialInfo.pUnit)),
-                        .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
-                    }
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return New MaterialInfo With {
+                    .ID = reader(NameOf(MaterialInfo.ID)),
+                    .pID = reader(NameOf(MaterialInfo.pID)),
+                    .pName = reader(NameOf(MaterialInfo.pName)),
+                    .pConfig = reader(NameOf(MaterialInfo.pConfig)),
+                    .pUnit = reader(NameOf(MaterialInfo.pUnit)),
+                    .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
+                }
+            End If
         End Using
 
         Return Nothing
@@ -395,23 +342,16 @@ where ID=@ID"
     ''' </summary>
     Public Shared Function GetConfigurationNodeIDByppIDFromLocalDatabase(pID As String) As String
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select ConfigurationNodeID from ConfigurationNodeValueInfo 
 where Value=@pID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = pID})
+        cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = pID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return reader(0)
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return reader(0)
+            End If
         End Using
 
         Return Nothing
@@ -424,12 +364,7 @@ where Value=@pID"
     ''' </summary>
     Public Shared Sub SaveMaterialLinkInfoToLocalDatabase(value As MaterialLinkInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "insert into MaterialLinkInfo 
 values(
 @ID,
@@ -439,15 +374,13 @@ values(
 @LinkNodeValueID
 )"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
-            cmd.Parameters.Add(New SQLiteParameter("@NodeID", DbType.String) With {.Value = value.NodeID})
-            cmd.Parameters.Add(New SQLiteParameter("@NodeValueID", DbType.String) With {.Value = value.NodeValueID})
-            cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = value.LinkNodeID})
-            cmd.Parameters.Add(New SQLiteParameter("@LinkNodeValueID", DbType.String) With {.Value = value.LinkNodeValueID})
+        cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
+        cmd.Parameters.Add(New SQLiteParameter("@NodeID", DbType.String) With {.Value = value.NodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@NodeValueID", DbType.String) With {.Value = value.NodeValueID})
+        cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = value.LinkNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@LinkNodeValueID", DbType.String) With {.Value = value.LinkNodeValueID})
 
-            cmd.ExecuteNonQuery()
-
-        End Using
+        cmd.ExecuteNonQuery()
 
     End Sub
 #End Region
@@ -460,27 +393,20 @@ values(
 
         Dim tmpList = New List(Of ConfigurationNodeInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from ConfigurationNodeInfo order by SortID"
             }
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpList.Add(New ConfigurationNodeInfo With {
-                        .ID = reader(NameOf(ConfigurationNodeInfo.ID)),
-                        .SortID = reader(NameOf(ConfigurationNodeInfo.SortID)),
-                        .Name = reader(NameOf(ConfigurationNodeInfo.Name)),
-                        .IsMaterial = reader(NameOf(ConfigurationNodeInfo.IsMaterial)),
-                        .GroupID = reader(NameOf(ConfigurationNodeInfo.GroupID))
-                    })
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(New ConfigurationNodeInfo With {
+                    .ID = reader(NameOf(ConfigurationNodeInfo.ID)),
+                    .SortID = reader(NameOf(ConfigurationNodeInfo.SortID)),
+                    .Name = reader(NameOf(ConfigurationNodeInfo.Name)),
+                    .IsMaterial = reader(NameOf(ConfigurationNodeInfo.IsMaterial)),
+                    .GroupID = reader(NameOf(ConfigurationNodeInfo.GroupID))
+                })
+            End While
         End Using
 
         Return tmpList
@@ -493,38 +419,31 @@ values(
     ''' </summary>
     Public Shared Sub SaveMaterialRowIDToLocalDatabase(values As List(Of ConfigurationNodeRowInfo))
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            '使用事务提交
-            Using Transaction As DbTransaction = tmpConnection.BeginTransaction()
-                Dim cmd As New SQLiteCommand(tmpConnection) With {
-                    .CommandText = "insert into ConfigurationNodeRowInfo 
+        '使用事务提交
+        Using Transaction As DbTransaction = DatabaseConnection.BeginTransaction()
+            Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+                .CommandText = "insert into ConfigurationNodeRowInfo 
 values(
 @ID,
 @ConfigurationNodeID,
 @MaterialRowID
 )"
-                }
-                cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String))
-                cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String))
-                cmd.Parameters.Add(New SQLiteParameter("@MaterialRowID", DbType.Int32))
+            }
+            cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String))
+            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String))
+            cmd.Parameters.Add(New SQLiteParameter("@MaterialRowID", DbType.Int32))
 
-                For Each item In values
+            For Each item In values
 
-                    cmd.Parameters("@ID").Value = Wangk.Resource.IDHelper.NewID
-                    cmd.Parameters("@ConfigurationNodeID").Value = item.ConfigurationNodeID
-                    cmd.Parameters("@MaterialRowID").Value = item.MaterialRowID
+                cmd.Parameters("@ID").Value = Wangk.Resource.IDHelper.NewID
+                cmd.Parameters("@ConfigurationNodeID").Value = item.ConfigurationNodeID
+                cmd.Parameters("@MaterialRowID").Value = item.MaterialRowID
 
-                    cmd.ExecuteNonQuery()
-                Next
+                cmd.ExecuteNonQuery()
+            Next
 
-                '提交事务
-                Transaction.Commit()
-            End Using
-
+            '提交事务
+            Transaction.Commit()
         End Using
 
     End Sub
@@ -538,25 +457,18 @@ values(
 
         Dim tmpList = New List(Of ConfigurationGroupInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from ConfigurationGroupInfo order by SortID"
             }
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpList.Add(New ConfigurationGroupInfo With {
-                        .ID = reader(NameOf(ConfigurationGroupInfo.ID)),
-                        .SortID = reader(NameOf(ConfigurationGroupInfo.SortID)),
-                        .Name = reader(NameOf(ConfigurationGroupInfo.Name))
-                    })
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(New ConfigurationGroupInfo With {
+                    .ID = reader(NameOf(ConfigurationGroupInfo.ID)),
+                    .SortID = reader(NameOf(ConfigurationGroupInfo.SortID)),
+                    .Name = reader(NameOf(ConfigurationGroupInfo.Name))
+                })
+            End While
         End Using
 
         Return tmpList
@@ -570,23 +482,16 @@ values(
     Public Shared Function GetMaterialRowIDInLocalDatabase(configurationNodeID As String) As List(Of Integer)
         Dim tmpList As New List(Of Integer)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select MaterialRowID from ConfigurationNodeRowInfo 
 where ConfigurationNodeID=@ConfigurationNodeID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read()
-                    tmpList.Add(reader(0))
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read()
+                tmpList.Add(reader(0))
+            End While
         End Using
 
         Return tmpList
@@ -600,25 +505,18 @@ where ConfigurationNodeID=@ConfigurationNodeID"
     Public Shared Function GetLinkNodeIDListByNodeID(nodeID As String) As List(Of String)
         Dim tmpList As New List(Of String)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select MaterialLinkInfo.LinkNodeID
 from MaterialLinkInfo
 where NodeID=@NodeID
 group by MaterialLinkInfo.LinkNodeID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@NodeID", DbType.String) With {.Value = nodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@NodeID", DbType.String) With {.Value = nodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpList.Add(reader(0))
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(reader(0))
+            End While
         End Using
 
         Return tmpList
@@ -632,12 +530,7 @@ group by MaterialLinkInfo.LinkNodeID"
     Public Shared Function GetConfigurationNodeValueIDItems(configurationNodeID As String) As Dictionary(Of String, Integer)
         Dim tmpDictionary As New Dictionary(Of String, Integer)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select MaterialLinkInfo.LinkNodeValueID,count(MaterialLinkInfo.LinkNodeValueID)
 from  MaterialLinkInfo
 inner join ConfigurationNodeInfo
@@ -647,21 +540,12 @@ where MaterialLinkInfo.LinkNodeID=@ConfigurationNodeID
 group by MaterialLinkInfo.LinkNodeValueID"
             }
 
-            '                .CommandText = "select ConfigurationNodeValueInfo.ID,count(ConfigurationNodeValueInfo.ID)
-            'from ConfigurationNodeValueInfo
-            'left outer join MaterialLinkInfo
-            'on ConfigurationNodeValueInfo.ID=MaterialLinkInfo.LinkNodeValueID 
-            'where ConfigurationNodeValueInfo.ConfigurationNodeID=@ConfigurationNodeID
-            'group by ConfigurationNodeValueInfo.ID"
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
-
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpDictionary.Add(reader(0), reader(1))
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpDictionary.Add(reader(0), reader(1))
+            End While
         End Using
 
         Return tmpDictionary
@@ -675,25 +559,18 @@ group by MaterialLinkInfo.LinkNodeValueID"
     Public Shared Function GetParentConfigurationNodeIDItems(configurationNodeID As String) As HashSet(Of String)
         Dim tmpHashSet As New HashSet(Of String)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select NodeID
 from MaterialLinkInfo
 where LinkNodeID=@LinkNodeID
 group by NodeID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = configurationNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = configurationNodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpHashSet.Add(reader(0))
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpHashSet.Add(reader(0))
+            End While
         End Using
 
         Return tmpHashSet
@@ -710,13 +587,8 @@ group by NodeID"
 
         Dim tmpList = New List(Of ConfigurationNodeValueInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
 #Disable Warning CA2100 ' Review SQL queries for security vulnerabilities
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = $"select count(NodeValueID)
 from MaterialLinkInfo
 inner join ConfigurationNodeInfo
@@ -730,14 +602,12 @@ group by NodeValueID"
             }
 #Enable Warning CA2100 ' Review SQL queries for security vulnerabilities
 
-            cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = nodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = nodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return CInt(reader(0)) > 0
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return CInt(reader(0)) > 0
+            End If
         End Using
 
         Return False
@@ -753,27 +623,20 @@ group by NodeValueID"
                                                      linkNodeID As String) As HashSet(Of String)
         Dim tmpHashSet As New HashSet(Of String)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select LinkNodeValueID
     from MaterialLinkInfo
     where NodeValueID=@NodeValueID
     and LinkNodeID=@LinkNodeID
     group by LinkNodeValueID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@NodeValueID", DbType.String) With {.Value = nodeValueID})
-            cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = linkNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@NodeValueID", DbType.String) With {.Value = nodeValueID})
+        cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = linkNodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpHashSet.Add(reader(0))
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpHashSet.Add(reader(0))
+            End While
         End Using
 
         Return tmpHashSet
@@ -790,28 +653,21 @@ group by NodeValueID"
                                                      linkNodeID As String) As HashSet(Of String)
         Dim tmpHashSet As New HashSet(Of String)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select LinkNodeValueID
 from MaterialLinkInfo
 where NodeID=@NodeID and NodeValueID<>@NodeValueID
 and LinkNodeID=@LinkNodeID
 group by LinkNodeValueID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@NodeID", DbType.String) With {.Value = nodeID})
-            cmd.Parameters.Add(New SQLiteParameter("@NodeValueID", DbType.String) With {.Value = nodeValueID})
-            cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = linkNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@NodeID", DbType.String) With {.Value = nodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@NodeValueID", DbType.String) With {.Value = nodeValueID})
+        cmd.Parameters.Add(New SQLiteParameter("@LinkNodeID", DbType.String) With {.Value = linkNodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpHashSet.Add(reader(0))
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpHashSet.Add(reader(0))
+            End While
         End Using
 
         Return tmpHashSet
@@ -823,24 +679,18 @@ group by LinkNodeValueID"
     ''' 获取被关联项数
     ''' </summary>
     Public Shared Function GetLinkCount(configurationNodeID As String) As Integer
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
 
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select count(id)
 from MaterialLinkInfo
 where LinkNodeID=@ConfigurationNodeID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                If reader.Read Then
-                    Return reader(0)
-                End If
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return reader(0)
+            End If
         End Using
 
         Return 0
@@ -855,12 +705,7 @@ where LinkNodeID=@ConfigurationNodeID"
 
         Dim tmpList = New List(Of MaterialInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select MaterialInfo.*
 from ConfigurationNodeValueInfo
 
@@ -873,21 +718,19 @@ on MaterialInfo.ID=ConfigurationNodeValueInfo.ID
 
 order by MaterialInfo.pUnitPrice"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpList.Add(New MaterialInfo With {
-                        .ID = reader(NameOf(MaterialInfo.ID)),
-                        .pID = reader(NameOf(MaterialInfo.pID)),
-                        .pName = reader(NameOf(MaterialInfo.pName)),
-                        .pConfig = reader(NameOf(MaterialInfo.pConfig)),
-                        .pUnit = reader(NameOf(MaterialInfo.pUnit)),
-                        .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
-                    })
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(New MaterialInfo With {
+                    .ID = reader(NameOf(MaterialInfo.ID)),
+                    .pID = reader(NameOf(MaterialInfo.pID)),
+                    .pName = reader(NameOf(MaterialInfo.pName)),
+                    .pConfig = reader(NameOf(MaterialInfo.pConfig)),
+                    .pUnit = reader(NameOf(MaterialInfo.pUnit)),
+                    .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
+                })
+            End While
         End Using
 
         Return tmpList
@@ -904,13 +747,8 @@ order by MaterialInfo.pUnitPrice"
 
         Dim tmpList = New List(Of MaterialInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
 #Disable Warning CA2100 ' Review SQL queries for security vulnerabilities
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = $"select *
 from MaterialInfo
 where ID in ({String.Join(",", tmpIDArray)})
@@ -919,19 +757,17 @@ order by MaterialInfo.pUnitPrice"
             }
 #Enable Warning CA2100 ' Review SQL queries for security vulnerabilities
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpList.Add(New MaterialInfo With {
-                        .ID = reader(NameOf(MaterialInfo.ID)),
-                        .pID = reader(NameOf(MaterialInfo.pID)),
-                        .pName = reader(NameOf(MaterialInfo.pName)),
-                        .pConfig = reader(NameOf(MaterialInfo.pConfig)),
-                        .pUnit = reader(NameOf(MaterialInfo.pUnit)),
-                        .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
-                    })
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(New MaterialInfo With {
+                    .ID = reader(NameOf(MaterialInfo.ID)),
+                    .pID = reader(NameOf(MaterialInfo.pID)),
+                    .pName = reader(NameOf(MaterialInfo.pName)),
+                    .pConfig = reader(NameOf(MaterialInfo.pConfig)),
+                    .pUnit = reader(NameOf(MaterialInfo.pUnit)),
+                    .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
+                })
+            End While
         End Using
 
         Return tmpList
@@ -946,12 +782,7 @@ order by MaterialInfo.pUnitPrice"
 
         Dim tmpList = New List(Of ConfigurationNodeValueInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select ConfigurationNodeValueInfo.*
 from ConfigurationNodeValueInfo
 
@@ -961,19 +792,17 @@ and ConfigurationNodeInfo.ID=@ConfigurationNodeID
 
 order by ConfigurationNodeValueInfo.SortID"
             }
-            cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpList.Add(New ConfigurationNodeValueInfo With {
-                        .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
-                        .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
-                        .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID)),
-                        .Value = reader(NameOf(ConfigurationNodeValueInfo.Value))
-                    })
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(New ConfigurationNodeValueInfo With {
+                    .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
+                    .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
+                    .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID)),
+                    .Value = reader(NameOf(ConfigurationNodeValueInfo.Value))
+                })
+            End While
         End Using
 
         Return tmpList
@@ -990,13 +819,8 @@ order by ConfigurationNodeValueInfo.SortID"
 
         Dim tmpList = New List(Of ConfigurationNodeValueInfo)
 
-        Using tmpConnection As New SQLite.SQLiteConnection With {
-            .ConnectionString = AppSettingHelper.SQLiteConnection
-        }
-            tmpConnection.Open()
-
 #Disable Warning CA2100 ' Review SQL queries for security vulnerabilities
-            Dim cmd As New SQLiteCommand(tmpConnection) With {
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = $"select *
 from ConfigurationNodeValueInfo
 
@@ -1006,17 +830,15 @@ order by ConfigurationNodeValueInfo.SortID"
             }
 #Enable Warning CA2100 ' Review SQL queries for security vulnerabilities
 
-            Using reader As SQLiteDataReader = cmd.ExecuteReader()
-                While reader.Read
-                    tmpList.Add(New ConfigurationNodeValueInfo With {
-                        .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
-                        .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
-                        .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID)),
-                        .Value = reader(NameOf(ConfigurationNodeValueInfo.Value))
-                    })
-                End While
-            End Using
-
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(New ConfigurationNodeValueInfo With {
+                    .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
+                    .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
+                    .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID)),
+                    .Value = reader(NameOf(ConfigurationNodeValueInfo.Value))
+                })
+            End While
         End Using
 
         Return tmpList

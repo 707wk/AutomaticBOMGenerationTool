@@ -22,21 +22,9 @@ Partial Class ConfigurationNodeControl
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.Label1 = New System.Windows.Forms.Label()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.Label1 = New AutomaticBOMGenerationTool.ConfigurationNodeLabel()
         Me.SuspendLayout()
-        '
-        'Label1
-        '
-        Me.Label1.BackColor = System.Drawing.SystemColors.Control
-        Me.Label1.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Label1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Me.Label1.Location = New System.Drawing.Point(0, 0)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(1202, 20)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Title"
-        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'FlowLayoutPanel1
         '
@@ -45,8 +33,20 @@ Partial Class ConfigurationNodeControl
         Me.FlowLayoutPanel1.AutoSize = True
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 23)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1196, 26)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1195, 26)
         Me.FlowLayoutPanel1.TabIndex = 1
+        '
+        'Label1
+        '
+        Me.Label1.BackColor = System.Drawing.SystemColors.Control
+        Me.Label1.Dock = System.Windows.Forms.DockStyle.Top
+        Me.Label1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.Label1.Location = New System.Drawing.Point(0, 0)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(1198, 20)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = "Title"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'ConfigurationNodeControl
         '
@@ -59,12 +59,12 @@ Partial Class ConfigurationNodeControl
         Me.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.Name = "ConfigurationNodeControl"
-        Me.Size = New System.Drawing.Size(1202, 52)
+        Me.Size = New System.Drawing.Size(1198, 52)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
 
-    Friend WithEvents Label1 As Label
+    Friend WithEvents Label1 As ConfigurationNodeLabel
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
 End Class

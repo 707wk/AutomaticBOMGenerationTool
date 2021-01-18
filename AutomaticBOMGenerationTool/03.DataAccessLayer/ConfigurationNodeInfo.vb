@@ -21,4 +21,9 @@ Public Class ConfigurationNodeInfo
     ''' </summary>
     Public GroupID As String
 
+    ''' <summary>
+    ''' 单项总价
+    ''' </summary>
+    Public TotalPrice As Decimal
+
 End Class
