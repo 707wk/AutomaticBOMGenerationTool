@@ -88,16 +88,17 @@ Public Class AppSettingHelper
     ''' 从本地读取配置
     ''' </summary>
     Private Shared Sub LoadFromLocaltion()
-        Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+        'Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 
-        System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech")
-        System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}")
-        System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
+        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech")
+        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}")
+        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
+        System.IO.Directory.CreateDirectory($".\Data")
 
         '反序列化
         Try
             instance = JsonConvert.DeserializeObject(Of AppSettingHelper)(
-                System.IO.File.ReadAllText($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data\Setting.json",
+                System.IO.File.ReadAllText($".\Data\Setting.json",
                                            System.Text.Encoding.UTF8))
 
         Catch ex As Exception
@@ -114,16 +115,17 @@ Public Class AppSettingHelper
     ''' 保存配置到本地
     ''' </summary>
     Public Shared Sub SaveToLocaltion()
-        Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+        'Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 
-        System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech")
-        System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}")
-        System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
+        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech")
+        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}")
+        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
+        System.IO.Directory.CreateDirectory($".\Data")
 
         '序列化
         Try
             Using t As System.IO.StreamWriter = New System.IO.StreamWriter(
-                    $"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data\Setting.json",
+                    $".\Data\Setting.json",
                     False,
                     System.Text.Encoding.UTF8)
 
@@ -134,6 +136,43 @@ Public Class AppSettingHelper
             MsgBox(ex.ToString, MsgBoxStyle.Exclamation, My.Application.Info.Title)
 
         End Try
+
+    End Sub
+#End Region
+
+#Region "导出配置"
+    ''' <summary>
+    ''' 导出配置
+    ''' </summary>
+    Public Shared Sub ExportSettings(filePath As String)
+
+        '序列化
+        Using t As System.IO.StreamWriter = New System.IO.StreamWriter(
+            filePath,
+            False,
+            System.Text.Encoding.UTF8)
+
+            t.Write(JsonConvert.SerializeObject(instance))
+        End Using
+
+    End Sub
+#End Region
+
+#Region "导入配置"
+    ''' <summary>
+    ''' 导入配置
+    ''' </summary>
+    Public Shared Sub ImportSettings(filePath As String)
+
+        '反序列化
+        Dim tmpInstance = JsonConvert.DeserializeObject(Of AppSettingHelper)(
+            System.IO.File.ReadAllText(filePath,
+                                       System.Text.Encoding.UTF8))
+
+        '需要导入的变量
+        instance.ExportConfigurationNodeInfoList = tmpInstance.ExportConfigurationNodeInfoList
+
+        SaveToLocaltion()
 
     End Sub
 #End Region
@@ -187,6 +226,10 @@ Public Class AppSettingHelper
     ''' 源文件地址
     ''' </summary>
     Public SourceFilePath As String
+    ''' <summary>
+    ''' 临时文件地址,存放处理后的源文件
+    ''' </summary>
+    Public Shared TempfilePath As String = ".\Data\Tempfile.xlsx"
 
     ''' <summary>
     ''' 模板文件地址
@@ -208,5 +251,27 @@ Public Class AppSettingHelper
     ''' 待导出BOM列表
     ''' </summary>
     Public ExportBOMList As New List(Of BOMConfigurationInfo)
+
+    ''' <summary>
+    ''' 当前BOM最大阶层数
+    ''' </summary>
+    Public BOMLevelCount As Integer
+    ''' <summary>
+    ''' 当前BOM阶层首层所在列ID
+    ''' </summary>
+    Public BOMlevelColumnID As Integer
+    ''' <summary>
+    ''' 当前BOM品号所在列ID
+    ''' </summary>
+    Public BOMpIDColumnID As Integer
+
+    ''' <summary>
+    ''' BOM第一个物料行号
+    ''' </summary>
+    Public BOMMaterialRowMinID As Integer
+    ''' <summary>
+    ''' BOM最后一个物料行号
+    ''' </summary>
+    Public BOMMaterialRowMaxID As Integer
 
 End Class

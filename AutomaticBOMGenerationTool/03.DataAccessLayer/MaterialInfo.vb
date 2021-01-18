@@ -34,4 +34,19 @@ Public Class MaterialInfo
     ''' </summary>
     Public pUnitPrice As Double
 
+    ''' <summary>
+    ''' 是否是替换料
+    ''' </summary>
+    Public IsReplaceableMaterial As Boolean
+
+    ''' <summary>
+    ''' 是否是组合料
+    ''' </summary>
+    Public IsCompositeMaterial As Boolean
+
+    ''' <summary>
+    ''' 子物料
+    ''' </summary>
+    Public Nodes As List(Of MaterialInfo)
+
 End Class

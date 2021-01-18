@@ -5,6 +5,34 @@ Imports System.Data.SQLite
 ''' </summary>
 Public NotInheritable Class LocalDatabaseHelper
 
+#Region "是否有数据"
+    ''' <summary>
+    ''' 是否有数据
+    ''' </summary>
+    Public Shared Function HaveData() As Boolean
+
+        Using tmpConnection As New SQLite.SQLiteConnection With {
+            .ConnectionString = AppSettingHelper.SQLiteConnection
+        }
+            tmpConnection.Open()
+
+            Dim cmd As New SQLiteCommand(tmpConnection) With {
+                .CommandText = "select count(ID) from ConfigurationGroupInfo"
+            }
+
+            Using reader As SQLiteDataReader = cmd.ExecuteReader()
+                If reader.Read Then
+                    Return reader(0) > 0
+                End If
+            End Using
+
+        End Using
+
+        Return False
+
+    End Function
+#End Region
+
 #Region "清空数据库"
     ''' <summary>
     ''' 清空数据库
@@ -20,10 +48,10 @@ Public NotInheritable Class LocalDatabaseHelper
                 tmpCommand.CommandText = "
 delete from MaterialInfo;
 delete from ConfigurationNodeInfo;
-delete from ConfigurationNodeRowInfo;
 delete from ConfigurationNodeValueInfo;
 delete from MaterialLinkInfo;
-delete from ConfigurationGroupInfo;"
+delete from ConfigurationGroupInfo;
+delete from CompositeMaterialInfo;"
 
                 tmpCommand.ExecuteNonQuery()
             End Using

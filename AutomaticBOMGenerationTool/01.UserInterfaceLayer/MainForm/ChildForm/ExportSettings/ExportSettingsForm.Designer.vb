@@ -33,6 +33,8 @@ Partial Class ExportSettingsForm
         Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         Me.CancelButton = New System.Windows.Forms.Button()
         Me.AddOrSaveButton = New System.Windows.Forms.Button()
+        Me.ImportSettingsButton = New System.Windows.Forms.Button()
+        Me.ExportSettingsButton = New System.Windows.Forms.Button()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -152,11 +154,33 @@ Partial Class ExportSettingsForm
         Me.AddOrSaveButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.AddOrSaveButton.UseVisualStyleBackColor = True
         '
+        'ImportSettingsButton
+        '
+        Me.ImportSettingsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ImportSettingsButton.Location = New System.Drawing.Point(114, 462)
+        Me.ImportSettingsButton.Name = "ImportSettingsButton"
+        Me.ImportSettingsButton.Size = New System.Drawing.Size(96, 25)
+        Me.ImportSettingsButton.TabIndex = 48
+        Me.ImportSettingsButton.Text = "导入设置..."
+        Me.ImportSettingsButton.UseVisualStyleBackColor = True
+        '
+        'ExportSettingsButton
+        '
+        Me.ExportSettingsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ExportSettingsButton.Location = New System.Drawing.Point(12, 462)
+        Me.ExportSettingsButton.Name = "ExportSettingsButton"
+        Me.ExportSettingsButton.Size = New System.Drawing.Size(96, 25)
+        Me.ExportSettingsButton.TabIndex = 49
+        Me.ExportSettingsButton.Text = "导出设置..."
+        Me.ExportSettingsButton.UseVisualStyleBackColor = True
+        '
         'ExportSettingsForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1008, 499)
+        Me.Controls.Add(Me.ImportSettingsButton)
+        Me.Controls.Add(Me.ExportSettingsButton)
         Me.Controls.Add(Me.CancelButton)
         Me.Controls.Add(Me.AddOrSaveButton)
         Me.Controls.Add(Me.TabControl1)
@@ -186,4 +210,6 @@ Partial Class ExportSettingsForm
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents ToolStripButton2 As ToolStripButton
+    Friend WithEvents ImportSettingsButton As Button
+    Friend WithEvents ExportSettingsButton As Button
 End Class

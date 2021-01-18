@@ -35,16 +35,18 @@ Public Class MainForm
 
     Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
 
-        If Not String.IsNullOrWhiteSpace(AppSettingHelper.GetInstance.SourceFilePath) Then
-            ToolStripStatusLabel1.Text = AppSettingHelper.GetInstance.SourceFilePath
-            ShowConfigurationNodeControl()
+        If LocalDatabaseHelper.HaveData() Then
+            If File.Exists(AppSettingHelper.GetInstance.SourceFilePath) Then
+                ToolStripStatusLabel1.Text = AppSettingHelper.GetInstance.SourceFilePath
+            End If
+
+            CreateConfigurationNodeControl()
+            ShowExportBOMListData()
         End If
 
         FlowLayoutPanel1_ControlRemoved(Nothing, Nothing)
         ExportBOMList_RowsRemoved(Nothing, Nothing)
         ToolStripStatusLabel1_TextChanged(Nothing, Nothing)
-
-        ShowExportBOMListData()
 
     End Sub
 
@@ -95,6 +97,9 @@ Public Class MainForm
         ExportBOMList.Rows.Clear()
         ConfigurationGroupList.Controls.Clear()
 
+        Dim tmpStopwatch = New Stopwatch
+        tmpStopwatch.Start()
+
         Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
             .Text = "解析数据"
         }
@@ -105,29 +110,38 @@ Public Class MainForm
                                 be.Write("清空数据库", 100 / stepCount * 0)
                                 LocalDatabaseHelper.ClearLocalDatabase()
 
-                                be.Write("获取替换物料品号", 100 / stepCount * 1)
-                                Dim tmpIDList = EPPlusHelper.GetMaterialpIDList(AppSettingHelper.GetInstance.SourceFilePath)
+                                be.Write("预处理源文件", 100 / stepCount * 0)
+                                EPPlusHelper.PreproccessSourceFile()
+
+                                be.Write("检测物料阶层结构", 100 / stepCount * 0)
+                                EPPlusHelper.TestMaterialLevel()
+
+                                be.Write("获取配置表中的替换物料品号", 100 / stepCount * 1)
+                                Dim configurationTablepIDList = EPPlusHelper.GetMaterialpIDListFromConfigurationTable()
 
                                 be.Write("检测替换物料完整性", 100 / stepCount * 2)
-                                EPPlusHelper.TestMaterialInfoCompleteness(AppSettingHelper.GetInstance.SourceFilePath, tmpIDList)
+                                EPPlusHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
 
-                                be.Write("获取替换物料信息", 100 / stepCount * 3)
-                                Dim tmpList = EPPlusHelper.GetMaterialInfoList(AppSettingHelper.GetInstance.SourceFilePath, tmpIDList)
+                                'todo:解析配置节点信息
 
-                                be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 4)
-                                LocalDatabaseHelper.SaveMaterialInfoToLocalDatabase(tmpList)
 
-                                be.Write("解析配置节点信息", 100 / stepCount * 5)
-                                EPPlusHelper.TransformationConfigurationTable(AppSettingHelper.GetInstance.SourceFilePath)
+                                'be.Write("获取替换物料信息", 100 / stepCount * 3)
+                                'Dim tmpList = EPPlusHelper.GetMaterialInfoList(AppSettingHelper.GetInstance.SourceFilePath, tmpIDList)
 
-                                be.Write("制作提取模板", 100 / stepCount * 6)
-                                EPPlusHelper.CreateTemplate(AppSettingHelper.GetInstance.SourceFilePath)
+                                'be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 4)
+                                'LocalDatabaseHelper.SaveMaterialInfoToLocalDatabase(tmpList)
 
-                                be.Write("获取替换物料在模板中的位置", 100 / stepCount * 7)
-                                Dim tmpRowIDList = EPPlusHelper.GetMaterialRowIDInTemplate(AppSettingHelper.TemplateFilePath)
+                                'be.Write("解析配置节点信息", 100 / stepCount * 5)
+                                'EPPlusHelper.TransformationConfigurationTable(AppSettingHelper.GetInstance.SourceFilePath)
 
-                                be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 8)
-                                LocalDatabaseHelper.SaveMaterialRowIDToLocalDatabase(tmpRowIDList)
+                                'be.Write("制作提取模板", 100 / stepCount * 6)
+                                'EPPlusHelper.CreateTemplate(AppSettingHelper.GetInstance.SourceFilePath)
+
+                                'be.Write("获取替换物料在模板中的位置", 100 / stepCount * 7)
+                                'Dim tmpRowIDList = EPPlusHelper.GetMaterialRowIDInTemplate(AppSettingHelper.TemplateFilePath)
+
+                                'be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 8)
+                                'LocalDatabaseHelper.SaveMaterialRowIDToLocalDatabase(tmpRowIDList)
 
                             End Sub)
 
@@ -139,9 +153,11 @@ Public Class MainForm
 
         End Using
 
-        ShowConfigurationNodeControl()
+        tmpStopwatch.Stop()
 
-        UIFormHelper.ToastSuccess("解析完成")
+        'ShowConfigurationNodeControl()
+
+        UIFormHelper.ToastSuccess($"解析完成,耗时 {tmpStopwatch.Elapsed:mm\:ss\.ff}")
 
     End Sub
 #End Region
@@ -150,7 +166,7 @@ Public Class MainForm
     ''' <summary>
     ''' 创建配置项选择控件
     ''' </summary>
-    Private Sub ShowConfigurationNodeControl()
+    Private Sub CreateConfigurationNodeControl()
 
         AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Clear()
         ExportBOMList.Rows.Clear()
@@ -171,7 +187,6 @@ Public Class MainForm
             tmpGroupDict.Add(item.ID, addConfigurationGroupControl)
         Next
 
-        'Dim tmpIndex = 1
         For Each item In tmpNodeList
 
             Dim tmpConfigurationGroupControl = tmpGroupDict(item.GroupID)
@@ -179,7 +194,6 @@ Public Class MainForm
             Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
                                           .NodeInfo = item
                                           }
-            'tmpIndex += 1
 
             tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
 
@@ -201,14 +215,6 @@ Public Class MainForm
     ''' 显示单价
     ''' </summary>
     Friend Sub ShowUnitPrice()
-
-        '检测物料完整性(跳过)
-        'For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
-        '    If String.IsNullOrWhiteSpace(item.SelectedValueID) Then
-        '        item.Select()
-        '        Throw New Exception($"配置项 {item.NodeInfo.Name} 未找到可替换物料")
-        '    End If
-        'Next
 
         '获取配置项信息
         Dim tmpConfigurationNodeRowInfoList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
@@ -239,9 +245,6 @@ Public Class MainForm
                 Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
                 EPPlusHelper.ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
-
-                ''计算单价
-                'EPPlusHelper.CalculateUnitPrice(tmpExcelPackage)
 
                 Dim headerLocation = EPPlusHelper.FindHeaderLocation(tmpExcelPackage, "单价")
 
@@ -700,7 +703,7 @@ Public Class MainForm
 
             Case 3
 #Region "查看配置"
-
+                UIFormHelper.ToastWarning("功能未开发")
 #End Region
 
         End Select
@@ -708,6 +711,10 @@ Public Class MainForm
 
     Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
         UIFormHelper.ToastWarning("功能未开发")
+    End Sub
+
+    Private Sub FeedbackButton_Click(sender As Object, e As EventArgs) Handles FeedbackButton.Click
+        Process.Start("https://support.qq.com/products/285331")
     End Sub
 
 End Class
