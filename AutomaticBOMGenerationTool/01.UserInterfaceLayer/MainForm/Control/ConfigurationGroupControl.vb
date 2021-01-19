@@ -14,7 +14,7 @@
 
     Private Sub ConfigurationGroupControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        CheckBox1.Text = GroupInfo.Name
+        CheckBox1.Text = $"{GroupInfo.SortID + 1}.{ GroupInfo.Name}"
 
         CheckBox1_CheckedChanged(Nothing, Nothing)
     End Sub

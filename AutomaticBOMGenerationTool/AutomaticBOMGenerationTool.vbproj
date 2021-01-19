@@ -112,6 +112,7 @@
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -258,6 +259,8 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="res\copy_20px.png" />
+    <None Include="res\save_20px.png" />
     <None Include="res\message_32px.png" />
     <None Include="res\link_32px.png" />
     <None Include="Data\ConfigurationRule.txt">

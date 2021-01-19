@@ -31,6 +31,7 @@ Partial Class ConfigurationGroupControl
         Me.CheckBox1.Appearance = System.Windows.Forms.Appearance.Button
         Me.CheckBox1.AutoSize = True
         Me.CheckBox1.FlatAppearance.BorderSize = 0
+        Me.CheckBox1.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.CheckBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.CheckBox1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.CheckBox1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.expand_16px
@@ -57,9 +58,11 @@ Partial Class ConfigurationGroupControl
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
+        Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Controls.Add(Me.CheckBox1)
         Me.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.ForeColor = System.Drawing.Color.White
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.MaximumSize = New System.Drawing.Size(1230, 32767)
         Me.MinimumSize = New System.Drawing.Size(1230, 0)

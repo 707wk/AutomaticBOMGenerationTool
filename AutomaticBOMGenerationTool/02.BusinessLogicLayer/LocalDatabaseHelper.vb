@@ -15,6 +15,8 @@ Public NotInheritable Class LocalDatabaseHelper
                 }
                 _DatabaseConnection.Open()
 
+                InitLocalDatabase()
+
             End If
 
             Return _DatabaseConnection
@@ -48,6 +50,25 @@ Public NotInheritable Class LocalDatabaseHelper
         Return False
 
     End Function
+#End Region
+
+#Region "初始化数据库"
+    ''' <summary>
+    ''' 初始化数据库
+    ''' </summary>
+    Public Shared Sub InitLocalDatabase()
+
+        Using tmpCommand As New SQLite.SQLiteCommand(DatabaseConnection)
+            tmpCommand.CommandText = "
+--关闭同步
+--PRAGMA synchronous = OFF;
+--不记录日志
+--PRAGMA journal_mode = OFF;"
+
+            tmpCommand.ExecuteNonQuery()
+        End Using
+
+    End Sub
 #End Region
 
 #Region "清空数据库"

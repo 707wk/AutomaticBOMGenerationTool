@@ -26,11 +26,6 @@ Public Class ConfigurationNodeControl
     Public SelectedValue As String
 
     ''' <summary>
-    ''' 序号
-    ''' </summary>
-    Public Index As Integer
-
-    ''' <summary>
     ''' 是否是手动点击的
     ''' </summary>
     Private IsUserChecked As Boolean = True
@@ -40,11 +35,15 @@ Public Class ConfigurationNodeControl
     ''' </summary>
     Private ParentNodeIDHashSet As HashSet(Of String)
 
+    'Private OldLabelBackColor As Color
+
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         Me.Label1.Text = NodeInfo.Name
         Me.Label1.ProgressBarWidth = 800
         Me.Label1.NodeInfo = _NodeInfo
+
+        'OldLabelBackColor = Color.FromArgb(70, 70, 74)
 
     End Sub
 
@@ -230,7 +229,7 @@ Public Class ConfigurationNodeControl
             Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
             tmpMaterialInfoControl.Checked = True
 
-            Me.Label1.BackColor = SystemColors.Control
+            Me.Label1.BackColor = Color.FromArgb(70, 70, 74)
         Else
             Me.Label1.BackColor = UIFormHelper.ErrorColor
         End If

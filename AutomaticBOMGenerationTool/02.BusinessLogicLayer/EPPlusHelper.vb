@@ -171,28 +171,6 @@ Public NotInheritable Class EPPlusHelper
     ''' 查找表头位置
     ''' </summary>
     Public Shared Function FindHeaderLocation(
-                                             filePath As String,
-                                             headText As String) As Point
-
-        Dim findStr = StrConv(headText, VbStrConv.Narrow).ToUpper
-
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-            Using tmpExcelPackage As New ExcelPackage(readFS)
-
-                Return FindHeaderLocation(tmpExcelPackage, headText)
-
-                Throw New Exception($"未找到 {headText}")
-
-            End Using
-        End Using
-    End Function
-#End Region
-
-#Region "查找表头位置"
-    ''' <summary>
-    ''' 查找表头位置
-    ''' </summary>
-    Public Shared Function FindHeaderLocation(
                                        wb As ExcelPackage,
                                        headText As String) As Point
 
@@ -235,7 +213,6 @@ Public NotInheritable Class EPPlusHelper
     ''' <summary>
     ''' 转换配置表
     ''' </summary>
-    ''' <param name="filePath"></param>
     Public Shared Sub TransformationConfigurationTable(filePath As String)
 
         ReplaceableMaterialParser(filePath)
@@ -257,7 +234,7 @@ Public NotInheritable Class EPPlusHelper
 
                 Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "说明")
                 Dim rowMaxID = headerLocation.Y - 1
-                headerLocation = FindHeaderLocation(filePath, "产品配置选项")
+                headerLocation = FindHeaderLocation(tmpExcelPackage, "产品配置选项")
 
                 Dim tmpRootNode As ConfigurationNodeInfo = Nothing
                 Dim tmpChildNode As ConfigurationNodeValueInfo = Nothing
@@ -315,11 +292,11 @@ Public NotInheritable Class EPPlusHelper
 
                             Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}"
                             tmpChildNode = New ConfigurationNodeValueInfo With {
-                            .ID = Wangk.Resource.IDHelper.NewID,
-                            .ConfigurationNodeID = tmpRootNode.ID,
-                            .SortID = childSortID,
-                            .Value = tmpChildNodeName
-                        }
+                                .ID = Wangk.Resource.IDHelper.NewID,
+                                .ConfigurationNodeID = tmpRootNode.ID,
+                                .SortID = childSortID,
+                                .Value = tmpChildNodeName
+                            }
                             LocalDatabaseHelper.SaveConfigurationNodeValueInfoToLocalDatabase(tmpChildNode)
                             childSortID += 1
 
@@ -422,7 +399,7 @@ Public NotInheritable Class EPPlusHelper
 
                 Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "说明")
                 Dim rowMaxID = headerLocation.Y - 1
-                headerLocation = FindHeaderLocation(filePath, "料品固定搭配集")
+                headerLocation = FindHeaderLocation(tmpExcelPackage, "料品固定搭配集")
 
                 For rID = headerLocation.Y + 1 To rowMaxID
 
@@ -534,7 +511,6 @@ Public NotInheritable Class EPPlusHelper
     ''' </summary>
     Public Shared Sub CreateTemplate(filePath As String)
 
-
         Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -547,10 +523,8 @@ Public NotInheritable Class EPPlusHelper
 
                 '清除单元格背景色
                 For rid = rowMinID To rowMaxID
-                    For cid = colMinID To colMaxID
-                        tmpWorkSheet.Cells(rid, cid).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-                        tmpWorkSheet.Cells(rid, cid).Style.Fill.BackgroundColor.SetColor(Color.White)
-                    Next
+                    tmpWorkSheet.Row(rid).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                    tmpWorkSheet.Row(rid).Style.Fill.BackgroundColor.SetColor(Color.White)
                 Next
 
                 '移除核价产品配置表
@@ -657,8 +631,6 @@ Public NotInheritable Class EPPlusHelper
                 countStack.Push(Decimal.Parse(tmpWorkSheet.Cells(rID, pCountColumnID).Value))
 
             End If
-
-            Console.WriteLine($"{rID} {String.Join(",", countStack)}")
 
             tmpWorkSheet.Cells(rID, tmpCountColumnID).Value = countStack.Aggregate(Function(self As Decimal, nextItem As Decimal)
                                                                                        Return self * nextItem
@@ -1057,6 +1029,105 @@ Public NotInheritable Class EPPlusHelper
 
         headerLocation = FindHeaderLocation(tmpExcelPackage, "品 号")
         AppSettingHelper.GetInstance.BOMpIDColumnID = headerLocation.X
+
+    End Sub
+#End Region
+
+#Region "生成文件配置清单文件"
+    ''' <summary>
+    ''' 生成文件配置清单文件
+    ''' </summary>
+    Public Shared Sub CreateConfigurationListFile(
+                                                 outputFilePath As String,
+                                                 BOMList As List(Of BOMConfigurationInfo))
+
+        Using tmpExcelPackage As New ExcelPackage()
+            Dim tmpWorkBook = tmpExcelPackage.Workbook
+            Dim tmpWorkSheet = tmpWorkBook.Worksheets.Add(IO.Path.GetFileNameWithoutExtension(outputFilePath))
+
+            '创建列标题
+            tmpWorkSheet.Cells(1, 1).Value = "文件名"
+            tmpWorkSheet.Cells(1, 2).Value = "操作"
+            Dim tmpID = 3
+            For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                If Not item.Exist Then
+                    Continue For
+                End If
+                tmpWorkSheet.Cells(1, tmpID).Value = item.Name
+                tmpID += 1
+            Next
+            tmpWorkSheet.Cells(1, tmpID).Value = "总价"
+
+            Dim tmpKeys = From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+                          Where item.NodeInfo.IsMaterial = True
+                          Order By item.NodeInfo.SortID
+                          Select item.NodeInfo.ID
+            '显示物料选项标题
+            For i001 = 0 To tmpKeys.Count - 1
+                tmpWorkSheet.Cells(1, tmpID + i001 + 1).Value = AppSettingHelper.GetInstance.ConfigurationNodeControlTable(tmpKeys(i001)).NodeInfo.Name
+            Next
+
+            For i001 = 0 To BOMList.Count - 1
+                Dim tmpBOMConfigurationInfo = BOMList(i001)
+
+                '文件名
+                tmpWorkSheet.Cells(i001 + 1 + 1, 1).Value = tmpBOMConfigurationInfo.FileName
+                tmpWorkSheet.Cells(i001 + 1 + 1, 2).Formula = $"=HYPERLINK(""{tmpBOMConfigurationInfo.FileName}"",""查看文件"")"
+                tmpWorkSheet.Cells(i001 + 1 + 1, 2).Style.Font.Color.SetColor(UIFormHelper.NormalColor)
+
+                '配置
+                For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                    If Not item.Exist Then
+                        Continue For
+                    End If
+
+                    Dim findNode = (From node In tmpBOMConfigurationInfo.ConfigurationItems
+                                    Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
+                                    Select node).First()
+
+                    If findNode Is Nothing Then Continue For
+
+                    item.ValueID = findNode.SelectedValueID
+                    item.Value = findNode.SelectedValue
+                    item.IsMaterial = findNode.IsMaterial
+                    If item.IsMaterial Then
+                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                    End If
+
+                    tmpWorkSheet.Cells(i001 + 1 + 1, item.ColIndex + 3).Value = EPPlusHelper.JoinConfigurationName(item)
+
+                Next
+
+                '总价
+                tmpWorkSheet.Cells(i001 + 1 + 1, tmpID).Value = $"{tmpBOMConfigurationInfo.UnitPrice:n2}"
+
+                '单项总价
+                For keyID = 0 To tmpKeys.Count - 1
+                    Dim nodeKey = tmpKeys(keyID)
+                    Dim findNode = (From node In tmpBOMConfigurationInfo.ConfigurationItems
+                                    Where node.ConfigurationNodeID.Equals(nodeKey)
+                                    Select node).First()
+
+                    tmpWorkSheet.Cells(i001 + 1 + 1, tmpID + keyID + 1).Value = $"{findNode.TotalPrice:n2}"
+
+                Next
+
+            Next
+
+            '自适应高度
+            tmpWorkSheet.Cells.AutoFitColumns()
+
+            '首行筛选
+            tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, tmpID + tmpKeys.Count).Address}").AutoFilter = True
+
+            '设置首行背景色
+            tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, tmpID + tmpKeys.Count).Address}").Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+            tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, tmpID + tmpKeys.Count).Address}").Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
+
+            Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
+                tmpExcelPackage.SaveAs(tmpSaveFileStream)
+            End Using
+        End Using
 
     End Sub
 #End Region

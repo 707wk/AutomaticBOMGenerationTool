@@ -121,6 +121,9 @@
   <data name="link_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\link_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="message_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\message_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="toastInfo_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\toastInfo_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -129,6 +132,9 @@
   </data>
   <data name="yes_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\yes_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="no_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\no_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="expand_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\expand_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -154,17 +160,17 @@
   <data name="openFile_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\openFile_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="no_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\no_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="toastFail_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\toastFail_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="book_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\book_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="save_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\save_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="analysis_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\analysis_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="toastSuccess_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\toastSuccess_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="setting_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\setting_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -175,13 +181,13 @@
   <data name="expand_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\expand_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="toastFail_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\toastFail_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="toastSuccess_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\toastSuccess_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="view_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\view_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="message_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\message_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="copy_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\copy_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

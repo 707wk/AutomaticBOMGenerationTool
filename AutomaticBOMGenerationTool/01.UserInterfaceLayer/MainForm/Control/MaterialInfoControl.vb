@@ -40,30 +40,21 @@
             Me.FlatAppearance.BorderColor = Color.FromArgb(0, 122, 204)
             Me.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
 
-            'If _Cache IsNot Nothing AndAlso
-            '    _Cache.pUnitPrice = 0 Then
-            '    Me.BackColor = UIFormHelper.ErrorColor
-            'Else
-            Me.BackColor = Color.FromArgb(240, 248, 255)
-            'End If
+            Me.BackColor = Color.FromArgb(70, 70, 74)
+            Me.FlatAppearance.CheckedBackColor = Color.FromArgb(70, 70, 74)
 
         Else
             Me.FlatAppearance.BorderColor = Color.FromArgb(173, 173, 173)
             Me.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Regular)
 
-            'If _Cache IsNot Nothing AndAlso
-            '    _Cache.pUnitPrice = 0 Then
-            '    Me.BackColor = UIFormHelper.ErrorColor
-            'Else
-            Me.BackColor = Color.White
-            'End If
+            Me.BackColor = Color.FromArgb(45, 45, 48)
 
         End If
     End Sub
 
     Private ReadOnly ZeroUnitPriceSolidBrush As New SolidBrush(UIFormHelper.ErrorColor)
-    Private ReadOnly TitleFontSolidBrush As New SolidBrush(Color.Black)
-    Private ReadOnly ContextFontSolidBrush As New SolidBrush(Color.DimGray)
+    Private ReadOnly TitleFontSolidBrush As New SolidBrush(Color.White)
+    Private ReadOnly ContextFontSolidBrush As New SolidBrush(Color.LightGray)
     Private ReadOnly StringFormatFar As New StringFormat()
     Private ReadOnly BorderPen As New Pen(Color.FromArgb(0, 122, 204), 2)
     Private ReadOnly OldFont As New Font("微软雅黑", Me.Font.Size)

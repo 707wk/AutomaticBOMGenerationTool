@@ -1,6 +1,7 @@
 ﻿Imports System.Data.Common
 Imports System.Data.SQLite
 Imports System.IO
+Imports System.Windows.Forms.DataVisualization.Charting
 Imports OfficeOpenXml
 
 Public Class MainForm
@@ -22,12 +23,22 @@ Public Class MainForm
 
             .DefaultCellStyle.WrapMode = DataGridViewTriState.True
             .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
+
 
             ExportBOMList.Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
             Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "总价", .Width = 120}
             tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             ExportBOMList.Columns.Add(tmpDataGridViewTextBoxColumn)
             ExportBOMList.Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
+
+            .EnableHeadersVisualStyles = False
+            .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
+            .RowHeadersDefaultCellStyle.ForeColor = Color.White
+            .RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single
+            .DefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48)
+            .GridColor = Color.FromArgb(45, 45, 48)
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
 
         End With
 
@@ -137,7 +148,7 @@ Public Class MainForm
                                 be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 导入替换物料位置到临时数据库", 100 / stepCount * 9)
                                 LocalDatabaseHelper.SaveMaterialRowIDToLocalDatabase(tmpRowIDList)
 
-                                '测试耗时
+                                ''测试耗时
                                 'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 处理完成", 100 / stepCount * 10)
                                 'Do While Not be.IsCancel
                                 '    Threading.Thread.Sleep(200)
@@ -187,15 +198,13 @@ Public Class MainForm
             tmpGroupDict.Add(item.ID, addConfigurationGroupControl)
         Next
 
-        'Dim tmpIndex = 1
         For Each item In tmpNodeList
 
             Dim tmpConfigurationGroupControl = tmpGroupDict(item.GroupID)
 
             Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
-                                          .NodeInfo = item
-                                          }
-            'tmpIndex += 1
+                .NodeInfo = item
+            }
 
             tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
 
@@ -260,6 +269,28 @@ Public Class MainForm
             item.UpdateTotalPrice()
         Next
 
+        Dim tmpOtherTotalPrice = AppSettingHelper.GetInstance.TotalPrice
+        Chart1.Series(0).Points.Clear()
+        For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+            If Not item.NodeInfo.IsMaterial Then
+                Continue For
+            End If
+
+            Chart1.Series(0).Points.Add(New DataPoint() With {
+                                        .YValues = {item.NodeInfo.TotalPrice},
+                                        .AxisLabel = $"{item.NodeInfo.Name}(￥{item.NodeInfo.TotalPrice:n2})"
+                                        })
+
+            tmpOtherTotalPrice -= item.NodeInfo.TotalPrice
+        Next
+
+        Chart1.Series(0).Points.Add(New DataPoint() With {
+                                        .YValues = {tmpOtherTotalPrice},
+                                        .AxisLabel = $"其他物料(￥{tmpOtherTotalPrice:n2})"
+                                        })
+
+        UIFormHelper.ToastSuccess($"{Now:HH:mm:ss} 价格更新完成", timeoutInterval:=1000)
+
     End Sub
 #End Region
 
@@ -288,7 +319,8 @@ Public Class MainForm
                                                                     .ConfigurationNodeName = item.NodeInfo.Name,
                                                                     .SelectedValueID = item.SelectedValueID,
                                                                     .SelectedValue = item.SelectedValue,
-                                                                    .IsMaterial = item.NodeInfo.IsMaterial
+                                                                    .IsMaterial = item.NodeInfo.IsMaterial,
+                                                                    .TotalPrice = item.NodeInfo.TotalPrice
                                                                     }
                                                                     ).ToList
 
@@ -476,7 +508,7 @@ Public Class MainForm
                                 Next
 
                                 be.Write("生成配置清单")
-                                CreateConfigurationListFile(Path.Combine(saveFolderPath, $"_文件配置清单.xlsx"), tmpBOMList)
+                                EPPlusHelper.CreateConfigurationListFile(Path.Combine(saveFolderPath, $"_文件配置清单.xlsx"), tmpBOMList)
 
                                 be.Write("导出中")
                                 For i001 = 0 To tmpBOMList.Count - 1
@@ -618,77 +650,6 @@ Public Class MainForm
         Next
     End Sub
 
-#Region "生成文件配置清单文件"
-    ''' <summary>
-    ''' 生成文件配置清单文件
-    ''' </summary>
-    Private Sub CreateConfigurationListFile(
-                                           outputFilePath As String,
-                                           BOMList As List(Of BOMConfigurationInfo))
-
-        Using tmpExcelPackage As New ExcelPackage()
-            Dim tmpWorkBook = tmpExcelPackage.Workbook
-            Dim tmpWorkSheet = tmpWorkBook.Worksheets.Add(IO.Path.GetFileNameWithoutExtension(outputFilePath))
-
-            '创建列标题
-            tmpWorkSheet.Cells(1, 1).Value = "文件名"
-            tmpWorkSheet.Cells(1, 2).Value = "操作"
-            Dim tmpID = 3
-            For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
-                If Not item.Exist Then
-                    Continue For
-                End If
-                tmpWorkSheet.Cells(1, tmpID).Value = item.Name
-                tmpID += 1
-            Next
-            tmpWorkSheet.Cells(1, tmpID).Value = "总价"
-
-            For i001 = 0 To BOMList.Count - 1
-                Dim tmpBOMConfigurationInfo = BOMList(i001)
-
-                '文件名
-                tmpWorkSheet.Cells(i001 + 1 + 1, 1).Value = tmpBOMConfigurationInfo.FileName
-                tmpWorkSheet.Cells(i001 + 1 + 1, 2).Formula = $"=HYPERLINK(""{tmpBOMConfigurationInfo.FileName}"",""查看文件"")"
-                tmpWorkSheet.Cells(i001 + 1 + 1, 2).Style.Font.Color.SetColor(UIFormHelper.NormalColor)
-
-                '配置
-                For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
-                    If Not item.Exist Then
-                        Continue For
-                    End If
-
-                    Dim findNode = (From node In tmpBOMConfigurationInfo.ConfigurationItems
-                                    Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
-                                    Select node).First()
-
-                    If findNode Is Nothing Then Continue For
-
-                    item.ValueID = findNode.SelectedValueID
-                    item.Value = findNode.SelectedValue
-                    item.IsMaterial = findNode.IsMaterial
-                    If item.IsMaterial Then
-                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
-                    End If
-
-                    tmpWorkSheet.Cells(i001 + 1 + 1, item.ColIndex + 3).Value = EPPlusHelper.JoinConfigurationName(item)
-
-                Next
-
-                '单价
-                tmpWorkSheet.Cells(i001 + 1 + 1, tmpID).Value = $"{tmpBOMConfigurationInfo.UnitPrice:n4}"
-
-            Next
-
-            tmpWorkSheet.Cells.AutoFitColumns()
-
-            Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
-                tmpExcelPackage.SaveAs(tmpSaveFileStream)
-            End Using
-        End Using
-
-    End Sub
-#End Region
-
     Private Sub ExportBOMList_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles ExportBOMList.CellContentClick
         If e.RowIndex < 0 Then
             Exit Sub
@@ -711,4 +672,15 @@ Public Class MainForm
     Private Sub FeedbackButton_Click(sender As Object, e As EventArgs) Handles FeedbackButton.Click
         Process.Start("https://support.qq.com/products/285331")
     End Sub
+
+    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
+        Dim tmpBitmap = New Bitmap(Chart1.Width, Chart1.Height)
+        Chart1.DrawToBitmap(tmpBitmap, New Rectangle(0, 0, Chart1.Width, Chart1.Height))
+
+        Clipboard.SetImage(tmpBitmap)
+
+        UIFormHelper.ToastSuccess("复制成功")
+
+    End Sub
+
 End Class
