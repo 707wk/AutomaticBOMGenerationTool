@@ -26,4 +26,9 @@ Public Class ConfigurationNodeInfo
     ''' </summary>
     Public TotalPrice As Decimal
 
+    ''' <summary>
+    ''' 单项总价占总价的百分比
+    ''' </summary>
+    Public TotalPricePercentage As Decimal
+
 End Class

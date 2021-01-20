@@ -42,6 +42,16 @@ Public Class MainForm
 
         End With
 
+        '占比选择项
+        MinimumTotalPricePercentage.Items.Add(0D)
+        MinimumTotalPricePercentage.Items.Add(0.5D)
+        For i001 = 1 To 10
+            MinimumTotalPricePercentage.Items.Add(i001 * 1D)
+        Next
+
+        Dim selectedID = MinimumTotalPricePercentage.Items.IndexOf(AppSettingHelper.GetInstance.MinimumTotalPricePercentage)
+        MinimumTotalPricePercentage.SelectedIndex = If(selectedID > -1, selectedID, 0)
+
     End Sub
 
     Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
@@ -269,27 +279,44 @@ Public Class MainForm
             item.UpdateTotalPrice()
         Next
 
-        Dim tmpOtherTotalPrice = AppSettingHelper.GetInstance.TotalPrice
-        Chart1.Series(0).Points.Clear()
-        For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
-            If Not item.NodeInfo.IsMaterial Then
-                Continue For
-            End If
+        ShowTotalPrice()
 
+        UIFormHelper.ToastSuccess($"{Now:HH:mm:ss} 价格更新完成", timeoutInterval:=1000)
+
+    End Sub
+#End Region
+
+#Region "显示单项价格占比饼图"
+    ''' <summary>
+    ''' 显示单项价格占比饼图
+    ''' </summary>
+    Private Sub ShowTotalPrice()
+
+        Dim tmpOtherTotalPrice = AppSettingHelper.GetInstance.TotalPrice
+
+        Chart1.Series(0).Points.Clear()
+
+        Dim tmpNodeItem = From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+                          Where item.NodeInfo.IsMaterial = True AndAlso
+                              item.NodeInfo.TotalPricePercentage >= AppSettingHelper.GetInstance.MinimumTotalPricePercentage
+                          Order By item.NodeInfo.TotalPrice Descending
+                          Select item.NodeInfo
+
+        For Each item In tmpNodeItem
             Chart1.Series(0).Points.Add(New DataPoint() With {
-                                        .YValues = {item.NodeInfo.TotalPrice},
-                                        .AxisLabel = $"{item.NodeInfo.Name}(￥{item.NodeInfo.TotalPrice:n2})"
+                                        .YValues = {item.TotalPrice},
+                                        .AxisLabel = $"{item.Name}
+({item.TotalPricePercentage:n1}%,￥{item.TotalPrice:n2})"
                                         })
 
-            tmpOtherTotalPrice -= item.NodeInfo.TotalPrice
+            tmpOtherTotalPrice -= item.TotalPrice
         Next
 
         Chart1.Series(0).Points.Add(New DataPoint() With {
                                         .YValues = {tmpOtherTotalPrice},
-                                        .AxisLabel = $"其他物料(￥{tmpOtherTotalPrice:n2})"
+                                        .AxisLabel = $"其他物料
+(￥{tmpOtherTotalPrice:n2})"
                                         })
-
-        UIFormHelper.ToastSuccess($"{Now:HH:mm:ss} 价格更新完成", timeoutInterval:=1000)
 
     End Sub
 #End Region
@@ -683,4 +710,10 @@ Public Class MainForm
 
     End Sub
 
+    Private Sub MinimumTotalPricePercentage_SelectedIndexChanged(sender As Object, e As EventArgs) Handles MinimumTotalPricePercentage.SelectedIndexChanged
+        AppSettingHelper.GetInstance.MinimumTotalPricePercentage = Decimal.Parse($"{MinimumTotalPricePercentage.SelectedItem}")
+
+        ShowTotalPrice()
+
+    End Sub
 End Class

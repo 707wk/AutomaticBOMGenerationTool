@@ -279,4 +279,9 @@ Public Class AppSettingHelper
     ''' </summary>
     Public TotalPrice As Decimal
 
+    ''' <summary>
+    ''' 显示的最小价格占比
+    ''' </summary>
+    Public MinimumTotalPricePercentage As Decimal = 1
+
 End Class

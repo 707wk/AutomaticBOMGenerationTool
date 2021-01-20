@@ -63,6 +63,9 @@ Partial Class MainForm
         Me.Chart1 = New System.Windows.Forms.DataVisualization.Charting.Chart()
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripLabel2 = New System.Windows.Forms.ToolStripLabel()
+        Me.MinimumTotalPricePercentage = New System.Windows.Forms.ToolStripComboBox()
+        Me.ToolStripLabel3 = New System.Windows.Forms.ToolStripLabel()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ExportBOMList = New Wangk.Resource.CheckBoxDataGridView()
         Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
@@ -97,7 +100,7 @@ Partial Class MainForm
         Me.ConfigurationGroupList.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ConfigurationGroupList.Location = New System.Drawing.Point(3, 46)
         Me.ConfigurationGroupList.Name = "ConfigurationGroupList"
-        Me.ConfigurationGroupList.Size = New System.Drawing.Size(764, 359)
+        Me.ConfigurationGroupList.Size = New System.Drawing.Size(729, 359)
         Me.ConfigurationGroupList.TabIndex = 3
         '
         'GroupBox1
@@ -109,7 +112,7 @@ Partial Class MainForm
         Me.GroupBox1.ForeColor = System.Drawing.Color.White
         Me.GroupBox1.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(770, 408)
+        Me.GroupBox1.Size = New System.Drawing.Size(735, 408)
         Me.GroupBox1.TabIndex = 4
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "BOM配置选择"
@@ -117,10 +120,11 @@ Partial Class MainForm
         'ToolStrip1
         '
         Me.ToolStrip1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator2, Me.AddCurrentToExportBOMListButton, Me.ExportCurrentButton, Me.ToolStripSeparator1, Me.ToolStripLabel1})
         Me.ToolStrip1.Location = New System.Drawing.Point(3, 19)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(764, 27)
+        Me.ToolStrip1.Size = New System.Drawing.Size(729, 27)
         Me.ToolStrip1.TabIndex = 4
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -495,7 +499,7 @@ Partial Class MainForm
         '
         Me.SplitContainer2.Panel2.Controls.Add(Me.GroupBox3)
         Me.SplitContainer2.Size = New System.Drawing.Size(1384, 408)
-        Me.SplitContainer2.SplitterDistance = 770
+        Me.SplitContainer2.SplitterDistance = 735
         Me.SplitContainer2.TabIndex = 5
         '
         'GroupBox3
@@ -506,7 +510,7 @@ Partial Class MainForm
         Me.GroupBox3.ForeColor = System.Drawing.Color.White
         Me.GroupBox3.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(610, 408)
+        Me.GroupBox3.Size = New System.Drawing.Size(645, 408)
         Me.GroupBox3.TabIndex = 1
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "物料价格占比"
@@ -532,17 +536,18 @@ Partial Class MainForm
         Series1.Name = "Series1"
         Series1.SmartLabelStyle.IsMarkerOverlappingAllowed = True
         Me.Chart1.Series.Add(Series1)
-        Me.Chart1.Size = New System.Drawing.Size(604, 359)
+        Me.Chart1.Size = New System.Drawing.Size(639, 359)
         Me.Chart1.TabIndex = 0
         Me.Chart1.Text = "Chart1"
         '
         'ToolStrip3
         '
         Me.ToolStrip3.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3})
+        Me.ToolStrip3.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3, Me.ToolStripLabel3, Me.MinimumTotalPricePercentage, Me.ToolStripLabel2})
         Me.ToolStrip3.Location = New System.Drawing.Point(3, 19)
         Me.ToolStrip3.Name = "ToolStrip3"
-        Me.ToolStrip3.Size = New System.Drawing.Size(604, 27)
+        Me.ToolStrip3.Size = New System.Drawing.Size(639, 27)
         Me.ToolStrip3.TabIndex = 1
         Me.ToolStrip3.Text = "ToolStrip3"
         '
@@ -554,6 +559,29 @@ Partial Class MainForm
         Me.ToolStripButton3.Name = "ToolStripButton3"
         Me.ToolStripButton3.Size = New System.Drawing.Size(128, 24)
         Me.ToolStripButton3.Text = "复制图片到剪贴板"
+        '
+        'ToolStripLabel2
+        '
+        Me.ToolStripLabel2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripLabel2.Name = "ToolStripLabel2"
+        Me.ToolStripLabel2.Size = New System.Drawing.Size(104, 24)
+        Me.ToolStripLabel2.Text = "隐藏价格占比低于"
+        '
+        'MinimumTotalPricePercentage
+        '
+        Me.MinimumTotalPricePercentage.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.MinimumTotalPricePercentage.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.MinimumTotalPricePercentage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.MinimumTotalPricePercentage.ForeColor = System.Drawing.Color.White
+        Me.MinimumTotalPricePercentage.Name = "MinimumTotalPricePercentage"
+        Me.MinimumTotalPricePercentage.Size = New System.Drawing.Size(75, 27)
+        '
+        'ToolStripLabel3
+        '
+        Me.ToolStripLabel3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripLabel3.Name = "ToolStripLabel3"
+        Me.ToolStripLabel3.Size = New System.Drawing.Size(68, 24)
+        Me.ToolStripLabel3.Text = "的替换物料"
         '
         'GroupBox2
         '
@@ -605,6 +633,7 @@ Partial Class MainForm
         'ToolStrip2
         '
         Me.ToolStrip2.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.ToolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExportAllBOMButton, Me.DeleteButton})
         Me.ToolStrip2.Location = New System.Drawing.Point(3, 19)
         Me.ToolStrip2.Name = "ToolStrip2"
@@ -722,4 +751,7 @@ Partial Class MainForm
     Friend WithEvents Chart1 As DataVisualization.Charting.Chart
     Friend WithEvents ToolStrip3 As ToolStrip
     Friend WithEvents ToolStripButton3 As ToolStripButton
+    Friend WithEvents ToolStripLabel2 As ToolStripLabel
+    Friend WithEvents ToolStripLabel3 As ToolStripLabel
+    Friend WithEvents MinimumTotalPricePercentage As ToolStripComboBox
 End Class

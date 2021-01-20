@@ -47,19 +47,16 @@
             e.Graphics.FillRectangle(BackgroundSolidBrush, Me.Width - ProgressBarWidth - 1, 1, ProgressBarWidth, Me.Height - 2)
 
             Dim tmpWidth As Integer
-            Dim proportion As Decimal
 
             If Price = 0 Then
-                proportion = 0
                 tmpWidth = 0
             Else
-                proportion = NodeInfo.TotalPrice * 100 / Price
-                tmpWidth = proportion * (ProgressBarWidth) \ 100
+                tmpWidth = NodeInfo.TotalPricePercentage * (ProgressBarWidth) \ 100
             End If
 
             e.Graphics.FillRectangle(ForegroundSolidBrush, Me.Width - tmpWidth, 1, tmpWidth, Me.Height - 2)
 
-            e.Graphics.DrawString($"￥{NodeInfo.TotalPrice:n2} 占比:{proportion:n1}%", OldFont, TitleFontSolidBrush, Me.Width - 2, Me.Height / 2, StringFormatFar)
+            e.Graphics.DrawString($"￥{NodeInfo.TotalPrice:n2} 占比:{NodeInfo.TotalPricePercentage:n1}%", OldFont, TitleFontSolidBrush, Me.Width - 2, Me.Height / 2, StringFormatFar)
 
         End If
 

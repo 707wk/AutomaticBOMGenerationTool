@@ -128,32 +128,34 @@ Public NotInheritable Class EPPlusHelper
 #Region "遍历物料信息"
                 For rID = MaterialRowMinID To MaterialRowMaxID
 
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".ToUpper
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".ToUpper.Trim
 
                     '单元格内容为空跳过
                     If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
 
                     If values.Contains(tmpStr) Then
                         Dim addMaterialInfo = New MaterialInfo With {
-                        .pID = tmpStr,
-                        .pName = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}",
-                        .pConfig = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 2).Value}",
-                        .pUnit = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 3).Value}",
-                        .pUnitPrice = Val($"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}")
-                    }
+                            .pID = tmpStr,
+                            .pName = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}",
+                            .pConfig = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 2).Value}",
+                            .pUnit = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 3).Value}",
+                            .pUnitPrice = Val($"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}")
+                        }
 
                         '有内容为空则报错
                         If String.IsNullOrWhiteSpace(addMaterialInfo.pID) OrElse
-                        String.IsNullOrWhiteSpace(addMaterialInfo.pName) OrElse
-                        String.IsNullOrWhiteSpace(addMaterialInfo.pConfig) OrElse
-                        String.IsNullOrWhiteSpace(addMaterialInfo.pUnit) OrElse
-                        String.IsNullOrWhiteSpace(addMaterialInfo.pUnitPrice) Then
+                            String.IsNullOrWhiteSpace(addMaterialInfo.pName) OrElse
+                            String.IsNullOrWhiteSpace(addMaterialInfo.pConfig) OrElse
+                            String.IsNullOrWhiteSpace(addMaterialInfo.pUnit) OrElse
+                            String.IsNullOrWhiteSpace(addMaterialInfo.pUnitPrice) Then
 
                             Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料信息不完整")
                         End If
 
                         values.Remove(tmpStr)
+
                         tmpList.Add(addMaterialInfo)
+
                     End If
 
                 Next
@@ -245,7 +247,7 @@ Public NotInheritable Class EPPlusHelper
 
                 For rID = headerLocation.Y + 1 To rowMaxID
 
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}"
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}".Trim
 
 #Region "解析配置选项及分类类型"
                     If Not String.IsNullOrWhiteSpace(tmpStr) Then
@@ -272,13 +274,13 @@ Public NotInheritable Class EPPlusHelper
                         groupSortID += 1
 
                         '第二列内容
-                        Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}"
+                        Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
                         tmpChildNode = New ConfigurationNodeValueInfo With {
-                        .ID = Wangk.Resource.IDHelper.NewID,
-                        .ConfigurationNodeID = tmpRootNode.ID,
-                        .SortID = childSortID,
-                        .Value = If(String.IsNullOrWhiteSpace(tmpChildNodeName), $"{tmpRootNode.Name}默认配置", tmpChildNodeName)
-                    }
+                            .ID = Wangk.Resource.IDHelper.NewID,
+                            .ConfigurationNodeID = tmpRootNode.ID,
+                            .SortID = childSortID,
+                            .Value = If(String.IsNullOrWhiteSpace(tmpChildNodeName), $"{tmpRootNode.Name}默认配置", tmpChildNodeName)
+                        }
                         LocalDatabaseHelper.SaveConfigurationNodeValueInfoToLocalDatabase(tmpChildNode)
                         childSortID += 1
 
@@ -290,7 +292,7 @@ Public NotInheritable Class EPPlusHelper
                                 Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 分类类型 缺失 配置选项")
                             End If
 
-                            Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}"
+                            Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
                             tmpChildNode = New ConfigurationNodeValueInfo With {
                                 .ID = Wangk.Resource.IDHelper.NewID,
                                 .ConfigurationNodeID = tmpRootNode.ID,
@@ -306,7 +308,8 @@ Public NotInheritable Class EPPlusHelper
                     End If
 #End Region
 
-                    Dim tmpNodeStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}"
+                    '物料项名
+                    Dim tmpNodeStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}".Trim
                     '解析替代料品号集
                     '转换为大写
                     Dim materialStr As String = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}".ToUpper
@@ -427,13 +430,13 @@ Public NotInheritable Class EPPlusHelper
 
                         Dim parentNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(0).Trim())
                         If parentNode Is Nothing Then
-                            Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 替换物料 {tmpMaterialArray(0).Trim()} 不存在")
+                            Throw New Exception($"第 {rID} 行 替换物料 {tmpMaterialArray(0).Trim()} 在配置表中不存在")
                         End If
 
                         For i001 = 1 To tmpMaterialArray.Count - 1
                             Dim linkNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(i001).Trim())
                             If linkNode Is Nothing Then
-                                Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 替换物料 {tmpMaterialArray(i001).Trim()} 不存在")
+                                Throw New Exception($"第 {rID} 行 替换物料 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
                             End If
 
                             LocalDatabaseHelper.SaveMaterialLinkInfoToLocalDatabase(New MaterialLinkInfo With {
@@ -479,7 +482,7 @@ Public NotInheritable Class EPPlusHelper
 
                 For rID = MaterialRowMinID To MaterialRowMaxID
 
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}"
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".Trim
 
                     '单元格内容为空跳过
                     If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
@@ -678,7 +681,7 @@ Public NotInheritable Class EPPlusHelper
                     tmpStr = tmpStr.ToUpper
 
                     '查找品号对应配置项信息
-                    Dim tmpID = LocalDatabaseHelper.GetConfigurationNodeIDByppIDFromLocalDatabase(tmpStr)
+                    Dim tmpID = LocalDatabaseHelper.GetConfigurationNodeIDByppIDFromLocalDatabase(tmpStr.Trim)
                     If String.IsNullOrWhiteSpace(tmpID) Then
                         Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 替换物料未在配置列表中出现")
                     End If
@@ -813,9 +816,6 @@ Public NotInheritable Class EPPlusHelper
         Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
         For Each node In values
-            'If Not node.IsMaterial Then
-            '    Continue For
-            'End If
 
             Dim tmpUnitPrice As Decimal = 0
 
@@ -830,7 +830,17 @@ Public NotInheritable Class EPPlusHelper
                 Next
             End If
 
-            AppSettingHelper.GetInstance.ConfigurationNodeControlTable(node.ConfigurationNodeID).NodeInfo.TotalPrice = tmpUnitPrice
+            Dim tmpConfigurationNode = AppSettingHelper.GetInstance.ConfigurationNodeControlTable(node.ConfigurationNodeID).NodeInfo
+
+            '记录价格
+            tmpConfigurationNode.TotalPrice = tmpUnitPrice
+
+            '计算占比
+            If AppSettingHelper.GetInstance.TotalPrice = 0 Then
+                tmpConfigurationNode.TotalPricePercentage = 0
+            Else
+                tmpConfigurationNode.TotalPricePercentage = tmpConfigurationNode.TotalPrice * 100 / AppSettingHelper.GetInstance.TotalPrice
+            End If
 
         Next
     End Sub
