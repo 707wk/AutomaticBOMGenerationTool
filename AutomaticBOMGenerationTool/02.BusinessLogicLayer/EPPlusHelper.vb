@@ -54,11 +54,11 @@ Public NotInheritable Class EPPlusHelper
     End Sub
 #End Region
 
-#Region "获取替换物料品号"
+#Region "获取配置表中的替换物料品号"
     ''' <summary>
-    ''' 获取替换物料品号
+    ''' 获取配置表中的替换物料品号
     ''' </summary>
-    Public Shared Function GetMaterialpIDList(filePath As String) As HashSet(Of String)
+    Public Shared Function GetMaterialpIDListFromConfigurationTable() As HashSet(Of String)
         Dim tmpHashSet = New HashSet(Of String)
 
         Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
@@ -105,16 +105,82 @@ Public NotInheritable Class EPPlusHelper
     End Function
 #End Region
 
+#Region "获取BOM中的替换物料品号"
+    ''' <summary>
+    ''' 获取BOM中的替换物料品号
+    ''' </summary>
+    Public Shared Function GetMaterialpIDListFromBOMTable() As HashSet(Of String)
+        Dim tmpHashSet = New HashSet(Of String)
+
+        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                ReadBOMInfo(tmpExcelPackage)
+
+                Dim levelColumnID = AppSettingHelper.GetInstance.BOMlevelColumnID
+                Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
+                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+
+                For rID = MaterialRowMinID To MaterialRowMaxID
+
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}"
+                    '统一字符格式
+                    tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
+                    tmpStr = tmpStr.ToUpper
+
+                    '判断是否是替换物料
+                    If Not String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}") Then
+                        If String.IsNullOrWhiteSpace(tmpStr) Then
+                            Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料缺失品号信息")
+                        End If
+
+                        tmpHashSet.Add(tmpStr.Trim)
+                    End If
+
+                Next
+
+            End Using
+        End Using
+
+        Return tmpHashSet
+    End Function
+#End Region
+
+#Region "检测替换物料完整性"
+    ''' <summary>
+    ''' 检测替换物料完整性
+    ''' </summary>
+    Public Shared Sub TestMaterialInfoCompleteness(pIDList As HashSet(Of String))
+
+        Dim BOMpIDList = GetMaterialpIDListFromBOMTable()
+
+        Dim tmpHashSet = New HashSet(Of String)(pIDList)
+        tmpHashSet.ExceptWith(BOMpIDList)
+        If tmpHashSet.Count > 0 Then
+            Throw New Exception($"配置表中品号为 {String.Join(", ", tmpHashSet)} 的替换物料未出现在BOM中")
+        End If
+
+        tmpHashSet = New HashSet(Of String)(BOMpIDList)
+        tmpHashSet.ExceptWith(pIDList)
+        If tmpHashSet.Count > 0 Then
+            Throw New Exception($"BOM中品号为 {String.Join(", ", tmpHashSet)} 的替换物料未出现在配置表中")
+        End If
+
+    End Sub
+#End Region
+
 #Region "获取替换物料信息"
     ''' <summary>
     ''' 获取替换物料信息
     ''' </summary>
-    Public Shared Function GetMaterialInfoList(
-                                              filePath As String,
-                                              values As HashSet(Of String)) As List(Of MaterialInfo)
+    Public Shared Function GetMaterialInfoList(values As HashSet(Of String)) As List(Of MaterialInfo)
         Dim tmpList = New List(Of MaterialInfo)
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -215,11 +281,11 @@ Public NotInheritable Class EPPlusHelper
     ''' <summary>
     ''' 转换配置表
     ''' </summary>
-    Public Shared Sub TransformationConfigurationTable(filePath As String)
+    Public Shared Sub TransformationConfigurationTable()
 
-        ReplaceableMaterialParser(filePath)
+        ReplaceableMaterialParser()
 
-        FixedMatchingMaterialParser(filePath)
+        FixedMatchingMaterialParser()
 
     End Sub
 
@@ -227,9 +293,9 @@ Public NotInheritable Class EPPlusHelper
     ''' <summary>
     ''' 解析可替换物料
     ''' </summary>
-    Public Shared Sub ReplaceableMaterialParser(filePath As String)
+    Public Shared Sub ReplaceableMaterialParser()
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -393,9 +459,9 @@ Public NotInheritable Class EPPlusHelper
     ''' <summary>
     ''' 解析固定搭配物料
     ''' </summary>
-    Public Shared Sub FixedMatchingMaterialParser(filePath As String)
+    Public Shared Sub FixedMatchingMaterialParser()
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -461,60 +527,13 @@ Public NotInheritable Class EPPlusHelper
 
 #End Region
 
-#Region "检测替换物料完整性"
-    ''' <summary>
-    ''' 检测替换物料完整性
-    ''' </summary>
-    Public Shared Sub TestMaterialInfoCompleteness(
-                                            filePath As String,
-                                            pIDList As HashSet(Of String))
-
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-            Using tmpExcelPackage As New ExcelPackage(readFS)
-                Dim tmpWorkBook = tmpExcelPackage.Workbook
-                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-                ReadBOMInfo(tmpExcelPackage)
-
-                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
-
-                For rID = MaterialRowMinID To MaterialRowMaxID
-
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".Trim
-
-                    '单元格内容为空跳过
-                    If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
-
-                    '跳过非替换物料
-                    If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}") Then
-                        Continue For
-                    End If
-
-                    '统一字符格式
-                    tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-                    tmpStr = tmpStr.ToUpper
-
-                    '判断品号是否在配置表中
-                    If Not pIDList.Contains(tmpStr) Then
-                        Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 替换物料 {tmpStr} 未在配置列表中出现")
-                    End If
-
-                Next
-
-            End Using
-        End Using
-    End Sub
-#End Region
-
 #Region "制作提取模板"
     ''' <summary>
     ''' 制作提取模板
     ''' </summary>
-    Public Shared Sub CreateTemplate(filePath As String)
+    Public Shared Sub CreateTemplate()
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -605,6 +624,8 @@ Public NotInheritable Class EPPlusHelper
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
+        tmpWorkSheet.InsertColumn(tmpCountColumnID, 1)
+
         Dim countStack = New Stack(Of Decimal)
 
         countStack.Push(1)
@@ -615,12 +636,12 @@ Public NotInheritable Class EPPlusHelper
 
             If lastLevel < nowLevel Then
                 '是上一个物料的子物料
-                countStack.Push(Decimal.Parse(tmpWorkSheet.Cells(rID, pCountColumnID).Value))
+                countStack.Push(Decimal.Parse(Val(tmpWorkSheet.Cells(rID, pCountColumnID).Value)))
 
             ElseIf lastLevel = nowLevel Then
                 '是上一个物料的同级物料
                 countStack.Pop()
-                countStack.Push(Decimal.Parse(tmpWorkSheet.Cells(rID, pCountColumnID).Value))
+                countStack.Push(Decimal.Parse(Val(tmpWorkSheet.Cells(rID, pCountColumnID).Value)))
 
             Else 'lastLevel > nowLevel
                 '是上一个物料的上级物料
@@ -631,7 +652,7 @@ Public NotInheritable Class EPPlusHelper
                 Next
 
                 countStack.Pop()
-                countStack.Push(Decimal.Parse(tmpWorkSheet.Cells(rID, pCountColumnID).Value))
+                countStack.Push(Decimal.Parse(Val(tmpWorkSheet.Cells(rID, pCountColumnID).Value)))
 
             End If
 
@@ -650,10 +671,10 @@ Public NotInheritable Class EPPlusHelper
     ''' <summary>
     ''' 获取替换物料在模板中的位置
     ''' </summary>
-    Public Shared Function GetMaterialRowIDInTemplate(filePath As String) As List(Of ConfigurationNodeRowInfo)
+    Public Shared Function GetMaterialRowIDInTemplate() As List(Of ConfigurationNodeRowInfo)
         Dim tmpList = New List(Of ConfigurationNodeRowInfo)
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -664,38 +685,135 @@ Public NotInheritable Class EPPlusHelper
                 Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
                 Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
 
-                For rID = MaterialRowMinID To MaterialRowMaxID
+#Region "新格式"
+                Dim MaterialItems = LocalDatabaseHelper.GetConfigurationNodeInfoItems()
 
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}"
-
-                    '单元格内容为空跳过
-                    If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
-
-                    '跳过非替换物料
-                    If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}") Then
+                For Each item In MaterialItems
+                    '跳过非物料选项
+                    If Not item.IsMaterial Then
                         Continue For
                     End If
 
-                    '统一字符格式
-                    tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-                    tmpStr = tmpStr.ToUpper
+                    Dim tmpMarkLocations = GetMarkLocations(tmpExcelPackage, item.Name)
+                    If tmpMarkLocations.Count > 0 Then
+                        '有标记
+                    Else
+                        '无标记
+                        Dim tmppIDItems = LocalDatabaseHelper.GetMaterialpIDItems(item.ID)
 
-                    '查找品号对应配置项信息
-                    Dim tmpID = LocalDatabaseHelper.GetConfigurationNodeIDByppIDFromLocalDatabase(tmpStr.Trim)
-                    If String.IsNullOrWhiteSpace(tmpID) Then
-                        Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 替换物料未在配置列表中出现")
+                        tmpMarkLocations = GetNoMarkLocations(tmpExcelPackage, tmppIDItems)
+
                     End If
 
                     '记录
-                    tmpList.Add(New ConfigurationNodeRowInfo With {
-                                .ID = Wangk.Resource.IDHelper.NewID,
-                                .ConfigurationNodeID = tmpID,
-                                .MaterialRowID = rID
-                                })
+                    For Each tmpItem In tmpMarkLocations
+                        tmpList.Add(New ConfigurationNodeRowInfo With {
+                            .ID = Wangk.Resource.IDHelper.NewID,
+                            .ConfigurationNodeID = item.ID,
+                            .MaterialRowID = tmpItem
+                            })
+                    Next
+
                 Next
+#End Region
 
             End Using
         End Using
+
+        Return tmpList
+    End Function
+#End Region
+
+#Region "获取标记的替换位置"
+    ''' <summary>
+    ''' 获取标记的替换位置
+    ''' </summary>
+    Private Shared Function GetMarkLocations(
+                                            wb As ExcelPackage,
+                                            nodeName As String) As List(Of Integer)
+        Dim tmpList As New List(Of Integer)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+
+        For rID = MaterialRowMinID To MaterialRowMaxID
+
+            '替换标志
+            Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}"
+
+            '跳过非替换物料
+            If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
+
+            '统一字符格式
+            tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
+            tmpStr = tmpStr.ToUpper
+
+            '移除标记
+            tmpStr = tmpStr.Trim.Substring(1)
+
+            If tmpStr.Equals(nodeName) Then
+                tmpList.Add(rID)
+            End If
+
+        Next
+
+        Return tmpList
+    End Function
+#End Region
+
+#Region "获取无标记的替换位置"
+    ''' <summary>
+    ''' 获取无标记的替换位置
+    ''' </summary>
+    Private Shared Function GetNoMarkLocations(
+                                              wb As ExcelPackage,
+                                              pIDItems As HashSet(Of String)) As List(Of Integer)
+        Dim tmpList As New List(Of Integer)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+
+        For rID = MaterialRowMinID To MaterialRowMaxID
+
+            '替换标志
+            Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}"
+
+            '跳过非替换物料
+            If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
+
+            '统一字符格式
+            tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
+            tmpStr = tmpStr.ToUpper
+            tmpStr = tmpStr.Trim
+
+            '跳过有标记的替换物料
+            If tmpStr.Length > 1 Then
+                Continue For
+            End If
+
+            '品号
+            tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}"
+
+            '统一字符格式
+            tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
+            tmpStr = tmpStr.ToUpper
+            tmpStr = tmpStr.Trim
+
+            If pIDItems.Contains(tmpStr) Then
+                tmpList.Add(rID)
+            End If
+
+        Next
 
         Return tmpList
     End Function
@@ -739,6 +857,35 @@ Public NotInheritable Class EPPlusHelper
 
                 '更改焦点
                 tmpWorkSheet.Select(tmpWorkSheet.Cells(1, 1).Address, True)
+
+                headerLocation = FindHeaderLocation(tmpExcelPackage, "阶层")
+                Dim levelColumnID = headerLocation.X
+                Dim MaterialRowMinID = headerLocation.Y + 2
+                Dim MaterialRowMaxID = FindHeaderLocation(tmpExcelPackage, "版次").Y - 1
+
+                '删除空格
+                For rid = MaterialRowMaxID To MaterialRowMinID Step -1
+
+                    '合并当前行内容
+                    Dim tmpStringBuilder As New StringBuilder
+                    For i001 = levelColumnID To levelColumnID + 6 + 2
+                        tmpStringBuilder.Append($"{tmpWorkSheet.Cells(rid, i001).Value}")
+                    Next
+                    Dim tmpStr = tmpStringBuilder.ToString
+
+                    If String.IsNullOrWhiteSpace(tmpStr) Then
+                        tmpWorkSheet.DeleteRow(rid)
+                    End If
+
+                Next
+
+                '重新计算序号
+                headerLocation = FindHeaderLocation(tmpExcelPackage, "阶层")
+                MaterialRowMinID = headerLocation.Y + 2
+                MaterialRowMaxID = FindHeaderLocation(tmpExcelPackage, "版次").Y - 1
+                For rid = MaterialRowMinID To MaterialRowMaxID
+                    tmpWorkSheet.Cells(rid, 1).Value = $"{rid - MaterialRowMinID + 1}"
+                Next
 
                 '另存为
                 Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
@@ -825,8 +972,8 @@ Public NotInheritable Class EPPlusHelper
                 '有替换物料
                 For Each item In node.MaterialRowIDList
                     tmpUnitPrice +=
-                        Convert.ToDecimal($"0{tmpWorkSheet.Cells(item, pUnitPriceColumnID).Value}") *
-                        Convert.ToDecimal($"0{tmpWorkSheet.Cells(item, tmpCountColumnID).Value}")
+                        Convert.ToDecimal(Val($"{tmpWorkSheet.Cells(item, pUnitPriceColumnID).Value}")) *
+                        Convert.ToDecimal(Val($"0{tmpWorkSheet.Cells(item, tmpCountColumnID).Value}"))
                 Next
             End If
 
@@ -964,8 +1111,8 @@ Public NotInheritable Class EPPlusHelper
                 If nowRowLevel = levelID Then
                     '当前节点与当前阶级相同
                     tmpUnitPrice +=
-                        Convert.ToDecimal($"0{tmpWorkSheet.Cells(rowID, pIDColumnID + 4).Value}") *
-                        Convert.ToDecimal($"0{tmpWorkSheet.Cells(rowID, pIDColumnID + 5).Value}")
+                        Convert.ToDecimal(Val($"{tmpWorkSheet.Cells(rowID, pIDColumnID + 4).Value}")) *
+                        Convert.ToDecimal(Val($"{tmpWorkSheet.Cells(rowID, pIDColumnID + 5).Value}"))
 
                 ElseIf nowRowLevel = 0 OrElse
                     nowRowLevel > levelID Then

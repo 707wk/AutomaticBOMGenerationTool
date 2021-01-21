@@ -63,9 +63,9 @@ Partial Class MainForm
         Me.Chart1 = New System.Windows.Forms.DataVisualization.Charting.Chart()
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripLabel2 = New System.Windows.Forms.ToolStripLabel()
-        Me.MinimumTotalPricePercentage = New System.Windows.Forms.ToolStripComboBox()
         Me.ToolStripLabel3 = New System.Windows.Forms.ToolStripLabel()
+        Me.MinimumTotalPricePercentage = New System.Windows.Forms.ToolStripComboBox()
+        Me.ToolStripLabel2 = New System.Windows.Forms.ToolStripLabel()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ExportBOMList = New Wangk.Resource.CheckBoxDataGridView()
         Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
@@ -356,7 +356,7 @@ Partial Class MainForm
         Me.RibbonBar2.Size = New System.Drawing.Size(192, 86)
         Me.RibbonBar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar2.TabIndex = 1
-        Me.RibbonBar2.Text = "物料搭配"
+        Me.RibbonBar2.Text = "物料"
         '
         '
         '
@@ -560,12 +560,12 @@ Partial Class MainForm
         Me.ToolStripButton3.Size = New System.Drawing.Size(128, 24)
         Me.ToolStripButton3.Text = "复制图片到剪贴板"
         '
-        'ToolStripLabel2
+        'ToolStripLabel3
         '
-        Me.ToolStripLabel2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        Me.ToolStripLabel2.Name = "ToolStripLabel2"
-        Me.ToolStripLabel2.Size = New System.Drawing.Size(104, 24)
-        Me.ToolStripLabel2.Text = "隐藏价格占比低于"
+        Me.ToolStripLabel3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripLabel3.Name = "ToolStripLabel3"
+        Me.ToolStripLabel3.Size = New System.Drawing.Size(79, 24)
+        Me.ToolStripLabel3.Text = "%的替换物料"
         '
         'MinimumTotalPricePercentage
         '
@@ -576,12 +576,12 @@ Partial Class MainForm
         Me.MinimumTotalPricePercentage.Name = "MinimumTotalPricePercentage"
         Me.MinimumTotalPricePercentage.Size = New System.Drawing.Size(75, 27)
         '
-        'ToolStripLabel3
+        'ToolStripLabel2
         '
-        Me.ToolStripLabel3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        Me.ToolStripLabel3.Name = "ToolStripLabel3"
-        Me.ToolStripLabel3.Size = New System.Drawing.Size(68, 24)
-        Me.ToolStripLabel3.Text = "的替换物料"
+        Me.ToolStripLabel2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripLabel2.Name = "ToolStripLabel2"
+        Me.ToolStripLabel2.Size = New System.Drawing.Size(104, 24)
+        Me.ToolStripLabel2.Text = "隐藏价格占比低于"
         '
         'GroupBox2
         '

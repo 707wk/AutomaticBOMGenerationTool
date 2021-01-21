@@ -26,11 +26,12 @@ Public Class MainForm
             .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
 
 
-            ExportBOMList.Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill})
+            ExportBOMList.Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .Width = 900})
             Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "总价", .Width = 120}
             tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             ExportBOMList.Columns.Add(tmpDataGridViewTextBoxColumn)
             ExportBOMList.Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
+            ExportBOMList.Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.ErrorColor))
 
             .EnableHeadersVisualStyles = False
             .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
@@ -77,7 +78,7 @@ Public Class MainForm
 
     Private Sub ShowExportBOMListData()
         For Each item In AppSettingHelper.GetInstance.ExportBOMList
-            ExportBOMList.Rows.Add({False, item.Name, $"￥{item.UnitPrice:n4}", "查看配置"})
+            ExportBOMList.Rows.Add({False, item.Name, $"￥{item.UnitPrice:n4}", "查看配置", "移除"})
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = item
         Next
     End Sub
@@ -128,38 +129,38 @@ Public Class MainForm
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
                                 Dim stepCount = 10
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 清空数据库", 100 / stepCount * 0)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 清空数据库", 100 / stepCount * 0)
                                 LocalDatabaseHelper.ClearLocalDatabase()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 预处理源文件", 100 / stepCount * 1)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 预处理源文件", 100 / stepCount * 1)
                                 EPPlusHelper.PreproccessSourceFile()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 获取替换物料品号", 100 / stepCount * 2)
-                                Dim tmpIDList = EPPlusHelper.GetMaterialpIDList(AppSettingHelper.TempfilePath)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 获取替换物料品号", 100 / stepCount * 2)
+                                Dim configurationTablepIDList = EPPlusHelper.GetMaterialpIDListFromConfigurationTable()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 检测替换物料完整性", 100 / stepCount * 3)
-                                EPPlusHelper.TestMaterialInfoCompleteness(AppSettingHelper.TempfilePath, tmpIDList)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 检测替换物料完整性", 100 / stepCount * 3)
+                                EPPlusHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 获取替换物料信息", 100 / stepCount * 4)
-                                Dim tmpList = EPPlusHelper.GetMaterialInfoList(AppSettingHelper.TempfilePath, tmpIDList)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 获取替换物料信息", 100 / stepCount * 4)
+                                Dim tmpList = EPPlusHelper.GetMaterialInfoList(configurationTablepIDList)
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 导入替换物料信息到临时数据库", 100 / stepCount * 5)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 导入替换物料信息到临时数据库", 100 / stepCount * 5)
                                 LocalDatabaseHelper.SaveMaterialInfoToLocalDatabase(tmpList)
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 解析配置节点信息", 100 / stepCount * 6)
-                                EPPlusHelper.TransformationConfigurationTable(AppSettingHelper.TempfilePath)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 解析配置节点信息", 100 / stepCount * 6)
+                                EPPlusHelper.TransformationConfigurationTable()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 制作提取模板", 100 / stepCount * 7)
-                                EPPlusHelper.CreateTemplate(AppSettingHelper.TempfilePath)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 制作提取模板", 100 / stepCount * 7)
+                                EPPlusHelper.CreateTemplate()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 获取替换物料在模板中的位置", 100 / stepCount * 8)
-                                Dim tmpRowIDList = EPPlusHelper.GetMaterialRowIDInTemplate(AppSettingHelper.TemplateFilePath)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 获取替换物料在模板中的位置", 100 / stepCount * 8)
+                                Dim tmpRowIDList = EPPlusHelper.GetMaterialRowIDInTemplate()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 导入替换物料位置到临时数据库", 100 / stepCount * 9)
+                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 导入替换物料位置到临时数据库", 100 / stepCount * 9)
                                 LocalDatabaseHelper.SaveMaterialRowIDToLocalDatabase(tmpRowIDList)
 
-                                ''测试耗时
-                                'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.ff} 处理完成", 100 / stepCount * 10)
+                                '测试耗时
+                                'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 处理完成", 100 / stepCount * 10)
                                 'Do While Not be.IsCancel
                                 '    Threading.Thread.Sleep(200)
                                 'Loop
@@ -175,10 +176,13 @@ Public Class MainForm
         End Using
 
         tmpStopwatch.Stop()
+        Dim dateTimeSpan = tmpStopwatch.Elapsed
 
+        tmpStopwatch.Restart()
         ShowConfigurationNodeControl()
+        Dim UITimeSpan = tmpStopwatch.Elapsed
 
-        UIFormHelper.ToastSuccess($"解析完成,耗时 {tmpStopwatch.Elapsed:mm\:ss\.ff}")
+        UIFormHelper.ToastSuccess($"处理完成,解析耗时 {dateTimeSpan:mm\:ss\.fff},UI生成耗时 {UITimeSpan:mm\:ss\.fff}")
 
     End Sub
 #End Region
@@ -222,8 +226,16 @@ Public Class MainForm
 
         Next
 
+        '关闭自动调整大小
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.FlowLayoutPanel1.AutoSize = False
+        Next
         For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
             item.Init()
+        Next
+        '启用自动调整大小
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.FlowLayoutPanel1.AutoSize = True
         Next
 
         ShowUnitPrice()
@@ -355,16 +367,18 @@ Public Class MainForm
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
                                     item.Exist = False
 
-                                    Dim findNode = (From node In tmpResult.ConfigurationItems
-                                                    Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
-                                                    Select node).First()
+                                    Dim findNodes = From node In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
+                                                    Select node
+                                    If findNodes.Count = 0 Then Continue For
 
+                                    Dim findNode = findNodes.First
                                     If findNode Is Nothing Then Continue For
 
                                     item.Exist = True
                                     item.ValueID = findNode.SelectedValueID
                                     item.Value = findNode.SelectedValue
-                                    item.IsMaterial = findNode.IsMaterial
+                                    item.IsMaterial = findNode.NodeInfo.IsMaterial
                                     If item.IsMaterial Then
                                         item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
                                     End If
@@ -400,7 +414,7 @@ Public Class MainForm
             '保存单价
             tmpBOMConfigurationInfo.UnitPrice = AppSettingHelper.GetInstance.TotalPrice
 
-            ExportBOMList.Rows.Add({False, tmpBOMConfigurationInfo.Name, $"￥{tmpBOMConfigurationInfo.UnitPrice:n4}", "查看配置"})
+            ExportBOMList.Rows.Add({False, tmpBOMConfigurationInfo.Name, $"￥{tmpBOMConfigurationInfo.UnitPrice:n4}", "查看配置", "移除"})
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpBOMConfigurationInfo
 
         End Using
@@ -448,16 +462,18 @@ Public Class MainForm
                                 For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
                                     item.Exist = False
 
-                                    Dim findNode = (From node In tmpConfigurationNodeRowInfoList
-                                                    Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
-                                                    Select node).First()
+                                    Dim findNodes = From node In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
+                                                    Select node
+                                    If findNodes.Count = 0 Then Continue For
 
+                                    Dim findNode = findNodes.First
                                     If findNode Is Nothing Then Continue For
 
                                     item.Exist = True
                                     item.ValueID = findNode.SelectedValueID
                                     item.Value = findNode.SelectedValue
-                                    item.IsMaterial = findNode.IsMaterial
+                                    item.IsMaterial = findNode.NodeInfo.IsMaterial
                                     If item.IsMaterial Then
                                         item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
                                     End If
@@ -516,10 +532,12 @@ Public Class MainForm
                                     item.Exist = False
                                     item.ColIndex = 0
 
-                                    Dim findNode = (From node In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+                                    Dim findNodes = From node In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                                                     Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
-                                                    Select node).First()
+                                                    Select node
+                                    If findNodes.Count = 0 Then Continue For
 
+                                    Dim findNode = findNodes.First
                                     If findNode Is Nothing Then Continue For
 
                                     item.Exist = True
@@ -605,7 +623,7 @@ Public Class MainForm
             Exit Sub
         End If
 
-        If MsgBox("确定移除选中项?", MsgBoxStyle.YesNo Or MsgBoxStyle.Question, DeleteButton.Text) <> MsgBoxResult.Yes Then
+        If MsgBox("确定移除选中项?", MsgBoxStyle.YesNo Or MsgBoxStyle.Question, "移除") <> MsgBoxResult.Yes Then
             Exit Sub
         End If
 
@@ -689,6 +707,16 @@ Public Class MainForm
                 UIFormHelper.ToastWarning("功能未开发")
 #End Region
 
+            Case 4
+#Region "移除"
+                If MsgBox($"确定移除 {ExportBOMList.Rows(e.RowIndex).Cells(1).Value} ?", MsgBoxStyle.YesNo Or MsgBoxStyle.Question, "移除") <> MsgBoxResult.Yes Then
+                    Exit Sub
+                End If
+
+                '删除
+                ExportBOMList.Rows.RemoveAt(e.RowIndex)
+#End Region
+
         End Select
     End Sub
 
@@ -711,9 +739,14 @@ Public Class MainForm
     End Sub
 
     Private Sub MinimumTotalPricePercentage_SelectedIndexChanged(sender As Object, e As EventArgs) Handles MinimumTotalPricePercentage.SelectedIndexChanged
-        AppSettingHelper.GetInstance.MinimumTotalPricePercentage = Decimal.Parse($"{MinimumTotalPricePercentage.SelectedItem}")
+        AppSettingHelper.GetInstance.MinimumTotalPricePercentage = MinimumTotalPricePercentage.SelectedItem
 
         ShowTotalPrice()
 
+        If AppSettingHelper.GetInstance.MinimumTotalPricePercentage = 0D Then
+            UIFormHelper.ToastWarning("显示项过多会导致部分标签无法显示")
+        End If
+
     End Sub
+
 End Class

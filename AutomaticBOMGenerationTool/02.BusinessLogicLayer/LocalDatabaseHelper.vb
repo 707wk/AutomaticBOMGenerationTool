@@ -15,7 +15,7 @@ Public NotInheritable Class LocalDatabaseHelper
                 }
                 _DatabaseConnection.Open()
 
-                InitLocalDatabase()
+                'InitLocalDatabase()
 
             End If
 
@@ -61,9 +61,9 @@ Public NotInheritable Class LocalDatabaseHelper
         Using tmpCommand As New SQLite.SQLiteCommand(DatabaseConnection)
             tmpCommand.CommandText = "
 --关闭同步
---PRAGMA synchronous = OFF;
+PRAGMA synchronous = OFF;
 --不记录日志
---PRAGMA journal_mode = OFF;"
+PRAGMA journal_mode = OFF;"
 
             tmpCommand.ExecuteNonQuery()
         End Using
@@ -751,6 +751,37 @@ order by MaterialInfo.pUnitPrice"
                     .pUnit = reader(NameOf(MaterialInfo.pUnit)),
                     .pUnitPrice = reader(NameOf(MaterialInfo.pUnitPrice))
                 })
+            End While
+        End Using
+
+        Return tmpList
+    End Function
+#End Region
+
+#Region "获取物料品号信息"
+    ''' <summary>
+    ''' 获取物料品号信息
+    ''' </summary>
+    Public Shared Function GetMaterialpIDItems(configurationNodeID As String) As HashSet(Of String)
+
+        Dim tmpList = New HashSet(Of String)
+
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+                .CommandText = "select MaterialInfo.pID
+from ConfigurationNodeValueInfo
+
+inner join ConfigurationNodeInfo
+on ConfigurationNodeInfo.ID=ConfigurationNodeValueInfo.ConfigurationNodeID
+and ConfigurationNodeInfo.ID=@ConfigurationNodeID
+
+inner join MaterialInfo
+on MaterialInfo.ID=ConfigurationNodeValueInfo.ID"
+            }
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
+
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(reader(0))
             End While
         End Using
 

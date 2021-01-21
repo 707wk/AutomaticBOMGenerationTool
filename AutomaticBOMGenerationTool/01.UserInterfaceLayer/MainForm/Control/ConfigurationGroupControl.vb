@@ -33,14 +33,4 @@
 
     End Sub
 
-    'Private ReadOnly BorderPen As New Pen(Color.FromArgb(173, 173, 173), 1)
-    'Private Sub FlowLayoutPanel1_Paint(sender As Object, e As PaintEventArgs) Handles FlowLayoutPanel1.Paint
-    '    e.Graphics.DrawRectangle(BorderPen, 1, 1, FlowLayoutPanel1.Width - 1, FlowLayoutPanel1.Height - 1)
-    'End Sub
-
-    'Private Shared LinePen As New Pen(Color.Silver, 1) With {.DashStyle = Drawing2D.DashStyle.Solid}
-    'Private Sub ConfigurationNodeControl_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
-    '    e.Graphics.DrawLine(LinePen, 0, 0, Me.Width, 0)
-    'End Sub
-
 End Class

@@ -35,6 +35,16 @@ Public Class ConfigurationNodeControl
     ''' </summary>
     Private ParentNodeIDHashSet As HashSet(Of String)
 
+    Public Sub New()
+
+        ' 此调用是设计器所必需的。
+        InitializeComponent()
+
+        ' 在 InitializeComponent() 调用之后添加任何初始化。
+        Me.DoubleBuffered = True
+
+    End Sub
+
     'Private OldLabelBackColor As Color
 
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -52,6 +62,7 @@ Public Class ConfigurationNodeControl
     ''' 初始化显示
     ''' </summary>
     Public Sub Init()
+
         If LocalDatabaseHelper.GetLinkCount(NodeInfo.ID) > 0 Then
             Exit Sub
         End If
@@ -124,6 +135,8 @@ Public Class ConfigurationNodeControl
     ''' </summary>
     Private Sub UpdateValueWithOtherConfiguration()
         IsUserChecked = False
+
+        Me.AutoSize = False
 
         SelectedValueID = Nothing
         SelectedValue = Nothing
@@ -229,9 +242,13 @@ Public Class ConfigurationNodeControl
             Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
             tmpMaterialInfoControl.Checked = True
 
-            Me.Label1.BackColor = Color.FromArgb(70, 70, 74)
+            Me.Visible = True
+            Me.AutoSize = True
+            Dim tmpHeight = Me.Height
+            Me.AutoSize = False
+            Me.Height = tmpHeight
         Else
-            Me.Label1.BackColor = UIFormHelper.ErrorColor
+            Me.Visible = False
         End If
 
         IsUserChecked = True

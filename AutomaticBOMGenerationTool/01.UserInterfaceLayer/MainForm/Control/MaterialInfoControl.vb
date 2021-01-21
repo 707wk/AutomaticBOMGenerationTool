@@ -11,22 +11,15 @@
         Set(ByVal value As MaterialInfo)
             _Cache = value
 
-            'If _Cache IsNot Nothing AndAlso
-            '    _Cache.pUnitPrice = 0 Then
-            '    Me.BackColor = UIFormHelper.ErrorColor
-            'Else
-            '    Me.BackColor = Color.White
-            'End If
-
-            Me.Size = New Size(290, 80)
+            Me.Size = New Size(290, 72)
         End Set
     End Property
 
     Public Sub New()
+        Me.DoubleBuffered = True
         Me.Appearance = Appearance.Button
         Me.FlatStyle = FlatStyle.Flat
         Me.FlatAppearance.BorderColor = Color.FromArgb(173, 173, 173)
-        'Me.AutoSize = True
         Me.Size = New Size(160, 28)
         Me.TextAlign = ContentAlignment.MiddleLeft
         Me.Cursor = Cursors.Hand
