@@ -217,7 +217,9 @@ Public Class MainForm
             Dim tmpConfigurationGroupControl = tmpGroupDict(item.GroupID)
 
             Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
-                .NodeInfo = item
+                .NodeInfo = item,
+                .ParentSortID = tmpConfigurationGroupControl.GroupInfo.SortID + 1,
+                .SortID = tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Count + 1
             }
 
             tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
@@ -373,7 +375,6 @@ Public Class MainForm
                                     If findNodes.Count = 0 Then Continue For
 
                                     Dim findNode = findNodes.First
-                                    If findNode Is Nothing Then Continue For
 
                                     item.Exist = True
                                     item.ValueID = findNode.SelectedValueID
@@ -468,7 +469,6 @@ Public Class MainForm
                                     If findNodes.Count = 0 Then Continue For
 
                                     Dim findNode = findNodes.First
-                                    If findNode Is Nothing Then Continue For
 
                                     item.Exist = True
                                     item.ValueID = findNode.SelectedValueID
@@ -538,7 +538,6 @@ Public Class MainForm
                                     If findNodes.Count = 0 Then Continue For
 
                                     Dim findNode = findNodes.First
-                                    If findNode Is Nothing Then Continue For
 
                                     item.Exist = True
                                     item.ColIndex = ColIndex
@@ -721,6 +720,10 @@ Public Class MainForm
     End Sub
 
     Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
+        UIFormHelper.ToastWarning("功能未开发")
+    End Sub
+
+    Private Sub ButtonItem7_Click(sender As Object, e As EventArgs) Handles ButtonItem7.Click
         UIFormHelper.ToastWarning("功能未开发")
     End Sub
 

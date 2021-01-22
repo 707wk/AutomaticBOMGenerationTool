@@ -319,14 +319,14 @@ Public NotInheritable Class EPPlusHelper
                     If Not String.IsNullOrWhiteSpace(tmpStr) Then
                         '第一列内容不为空
                         tmpRootNode = New ConfigurationNodeInfo With {
-                        .ID = Wangk.Resource.IDHelper.NewID,
-                        .SortID = rootSortID,
-                        .Name = tmpStr,
-                        .GroupID = .ID
-                    }
+                            .ID = Wangk.Resource.IDHelper.NewID,
+                            .SortID = rootSortID,
+                            .Name = tmpStr,
+                            .GroupID = .ID
+                        }
                         '查重
                         If LocalDatabaseHelper.GetConfigurationNodeInfoByNameFromLocalDatabase(tmpStr) IsNot Nothing Then
-                            Throw New Exception($"配置选项 {tmpStr} 名称重复")
+                            Throw New Exception($"第 {rID} 行 配置选项 {tmpStr} 名称重复")
                         End If
 
                         LocalDatabaseHelper.SaveConfigurationNodeInfoToLocalDatabase(tmpRootNode)
@@ -341,6 +341,7 @@ Public NotInheritable Class EPPlusHelper
 
                         '第二列内容
                         Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
+
                         tmpChildNode = New ConfigurationNodeValueInfo With {
                             .ID = Wangk.Resource.IDHelper.NewID,
                             .ConfigurationNodeID = tmpRootNode.ID,
@@ -355,10 +356,11 @@ Public NotInheritable Class EPPlusHelper
                         If Not String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}") Then
                             '第二列内容不为空
                             If tmpRootNode Is Nothing Then
-                                Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 分类类型 缺失 配置选项")
+                                Throw New Exception($"第 {rID} 行 分类类型 缺失 配置选项")
                             End If
 
                             Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
+
                             tmpChildNode = New ConfigurationNodeValueInfo With {
                                 .ID = Wangk.Resource.IDHelper.NewID,
                                 .ConfigurationNodeID = tmpRootNode.ID,
@@ -376,6 +378,7 @@ Public NotInheritable Class EPPlusHelper
 
                     '物料项名
                     Dim tmpNodeStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}".Trim
+
                     '解析替代料品号集
                     '转换为大写
                     Dim materialStr As String = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}".ToUpper
@@ -934,6 +937,10 @@ Public NotInheritable Class EPPlusHelper
                     tmpWorkSheet.Cells(item, pIDColumnID + 2).Value = node.MaterialValue.pConfig
                     tmpWorkSheet.Cells(item, pIDColumnID + 3).Value = node.MaterialValue.pUnit
                     tmpWorkSheet.Cells(item, pIDColumnID + 5).Value = node.MaterialValue.pUnitPrice
+
+                    'todo:调试
+                    tmpWorkSheet.Cells(item, pIDColumnID).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                    tmpWorkSheet.Cells(item, pIDColumnID).Style.Fill.BackgroundColor.SetColor(UIFormHelper.NormalColor)
                 Next
             End If
         Next

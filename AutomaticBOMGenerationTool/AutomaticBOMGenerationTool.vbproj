@@ -259,6 +259,8 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="res\exportData_32px.png" />
+    <None Include="res\importData_32px.png" />
     <None Include="res\copy_20px.png" />
     <None Include="res\save_20px.png" />
     <None Include="res\message_32px.png" />

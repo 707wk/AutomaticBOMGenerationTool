@@ -48,6 +48,7 @@ Partial Class MainForm
         Me.ButtonItem6 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar2 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem5 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem7 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar1 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem2 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem3 = New DevComponents.DotNetBar.ButtonItem()
@@ -100,7 +101,7 @@ Partial Class MainForm
         Me.ConfigurationGroupList.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ConfigurationGroupList.Location = New System.Drawing.Point(3, 46)
         Me.ConfigurationGroupList.Name = "ConfigurationGroupList"
-        Me.ConfigurationGroupList.Size = New System.Drawing.Size(729, 359)
+        Me.ConfigurationGroupList.Size = New System.Drawing.Size(729, 346)
         Me.ConfigurationGroupList.TabIndex = 3
         '
         'GroupBox1
@@ -112,7 +113,7 @@ Partial Class MainForm
         Me.GroupBox1.ForeColor = System.Drawing.Color.White
         Me.GroupBox1.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(735, 408)
+        Me.GroupBox1.Size = New System.Drawing.Size(735, 395)
         Me.GroupBox1.TabIndex = 4
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "BOM配置选择"
@@ -199,7 +200,7 @@ Partial Class MainForm
         Me.RibbonControl1.Location = New System.Drawing.Point(0, 0)
         Me.RibbonControl1.Name = "RibbonControl1"
         Me.RibbonControl1.QuickToolbarItems.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.QatCustomizeItem1})
-        Me.RibbonControl1.Size = New System.Drawing.Size(1384, 115)
+        Me.RibbonControl1.Size = New System.Drawing.Size(1384, 128)
         Me.RibbonControl1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonControl1.SystemText.MaximizeRibbonText = "&Maximize the Ribbon"
         Me.RibbonControl1.SystemText.MinimizeRibbonText = "Mi&nimize the Ribbon"
@@ -231,7 +232,7 @@ Partial Class MainForm
         Me.RibbonPanel1.Location = New System.Drawing.Point(0, 27)
         Me.RibbonPanel1.Name = "RibbonPanel1"
         Me.RibbonPanel1.Padding = New System.Windows.Forms.Padding(3, 0, 3, 2)
-        Me.RibbonPanel1.Size = New System.Drawing.Size(1384, 88)
+        Me.RibbonPanel1.Size = New System.Drawing.Size(1384, 101)
         '
         '
         '
@@ -264,7 +265,7 @@ Partial Class MainForm
         Me.RibbonBar4.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
         Me.RibbonBar4.Location = New System.Drawing.Point(687, 0)
         Me.RibbonBar4.Name = "RibbonBar4"
-        Me.RibbonBar4.Size = New System.Drawing.Size(224, 86)
+        Me.RibbonBar4.Size = New System.Drawing.Size(224, 99)
         Me.RibbonBar4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar4.TabIndex = 3
         Me.RibbonBar4.Text = "帮助"
@@ -313,7 +314,7 @@ Partial Class MainForm
         Me.RibbonBar3.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
         Me.RibbonBar3.Location = New System.Drawing.Point(561, 0)
         Me.RibbonBar3.Name = "RibbonBar3"
-        Me.RibbonBar3.Size = New System.Drawing.Size(126, 86)
+        Me.RibbonBar3.Size = New System.Drawing.Size(126, 99)
         Me.RibbonBar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar3.TabIndex = 2
         Me.RibbonBar3.Text = "其它"
@@ -349,11 +350,11 @@ Partial Class MainForm
         Me.RibbonBar2.ContainerControlProcessDialogKey = True
         Me.RibbonBar2.Dock = System.Windows.Forms.DockStyle.Left
         Me.RibbonBar2.DragDropSupport = True
-        Me.RibbonBar2.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem5})
+        Me.RibbonBar2.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem5, Me.ButtonItem7})
         Me.RibbonBar2.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
         Me.RibbonBar2.Location = New System.Drawing.Point(369, 0)
         Me.RibbonBar2.Name = "RibbonBar2"
-        Me.RibbonBar2.Size = New System.Drawing.Size(192, 86)
+        Me.RibbonBar2.Size = New System.Drawing.Size(192, 99)
         Me.RibbonBar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar2.TabIndex = 1
         Me.RibbonBar2.Text = "物料"
@@ -369,11 +370,20 @@ Partial Class MainForm
         'ButtonItem5
         '
         Me.ButtonItem5.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem5.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.link_32px
+        Me.ButtonItem5.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.importData_32px
         Me.ButtonItem5.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
         Me.ButtonItem5.Name = "ButtonItem5"
         Me.ButtonItem5.SubItemsExpandWidth = 14
-        Me.ButtonItem5.Text = "预留按钮"
+        Me.ButtonItem5.Text = "导入物料" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "价格..."
+        '
+        'ButtonItem7
+        '
+        Me.ButtonItem7.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem7.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportData_32px
+        Me.ButtonItem7.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem7.Name = "ButtonItem7"
+        Me.ButtonItem7.SubItemsExpandWidth = 14
+        Me.ButtonItem7.Text = "导出物料" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "价格..."
         '
         'RibbonBar1
         '
@@ -393,7 +403,7 @@ Partial Class MainForm
         Me.RibbonBar1.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
         Me.RibbonBar1.Location = New System.Drawing.Point(3, 0)
         Me.RibbonBar1.Name = "RibbonBar1"
-        Me.RibbonBar1.Size = New System.Drawing.Size(366, 86)
+        Me.RibbonBar1.Size = New System.Drawing.Size(366, 99)
         Me.RibbonBar1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar1.TabIndex = 0
         Me.RibbonBar1.Text = "文件"
@@ -413,7 +423,7 @@ Partial Class MainForm
         Me.ButtonItem2.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
         Me.ButtonItem2.Name = "ButtonItem2"
         Me.ButtonItem2.SubItemsExpandWidth = 14
-        Me.ButtonItem2.Text = "选择模板..."
+        Me.ButtonItem2.Text = "选择" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "BOM模板..."
         '
         'ButtonItem3
         '
@@ -431,7 +441,7 @@ Partial Class MainForm
         Me.ButtonItem4.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
         Me.ButtonItem4.Name = "ButtonItem4"
         Me.ButtonItem4.SubItemsExpandWidth = 14
-        Me.ButtonItem4.Text = "重新解析"
+        Me.ButtonItem4.Text = "重新解析" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "BOM模板"
         '
         'RibbonTabItem1
         '
@@ -469,7 +479,7 @@ Partial Class MainForm
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2
-        Me.SplitContainer1.Location = New System.Drawing.Point(0, 115)
+        Me.SplitContainer1.Location = New System.Drawing.Point(0, 128)
         Me.SplitContainer1.Name = "SplitContainer1"
         Me.SplitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal
         '
@@ -480,8 +490,8 @@ Partial Class MainForm
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.GroupBox2)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1384, 624)
-        Me.SplitContainer1.SplitterDistance = 408
+        Me.SplitContainer1.Size = New System.Drawing.Size(1384, 611)
+        Me.SplitContainer1.SplitterDistance = 395
         Me.SplitContainer1.TabIndex = 10
         '
         'SplitContainer2
@@ -498,7 +508,7 @@ Partial Class MainForm
         'SplitContainer2.Panel2
         '
         Me.SplitContainer2.Panel2.Controls.Add(Me.GroupBox3)
-        Me.SplitContainer2.Size = New System.Drawing.Size(1384, 408)
+        Me.SplitContainer2.Size = New System.Drawing.Size(1384, 395)
         Me.SplitContainer2.SplitterDistance = 735
         Me.SplitContainer2.TabIndex = 5
         '
@@ -510,7 +520,7 @@ Partial Class MainForm
         Me.GroupBox3.ForeColor = System.Drawing.Color.White
         Me.GroupBox3.Location = New System.Drawing.Point(0, 0)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(645, 408)
+        Me.GroupBox3.Size = New System.Drawing.Size(645, 395)
         Me.GroupBox3.TabIndex = 1
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "物料价格占比"
@@ -536,7 +546,7 @@ Partial Class MainForm
         Series1.Name = "Series1"
         Series1.SmartLabelStyle.IsMarkerOverlappingAllowed = True
         Me.Chart1.Series.Add(Series1)
-        Me.Chart1.Size = New System.Drawing.Size(639, 359)
+        Me.Chart1.Size = New System.Drawing.Size(639, 346)
         Me.Chart1.TabIndex = 0
         Me.Chart1.Text = "Chart1"
         '
@@ -754,4 +764,5 @@ Partial Class MainForm
     Friend WithEvents ToolStripLabel2 As ToolStripLabel
     Friend WithEvents ToolStripLabel3 As ToolStripLabel
     Friend WithEvents MinimumTotalPricePercentage As ToolStripComboBox
+    Friend WithEvents ButtonItem7 As DevComponents.DotNetBar.ButtonItem
 End Class

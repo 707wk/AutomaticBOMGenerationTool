@@ -612,9 +612,9 @@ group by NodeID"
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = $"select count(NodeValueID)
 from MaterialLinkInfo
-inner join ConfigurationNodeInfo
-on MaterialLinkInfo.NodeID=ConfigurationNodeInfo.ID
-and ConfigurationNodeInfo.IsMaterial=true
+--inner join ConfigurationNodeInfo
+--on MaterialLinkInfo.NodeID=ConfigurationNodeInfo.ID
+--and ConfigurationNodeInfo.IsMaterial=true
 
 where NodeValueID in ({String.Join(",", tmpIDArray)}) 
 and LinkNodeID=@LinkNodeID
@@ -664,18 +664,18 @@ group by NodeValueID"
     End Function
 #End Region
 
-#Region "获取配置项选中值以外的值关联的值ID列表"
+#Region "获取配置项选中值以外的值关联的值ID及数量列表"
     ''' <summary>
-    ''' 获取配置项选中值以外的值关联的值ID列表
+    ''' 获取配置项选中值以外的值关联的值ID及数量列表
     ''' </summary>
     Public Shared Function GetConfigurationNodeOtherValueIDItems(
                                                      nodeID As String,
                                                      nodeValueID As String,
-                                                     linkNodeID As String) As HashSet(Of String)
-        Dim tmpHashSet As New HashSet(Of String)
+                                                     linkNodeID As String) As Dictionary(Of String, Integer)
+        Dim tmpDictionary As New Dictionary(Of String, Integer)
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
-                .CommandText = "select LinkNodeValueID
+                .CommandText = "select LinkNodeValueID,count(MaterialLinkInfo.LinkNodeValueID)
 from MaterialLinkInfo
 where NodeID=@NodeID and NodeValueID<>@NodeValueID
 and LinkNodeID=@LinkNodeID
@@ -687,11 +687,11 @@ group by LinkNodeValueID"
 
         Using reader As SQLiteDataReader = cmd.ExecuteReader()
             While reader.Read
-                tmpHashSet.Add(reader(0))
+                tmpDictionary.Add(reader(0), reader(1))
             End While
         End Using
 
-        Return tmpHashSet
+        Return tmpDictionary
     End Function
 #End Region
 

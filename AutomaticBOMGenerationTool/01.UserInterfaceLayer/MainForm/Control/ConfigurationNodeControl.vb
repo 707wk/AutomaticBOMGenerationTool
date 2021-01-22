@@ -35,6 +35,9 @@ Public Class ConfigurationNodeControl
     ''' </summary>
     Private ParentNodeIDHashSet As HashSet(Of String)
 
+    Public ParentSortID As Integer
+    Public SortID As Integer
+
     Public Sub New()
 
         ' 此调用是设计器所必需的。
@@ -45,15 +48,11 @@ Public Class ConfigurationNodeControl
 
     End Sub
 
-    'Private OldLabelBackColor As Color
-
     Private Sub ConfigurationNodeControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        Me.Label1.Text = NodeInfo.Name
+        Me.Label1.Text = $"{ParentSortID}.{SortID}. { NodeInfo.Name}"
         Me.Label1.ProgressBarWidth = 800
         Me.Label1.NodeInfo = _NodeInfo
-
-        'OldLabelBackColor = Color.FromArgb(70, 70, 74)
 
     End Sub
 
@@ -141,6 +140,10 @@ Public Class ConfigurationNodeControl
         SelectedValueID = Nothing
         SelectedValue = Nothing
 
+        If NodeInfo.Name.Equals("卡线扣弹片") Then
+            Console.WriteLine()
+        End If
+
         Dim originDictionary = LocalDatabaseHelper.GetConfigurationNodeValueIDItems(NodeInfo.ID)
 
         Dim tmpParentNodeValueIDList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
@@ -158,7 +161,6 @@ Public Class ConfigurationNodeControl
                 Dim tmpHashSet = LocalDatabaseHelper.GetConfigurationNodeValueIDItems(item.SelectedValueID, NodeInfo.ID)
 
                 '取交集
-                'originHashSet.IntersectWith(tmpHashSet)
                 Dim tmpKeys = originDictionary.Keys.ToList
                 For Each key In tmpKeys
                     If tmpHashSet.Contains(key) Then
@@ -172,21 +174,21 @@ Public Class ConfigurationNodeControl
 
         Else
             '无关联,排除其他选项值
+            Console.WriteLine($"无关联项 [{NodeInfo.Name}]")
             '遍历其他配置项当前值
             For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                 If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
                     Continue For
                 End If
 
-                Dim tmpHashSet = LocalDatabaseHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
+                Dim tmpDictionary = LocalDatabaseHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
 
                 '排除
-                'originHashSet.ExceptWith(tmpHashSet)
-                For Each key In tmpHashSet
+                For Each key In tmpDictionary.Keys
                     If originDictionary.ContainsKey(key) Then
 
                         Dim count = originDictionary(key)
-                        count -= 1
+                        count -= tmpDictionary(key)
                         originDictionary(key) = count
                         If count <= 0 Then
                             originDictionary.Remove(key)
