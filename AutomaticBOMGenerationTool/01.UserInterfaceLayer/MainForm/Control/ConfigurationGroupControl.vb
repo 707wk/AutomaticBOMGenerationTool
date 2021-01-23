@@ -2,6 +2,8 @@
 
     Public GroupInfo As ConfigurationGroupInfo
 
+    Private NodeHashset As New HashSet(Of String)
+
     Public Sub New()
 
         ' 此调用是设计器所必需的。
@@ -14,7 +16,7 @@
 
     Private Sub ConfigurationGroupControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        CheckBox1.Text = $"{GroupInfo.SortID + 1}. { GroupInfo.Name}(--)"
+        CheckBox1.Text = $"{GroupInfo.SortID + 1}. { GroupInfo.Name}"
 
         CheckBox1_CheckedChanged(Nothing, Nothing)
     End Sub
@@ -29,17 +31,25 @@
             CheckBox1.Image = My.Resources.expand_16px
         End If
 
-        Me.Refresh()
-
     End Sub
 
-    Public Sub FlowLayoutPanel1_SizeChanged(sender As Object, e As EventArgs) Handles FlowLayoutPanel1.SizeChanged
-        If GroupInfo Is Nothing Then Exit Sub
+#Region "更新子控件状态"
+    ''' <summary>
+    ''' 更新子控件状态
+    ''' </summary>
+    Public Sub UpdateControlVisible(
+                                 nodeName As String,
+                                 isVisible As Boolean)
 
-        Dim getVisibleCount = (From item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
-                               Where item.FlowLayoutPanel1.Controls.Count > 0).Count
-        CheckBox1.Text = $"{GroupInfo.SortID + 1}. { GroupInfo.Name}({getVisibleCount})"
+        If isVisible Then
+            NodeHashset.Add(nodeName)
+        Else
+            NodeHashset.Remove(nodeName)
+        End If
+
+        CheckBox1.Text = $"{GroupInfo.SortID + 1}. { GroupInfo.Name}({NodeHashset.Count})"
 
     End Sub
+#End Region
 
 End Class

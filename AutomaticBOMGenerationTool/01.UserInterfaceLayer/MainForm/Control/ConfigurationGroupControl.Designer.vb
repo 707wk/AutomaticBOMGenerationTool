@@ -35,6 +35,7 @@ Partial Class ConfigurationGroupControl
         Me.CheckBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.CheckBox1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.CheckBox1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.expand_16px
+        Me.CheckBox1.ImageAlign = System.Drawing.ContentAlignment.TopLeft
         Me.CheckBox1.Location = New System.Drawing.Point(3, 3)
         Me.CheckBox1.Name = "CheckBox1"
         Me.CheckBox1.Size = New System.Drawing.Size(70, 27)

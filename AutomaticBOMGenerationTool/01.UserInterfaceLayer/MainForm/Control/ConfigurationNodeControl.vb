@@ -2,6 +2,8 @@
 
 Public Class ConfigurationNodeControl
 
+    Public GroupControl As ConfigurationGroupControl
+
     Public _NodeInfo As ConfigurationNodeInfo
     ''' <summary>
     ''' 配置项信息
@@ -98,6 +100,7 @@ Public Class ConfigurationNodeControl
         tmpMaterialInfoControl.Checked = True
 
         IsUserChecked = True
+
     End Sub
 #End Region
 
@@ -140,10 +143,6 @@ Public Class ConfigurationNodeControl
         SelectedValueID = Nothing
         SelectedValue = Nothing
 
-        If NodeInfo.Name.Equals("卡线扣弹片") Then
-            Console.WriteLine()
-        End If
-
         Dim originDictionary = LocalDatabaseHelper.GetConfigurationNodeValueIDItems(NodeInfo.ID)
 
         Dim tmpParentNodeValueIDList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
@@ -174,7 +173,6 @@ Public Class ConfigurationNodeControl
 
         Else
             '无关联,排除其他选项值
-            Console.WriteLine($"无关联项 [{NodeInfo.Name}]")
             '遍历其他配置项当前值
             For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
                 If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
@@ -254,6 +252,7 @@ Public Class ConfigurationNodeControl
         End If
 
         IsUserChecked = True
+
     End Sub
 #End Region
 
@@ -271,4 +270,7 @@ Public Class ConfigurationNodeControl
 
     End Sub
 
+    Private Sub ConfigurationNodeControl_VisibleChanged(sender As Object, e As EventArgs) Handles Me.VisibleChanged
+        GroupControl.UpdateControlVisible(NodeInfo.Name, Me.Visible)
+    End Sub
 End Class

@@ -22,17 +22,51 @@ Public NotInheritable Class EPPlusHelper
                 Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
                 Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
 
+#Region "检测阶层"
+                Dim lastLevel = GetLevel(tmpExcelPackage, MaterialRowMinID)
+
+                '检测根节点阶层
+                If lastLevel = 0 Then
+                    Throw New Exception($"第 {MaterialRowMinID} 行 阶层标记错误")
+                End If
+
+                '检测子节点阶层
+                For rid = MaterialRowMinID + 1 To MaterialRowMaxID
+                    Dim nowLevel = GetLevel(tmpExcelPackage, rid)
+
+                    If nowLevel = 0 Then
+                        '跳过无阶层标记的行
+                        Continue For
+
+                    ElseIf lastLevel < nowLevel Then
+                        '当前阶层高于上一个阶层
+
+                        If lastLevel = nowLevel - 1 Then
+                            '正常
+                        Else
+                            '阶层错误
+                            Throw New Exception($"第 {rid} 行 阶层标记错误")
+                        End If
+
+                    Else
+                        '正常
+                    End If
+
+                    lastLevel = nowLevel
+                Next
+#End Region
+
                 '记录原始行号
                 For rid = MaterialRowMaxID To MaterialRowMinID Step -1
                     tmpWorkSheet.Cells(rid, 1).Value = rid
                 Next
 
-                '删除空格
+#Region "删除空行"
                 For rid = MaterialRowMaxID To MaterialRowMinID Step -1
 
                     '合并当前行内容
                     Dim tmpStringBuilder As New StringBuilder
-                    For i001 = levelColumnID To levelColumnID + LevelCount + 2
+                    For i001 = levelColumnID To levelColumnID + LevelCount + 3
                         tmpStringBuilder.Append($"{tmpWorkSheet.Cells(rid, i001).Value}")
                     Next
                     Dim tmpStr = tmpStringBuilder.ToString
@@ -42,6 +76,7 @@ Public NotInheritable Class EPPlusHelper
                     End If
 
                 Next
+#End Region
 
                 '另存为
                 Using tmpSaveFileStream = New FileStream(AppSettingHelper.TempfilePath, FileMode.Create)
@@ -566,32 +601,37 @@ Public NotInheritable Class EPPlusHelper
 #Region "移除多余替换物料"
                 For rID = MaterialRowMaxID To MaterialRowMinID Step -1
 
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, levelColumnID + LevelCount).Value}"
-                    '非替换料跳过
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, levelColumnID + LevelCount).Value}".Trim
+                    '跳过非替换料
                     If String.IsNullOrWhiteSpace(tmpStr) Then
                         Continue For
                     End If
 
-                    '判断是否是带节点物料
-                    Dim isHaveNodeMaterial As Boolean = False
-                    For cID = levelColumnID To levelColumnID + LevelCount - 1
-                        tmpStr = $"{tmpWorkSheet.Cells(rID, cID).Value}"
-
-                        If Not String.IsNullOrWhiteSpace(tmpStr) Then
-                            isHaveNodeMaterial = True
-                            Exit For
-                        End If
-
-                    Next
-
                     '跳过带节点物料
-                    If isHaveNodeMaterial Then
+                    If GetLevel(tmpExcelPackage, rID) > 0 Then
                         Continue For
                     End If
 
                     '移除不带节点的替换物料
                     tmpWorkSheet.DeleteRow(rID)
 
+                Next
+#End Region
+
+#Region "清空组合料节点的价格"
+                ReadBOMInfo(tmpExcelPackage)
+
+                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+
+                Dim lastLevel = 1
+                For rID = MaterialRowMinID + 1 To MaterialRowMaxID
+                    Dim nowLevel = GetLevel(tmpExcelPackage, rID)
+
+                    If lastLevel = nowLevel - 1 Then
+                        tmpWorkSheet.Cells(rID - 1, pIDColumnID + 5).Value = "0"
+                    End If
+
+                    lastLevel = nowLevel
                 Next
 #End Region
 
@@ -837,6 +877,10 @@ Public NotInheritable Class EPPlusHelper
 
                 ReplaceMaterial(tmpExcelPackage, values)
 
+                '自动调整价格列宽度
+                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                tmpWorkSheet.Column(pIDColumnID + 5).AutoFit()
+
                 '删除物料标记列
                 Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "替换料")
                 tmpWorkSheet.DeleteColumn(headerLocation.X)
@@ -866,12 +910,14 @@ Public NotInheritable Class EPPlusHelper
                 Dim MaterialRowMinID = headerLocation.Y + 2
                 Dim MaterialRowMaxID = FindHeaderLocation(tmpExcelPackage, "版次").Y - 1
 
-                '删除空格
+                Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
+
+#Region "删除空行"
                 For rid = MaterialRowMaxID To MaterialRowMinID Step -1
 
                     '合并当前行内容
                     Dim tmpStringBuilder As New StringBuilder
-                    For i001 = levelColumnID To levelColumnID + 6 + 2
+                    For i001 = levelColumnID To levelColumnID + LevelCount + 3
                         tmpStringBuilder.Append($"{tmpWorkSheet.Cells(rid, i001).Value}")
                     Next
                     Dim tmpStr = tmpStringBuilder.ToString
@@ -881,6 +927,7 @@ Public NotInheritable Class EPPlusHelper
                     End If
 
                 Next
+#End Region
 
                 '重新计算序号
                 headerLocation = FindHeaderLocation(tmpExcelPackage, "阶层")
@@ -938,9 +985,9 @@ Public NotInheritable Class EPPlusHelper
                     tmpWorkSheet.Cells(item, pIDColumnID + 3).Value = node.MaterialValue.pUnit
                     tmpWorkSheet.Cells(item, pIDColumnID + 5).Value = node.MaterialValue.pUnitPrice
 
-                    'todo:调试
+                    '标记替换位置
                     tmpWorkSheet.Cells(item, pIDColumnID).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-                    tmpWorkSheet.Cells(item, pIDColumnID).Style.Fill.BackgroundColor.SetColor(UIFormHelper.NormalColor)
+                    tmpWorkSheet.Cells(item, pIDColumnID).Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
                 Next
             End If
         Next
@@ -1111,31 +1158,40 @@ Public NotInheritable Class EPPlusHelper
 
             Dim tmpUnitPrice As Decimal = 0
 
+            Dim haveSameLevelNode As Boolean = False
+
             For rowID = MaterialRowMaxID To MaterialRowMinID Step -1
 
                 Dim nowRowLevel = GetLevel(wb, rowID)
 
-                If nowRowLevel = levelID Then
-                    '当前节点与当前阶级相同
+                If nowRowLevel = 0 Then
+                    '跳过空行
+                    Continue For
+
+                ElseIf nowRowLevel > levelID Then
+                    '跳过大于当前阶层的行
+
+                ElseIf nowRowLevel = levelID Then
+                    '当前节点与当前遍历阶层相同
                     tmpUnitPrice +=
                         Convert.ToDecimal(Val($"{tmpWorkSheet.Cells(rowID, pIDColumnID + 4).Value}")) *
                         Convert.ToDecimal(Val($"{tmpWorkSheet.Cells(rowID, pIDColumnID + 5).Value}"))
 
-                ElseIf nowRowLevel = 0 OrElse
-                    nowRowLevel > levelID Then
-                    '跳过空行和低于当前阶级的行
+                    haveSameLevelNode = True
 
                 ElseIf nowRowLevel = levelID - 1 Then
-                    '上一级节点
-                    Dim lastRowLevel = GetLevel(wb, rowID + 1)
-                    If lastRowLevel = levelID Then
-                        '如果是上一节点的父节点
+                    '当前节点是遍历阶层的上级节点
+                    If haveSameLevelNode Then
+                        '如果是前一个节点的父节点
                         tmpWorkSheet.Cells(rowID, pIDColumnID + 5).Value = tmpUnitPrice
                         tmpUnitPrice = 0
+                        haveSameLevelNode = False
                     Else
-                        '跳过当前行
+                        '跳过不是父节点的行
                     End If
 
+                Else 'If nowRowLevel < levelID - 1 Then
+                    '跳过小于当前遍历阶层父节点的行
                 End If
 
             Next

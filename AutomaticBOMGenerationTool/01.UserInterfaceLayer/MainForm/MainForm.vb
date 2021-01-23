@@ -129,34 +129,34 @@ Public Class MainForm
             tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
                                 Dim stepCount = 10
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 清空数据库", 100 / stepCount * 0)
+                                be.Write("清空数据库", 100 / stepCount * 0)
                                 LocalDatabaseHelper.ClearLocalDatabase()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 预处理源文件", 100 / stepCount * 1)
+                                be.Write("预处理源文件", 100 / stepCount * 1)
                                 EPPlusHelper.PreproccessSourceFile()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 获取替换物料品号", 100 / stepCount * 2)
+                                be.Write("获取替换物料品号", 100 / stepCount * 2)
                                 Dim configurationTablepIDList = EPPlusHelper.GetMaterialpIDListFromConfigurationTable()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 检测替换物料完整性", 100 / stepCount * 3)
+                                be.Write("检测替换物料完整性", 100 / stepCount * 3)
                                 EPPlusHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 获取替换物料信息", 100 / stepCount * 4)
+                                be.Write("获取替换物料信息", 100 / stepCount * 4)
                                 Dim tmpList = EPPlusHelper.GetMaterialInfoList(configurationTablepIDList)
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 导入替换物料信息到临时数据库", 100 / stepCount * 5)
+                                be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 5)
                                 LocalDatabaseHelper.SaveMaterialInfoToLocalDatabase(tmpList)
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 解析配置节点信息", 100 / stepCount * 6)
+                                be.Write("解析配置节点信息", 100 / stepCount * 6)
                                 EPPlusHelper.TransformationConfigurationTable()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 制作提取模板", 100 / stepCount * 7)
+                                be.Write("制作提取模板", 100 / stepCount * 7)
                                 EPPlusHelper.CreateTemplate()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 获取替换物料在模板中的位置", 100 / stepCount * 8)
+                                be.Write("获取替换物料在模板中的位置", 100 / stepCount * 8)
                                 Dim tmpRowIDList = EPPlusHelper.GetMaterialRowIDInTemplate()
 
-                                be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 导入替换物料位置到临时数据库", 100 / stepCount * 9)
+                                be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 9)
                                 LocalDatabaseHelper.SaveMaterialRowIDToLocalDatabase(tmpRowIDList)
 
                                 '测试耗时
@@ -217,6 +217,7 @@ Public Class MainForm
             Dim tmpConfigurationGroupControl = tmpGroupDict(item.GroupID)
 
             Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
+                .GroupControl = tmpConfigurationGroupControl,
                 .NodeInfo = item,
                 .ParentSortID = tmpConfigurationGroupControl.GroupInfo.SortID + 1,
                 .SortID = tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Count + 1
@@ -238,6 +239,11 @@ Public Class MainForm
         '启用自动调整大小
         For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
             item.FlowLayoutPanel1.AutoSize = True
+        Next
+
+        '默认展开
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.CheckBox1.Checked = True
         Next
 
         ShowUnitPrice()
@@ -721,6 +727,32 @@ Public Class MainForm
 
     Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
         UIFormHelper.ToastWarning("功能未开发")
+
+        'Using tmpDialog As New OpenFileDialog
+        '    If tmpDialog.ShowDialog <> DialogResult.OK Then
+        '        Exit Sub
+        '    End If
+
+        '    Using readFS = New FileStream(tmpDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        '        Using tmpExcelPackage As New ExcelPackage(readFS)
+        '            Dim tmpWorkBook = tmpExcelPackage.Workbook
+        '            Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        '            Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+
+        '            EPPlusHelper.CalculateUnitPrice(tmpExcelPackage)
+
+        '            tmpWorkSheet.Column(pIDColumnID + 5).AutoFit()
+
+        '            '另存为
+        '            Using tmpSaveFileStream = New FileStream(tmpDialog.FileName & "1.xlsx", FileMode.Create)
+        '                tmpExcelPackage.SaveAs(tmpSaveFileStream)
+        '            End Using
+
+        '        End Using
+        '    End Using
+        'End Using
+        'UIFormHelper.ToastWarning("计算完成")
     End Sub
 
     Private Sub ButtonItem7_Click(sender As Object, e As EventArgs) Handles ButtonItem7.Click
