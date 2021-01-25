@@ -576,17 +576,6 @@ Public NotInheritable Class EPPlusHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
-                Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
-                Dim colMaxID = tmpWorkSheet.Dimension.End.Column
-                Dim colMinID = tmpWorkSheet.Dimension.Start.Column
-
-                '清除单元格背景色
-                For rid = rowMinID To rowMaxID
-                    tmpWorkSheet.Row(rid).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-                    tmpWorkSheet.Row(rid).Style.Fill.BackgroundColor.SetColor(Color.White)
-                Next
-
                 '移除核价产品配置表
                 Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "显示屏规格")
                 tmpWorkSheet.DeleteRow(tmpWorkSheet.Dimension.Start.Row, headerLocation.Y - 1)
@@ -597,6 +586,32 @@ Public NotInheritable Class EPPlusHelper
                 Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
                 Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
                 Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+                Dim BOMRemarkColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID
+                Dim BOMpIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+
+#Region "设置默认样式"
+                For rID = MaterialRowMinID To MaterialRowMaxID
+                    '清除背景色
+                    tmpWorkSheet.Row(rID).Style.Fill.PatternType = Style.ExcelFillStyle.None
+                    '清除字体颜色
+                    tmpWorkSheet.Row(rID).Style.Font.Color.SetAuto()
+                Next
+
+                '清除字体颜色(有些格式无法清除,原因未知)
+                For rID = MaterialRowMinID To MaterialRowMaxID
+                    For cID = BOMpIDColumnID To BOMRemarkColumnID
+                        Dim tmpValue = $"{tmpWorkSheet.Cells(rID, cID).Value}"
+                        tmpWorkSheet.Cells(rID, cID).Value = tmpValue
+                    Next
+                Next
+
+                '设置单元格边框
+                Dim tmpCells = tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(MaterialRowMaxID, BOMRemarkColumnID).Address}")
+                tmpCells.Style.Border.Top.Style = Style.ExcelBorderStyle.Thin
+                tmpCells.Style.Border.Bottom.Style = Style.ExcelBorderStyle.Thin
+                tmpCells.Style.Border.Left.Style = Style.ExcelBorderStyle.Thin
+                tmpCells.Style.Border.Right.Style = Style.ExcelBorderStyle.Thin
+#End Region
 
 #Region "移除多余替换物料"
                 For rID = MaterialRowMaxID To MaterialRowMinID Step -1
@@ -607,12 +622,12 @@ Public NotInheritable Class EPPlusHelper
                         Continue For
                     End If
 
-                    '跳过带节点物料
+                    '跳过带阶层物料
                     If GetLevel(tmpExcelPackage, rID) > 0 Then
                         Continue For
                     End If
 
-                    '移除不带节点的替换物料
+                    '移除不带阶层的替换物料
                     tmpWorkSheet.DeleteRow(rID)
 
                 Next
@@ -621,14 +636,24 @@ Public NotInheritable Class EPPlusHelper
 #Region "清空组合料节点的价格"
                 ReadBOMInfo(tmpExcelPackage)
 
+                MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+                MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
                 Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+                tmpWorkSheet.InsertColumn(baseMaterialFlagColumnID, 1)
+                tmpWorkSheet.Cells(MaterialRowMinID - 1, baseMaterialFlagColumnID).Value = "基础料标记"
+
+                For rID = MaterialRowMinID To MaterialRowMaxID
+                    tmpWorkSheet.Cells(rID, baseMaterialFlagColumnID).Value = True
+                Next
 
                 Dim lastLevel = 1
                 For rID = MaterialRowMinID + 1 To MaterialRowMaxID
                     Dim nowLevel = GetLevel(tmpExcelPackage, rID)
 
                     If lastLevel = nowLevel - 1 Then
-                        tmpWorkSheet.Cells(rID - 1, pIDColumnID + 5).Value = "0"
+                        tmpWorkSheet.Cells(rID - 1, pIDColumnID + 5).Value = 0
+                        tmpWorkSheet.Cells(rID - 1, baseMaterialFlagColumnID).Value = False
                     End If
 
                     lastLevel = nowLevel
@@ -661,30 +686,32 @@ Public NotInheritable Class EPPlusHelper
         Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
         Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
         Dim pCountColumnID = pIDColumnID + 4
-        Dim tmpCountColumnID = FindHeaderLocation(wb, "备注").X + 1
+        Dim tmpCountColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
         tmpWorkSheet.InsertColumn(tmpCountColumnID, 1)
+        tmpWorkSheet.Cells(MaterialRowMinID - 1, tmpCountColumnID).Value = "基础物料总数"
 
         Dim countStack = New Stack(Of Decimal)
 
         countStack.Push(1)
         Dim lastLevel = 1
+        tmpWorkSheet.Cells(MaterialRowMinID, tmpCountColumnID).Value = 1
         For rID = MaterialRowMinID + 1 To MaterialRowMaxID
 
             Dim nowLevel = GetLevel(wb, rID)
 
             If lastLevel < nowLevel Then
                 '是上一个物料的子物料
-                countStack.Push(Decimal.Parse(Val(tmpWorkSheet.Cells(rID, pCountColumnID).Value)))
+                countStack.Push(Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, pCountColumnID).Value}")))
 
             ElseIf lastLevel = nowLevel Then
                 '是上一个物料的同级物料
                 countStack.Pop()
-                countStack.Push(Decimal.Parse(Val(tmpWorkSheet.Cells(rID, pCountColumnID).Value)))
+                countStack.Push(Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, pCountColumnID).Value}")))
 
             Else 'lastLevel > nowLevel
                 '是上一个物料的上级物料
@@ -695,7 +722,7 @@ Public NotInheritable Class EPPlusHelper
                 Next
 
                 countStack.Pop()
-                countStack.Push(Decimal.Parse(Val(tmpWorkSheet.Cells(rID, pCountColumnID).Value)))
+                countStack.Push(Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, pCountColumnID).Value}")))
 
             End If
 
@@ -745,6 +772,10 @@ Public NotInheritable Class EPPlusHelper
                         Dim tmppIDItems = LocalDatabaseHelper.GetMaterialpIDItems(item.ID)
 
                         tmpMarkLocations = GetNoMarkLocations(tmpExcelPackage, tmppIDItems)
+
+                        If tmpMarkLocations.Count = 0 Then
+                            Throw New Exception($"未找到配置项 {item.Name} 的替换位置")
+                        End If
 
                     End If
 
@@ -799,7 +830,7 @@ Public NotInheritable Class EPPlusHelper
             '移除标记
             tmpStr = tmpStr.Trim.Substring(1)
 
-            If tmpStr.Equals(nodeName) Then
+            If tmpStr.Equals(nodeName.ToUpper) Then
                 tmpList.Add(rID)
             End If
 
@@ -877,16 +908,18 @@ Public NotInheritable Class EPPlusHelper
 
                 ReplaceMaterial(tmpExcelPackage, values)
 
-                '自动调整价格列宽度
                 Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
-                tmpWorkSheet.Column(pIDColumnID + 5).AutoFit()
 
                 '删除物料标记列
                 Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "替换料")
                 tmpWorkSheet.DeleteColumn(headerLocation.X)
+                pIDColumnID -= 1
 
                 '删除临时总数列
                 headerLocation = FindHeaderLocation(tmpExcelPackage, "备注")
+                tmpWorkSheet.DeleteColumn(headerLocation.X + 1)
+
+                '删除临时物料类型列
                 tmpWorkSheet.DeleteColumn(headerLocation.X + 1)
 
                 '更新BOM名称
@@ -937,6 +970,39 @@ Public NotInheritable Class EPPlusHelper
                     tmpWorkSheet.Cells(rid, 1).Value = $"{rid - MaterialRowMinID + 1}"
                 Next
 
+#Region "标记数量和价格"
+                For rid = MaterialRowMinID To MaterialRowMaxID
+
+                    '数量
+                    Dim tmpStr = $"{tmpWorkSheet.Cells(rid, pIDColumnID + 4).Value}"
+                    If String.IsNullOrWhiteSpace(tmpStr) OrElse
+                        Val(tmpStr) <= 0 Then
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 4).Value = 0
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 4).Style.Font.Color.SetColor(Color.Red)
+                    Else
+                        Dim tmpDecimal As Decimal = Decimal.Parse(tmpStr)
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 4).Value = tmpDecimal
+                    End If
+                    tmpWorkSheet.Cells(rid, pIDColumnID + 4).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
+
+                    '价格
+                    tmpStr = $"{tmpWorkSheet.Cells(rid, pIDColumnID + 5).Value}"
+                    If String.IsNullOrWhiteSpace(tmpStr) OrElse
+                        Val(tmpStr) <= 0 Then
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 5).Value = 0
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.Font.Color.SetColor(Color.Red)
+                    Else
+                        Dim tmpDecimal As Decimal = Decimal.Parse(tmpStr)
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 4).Value = tmpDecimal
+                    End If
+                    tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
+
+                Next
+#End Region
+
+                '自动调整价格列宽度
+                tmpWorkSheet.Column(pIDColumnID + 5).AutoFit()
+
                 '另存为
                 Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
@@ -956,6 +1022,7 @@ Public NotInheritable Class EPPlusHelper
                                      values As List(Of ConfigurationNodeRowInfo))
 
         Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim BOMRemarkColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -963,6 +1030,8 @@ Public NotInheritable Class EPPlusHelper
 
         Dim colMaxID = tmpWorkSheet.Dimension.End.Column
         Dim colMinID = tmpWorkSheet.Dimension.Start.Column
+
+        Dim DefaultBackgroundColor = Color.FromArgb(153, 214, 255)
 
         For Each node In values
             If Not node.IsMaterial Then
@@ -986,8 +1055,11 @@ Public NotInheritable Class EPPlusHelper
                     tmpWorkSheet.Cells(item, pIDColumnID + 5).Value = node.MaterialValue.pUnitPrice
 
                     '标记替换位置
-                    tmpWorkSheet.Cells(item, pIDColumnID).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-                    tmpWorkSheet.Cells(item, pIDColumnID).Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
+                    For cID = pIDColumnID To BOMRemarkColumnID
+                        tmpWorkSheet.Cells(item, cID).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                        tmpWorkSheet.Cells(item, cID).Style.Fill.BackgroundColor.SetColor(DefaultBackgroundColor)
+                    Next
+
                 Next
             End If
         Next
@@ -1001,7 +1073,7 @@ Public NotInheritable Class EPPlusHelper
     ''' <summary>
     ''' 计算配置项单项总价
     ''' </summary>
-    Public Shared Sub CalculateMaterialTotalPrice(
+    Public Shared Sub CalculateConfigurationMaterialTotalPrice(
                                                  wb As ExcelPackage,
                                                  values As List(Of ConfigurationNodeRowInfo))
 
@@ -1012,9 +1084,6 @@ Public NotInheritable Class EPPlusHelper
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
-        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
         For Each node In values
 
@@ -1044,6 +1113,59 @@ Public NotInheritable Class EPPlusHelper
             End If
 
         Next
+    End Sub
+#End Region
+
+#Region "计算物料单项总价"
+    ''' <summary>
+    ''' 计算物料单项总价
+    ''' </summary>
+    Public Shared Sub CalculateMaterialTotalPrice(wb As ExcelPackage)
+
+        AppSettingHelper.GetInstance.MaterialTotalPriceTable.Clear()
+
+        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim pUnitPriceColumnID = pIDColumnID + 5
+        Dim tmpCountColumnID = FindHeaderLocation(wb, "备注").X + 1
+        Dim baseMaterialFlagColumnID = tmpCountColumnID + 1
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        For rID = MaterialRowMinID To MaterialRowMaxID
+
+            Dim baseMaterialFlagStr = $"{tmpWorkSheet.Cells(rID, baseMaterialFlagColumnID).Value}"
+
+            If String.IsNullOrWhiteSpace(baseMaterialFlagStr) Then
+                Continue For
+            End If
+
+            Dim baseMaterialFlag = Boolean.Parse(baseMaterialFlagStr)
+
+            '跳过组合料
+            If Not baseMaterialFlag Then
+                Continue For
+            End If
+
+            Dim pName = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}".Trim
+
+            Dim tmpPrice As Decimal = Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, pUnitPriceColumnID).Value}")) *
+                    Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, tmpCountColumnID).Value}"))
+
+            If AppSettingHelper.GetInstance.MaterialTotalPriceTable.ContainsKey(pName) Then
+                '已存在
+                Dim oldPrice = AppSettingHelper.GetInstance.MaterialTotalPriceTable(pName)
+                AppSettingHelper.GetInstance.MaterialTotalPriceTable(pName) = oldPrice + tmpPrice
+            Else
+                '不存在
+                AppSettingHelper.GetInstance.MaterialTotalPriceTable.Add(pName, tmpPrice)
+            End If
+
+        Next
+
     End Sub
 #End Region
 
@@ -1249,6 +1371,9 @@ Public NotInheritable Class EPPlusHelper
 
         headerLocation = FindHeaderLocation(tmpExcelPackage, "品 号")
         AppSettingHelper.GetInstance.BOMpIDColumnID = headerLocation.X
+
+        headerLocation = FindHeaderLocation(tmpExcelPackage, "备注")
+        AppSettingHelper.GetInstance.BOMRemarkColumnID = headerLocation.X
 
     End Sub
 #End Region

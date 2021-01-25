@@ -264,6 +264,10 @@ Public Class AppSettingHelper
     ''' 当前BOM品号所在列ID
     ''' </summary>
     Public BOMpIDColumnID As Integer
+    ''' <summary>
+    ''' 当前BOM备注所在列ID
+    ''' </summary>
+    Public BOMRemarkColumnID As Integer
 
     ''' <summary>
     ''' BOM第一个物料行号
@@ -283,5 +287,11 @@ Public Class AppSettingHelper
     ''' 显示的最小价格占比
     ''' </summary>
     Public MinimumTotalPricePercentage As Decimal = 1
+
+    ''' <summary>
+    ''' 物料单项总价表
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public MaterialTotalPriceTable As New Dictionary(Of String, Decimal)
 
 End Class

@@ -44,8 +44,9 @@ Public Class MainForm
         End With
 
         '占比选择项
-        MinimumTotalPricePercentage.Items.Add(0D)
-        MinimumTotalPricePercentage.Items.Add(0.5D)
+        For i001 = 0 To 10
+            MinimumTotalPricePercentage.Items.Add(i001 * 0.1D)
+        Next
         For i001 = 1 To 10
             MinimumTotalPricePercentage.Items.Add(i001 * 1D)
         Next
@@ -208,6 +209,7 @@ Public Class MainForm
             }
 
             ConfigurationGroupList.Controls.Add(addConfigurationGroupControl)
+            ConfigurationGroupList.Controls.SetChildIndex(addConfigurationGroupControl, ConfigurationGroupList.Controls.Count - 1)
 
             tmpGroupDict.Add(item.ID, addConfigurationGroupControl)
         Next
@@ -224,6 +226,7 @@ Public Class MainForm
             }
 
             tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
+            tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.SetChildIndex(addConfigurationNodeControl, addConfigurationNodeControl.SortID - 1)
 
             AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Add(item.ID, addConfigurationNodeControl)
 
@@ -290,7 +293,9 @@ Public Class MainForm
                 AppSettingHelper.GetInstance.TotalPrice = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
                 ToolStripLabel1.Text = $"当前总价: ￥{AppSettingHelper.GetInstance.TotalPrice:n4}"
 
-                EPPlusHelper.CalculateMaterialTotalPrice(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
+                EPPlusHelper.CalculateConfigurationMaterialTotalPrice(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
+
+                EPPlusHelper.CalculateMaterialTotalPrice(tmpExcelPackage)
 
             End Using
         End Using
@@ -316,27 +321,28 @@ Public Class MainForm
 
         Chart1.Series(0).Points.Clear()
 
-        Dim tmpNodeItem = From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
-                          Where item.NodeInfo.IsMaterial = True AndAlso
-                              item.NodeInfo.TotalPricePercentage >= AppSettingHelper.GetInstance.MinimumTotalPricePercentage
-                          Order By item.NodeInfo.TotalPrice Descending
-                          Select item.NodeInfo
+        Dim tmpNodeItem = From item In AppSettingHelper.GetInstance.MaterialTotalPriceTable
+                          Where item.Value * 100 / AppSettingHelper.GetInstance.TotalPrice >= AppSettingHelper.GetInstance.MinimumTotalPricePercentage
+                          Select item
+                          Order By item.Value Descending
 
         For Each item In tmpNodeItem
             Chart1.Series(0).Points.Add(New DataPoint() With {
-                                        .YValues = {item.TotalPrice},
-                                        .AxisLabel = $"{item.Name}
-({item.TotalPricePercentage:n1}%,￥{item.TotalPrice:n2})"
+                                        .YValues = {item.Value},
+                                        .AxisLabel = $"{item.Key}
+({item.Value * 100 / AppSettingHelper.GetInstance.TotalPrice:n1}%,￥{item.Value:n2})"
                                         })
 
-            tmpOtherTotalPrice -= item.TotalPrice
+            tmpOtherTotalPrice -= item.Value
         Next
 
-        Chart1.Series(0).Points.Add(New DataPoint() With {
-                                        .YValues = {tmpOtherTotalPrice},
-                                        .AxisLabel = $"其他物料
+        If AppSettingHelper.GetInstance.MinimumTotalPricePercentage > 0 Then
+            Chart1.Series(0).Points.Add(New DataPoint() With {
+                                                    .YValues = {tmpOtherTotalPrice},
+                                                    .AxisLabel = $"其他物料
 (￥{tmpOtherTotalPrice:n2})"
-                                        })
+                                                    })
+        End If
 
     End Sub
 #End Region
@@ -397,11 +403,6 @@ Public Class MainForm
                                     Using tmpExcelPackage As New ExcelPackage(readFS)
                                         Dim tmpWorkBook = tmpExcelPackage.Workbook
                                         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-                                        Dim rowMaxID = tmpWorkSheet.Dimension.End.Row
-                                        Dim rowMinID = tmpWorkSheet.Dimension.Start.Row
-                                        Dim colMaxID = tmpWorkSheet.Dimension.End.Column
-                                        Dim colMinID = tmpWorkSheet.Dimension.Start.Column
 
                                         tmpResult.Name = EPPlusHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
 

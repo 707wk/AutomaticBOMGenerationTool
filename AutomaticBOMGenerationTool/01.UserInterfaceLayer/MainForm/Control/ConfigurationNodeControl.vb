@@ -92,12 +92,31 @@ Public Class ConfigurationNodeControl
             Next
         End If
 
-        For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
-            AddHandler item.CheckedChanged, AddressOf CheckedChanged
-        Next
+        If FlowLayoutPanel1.Controls.Count > 0 Then
 
-        Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
-        tmpMaterialInfoControl.Checked = True
+            '添加事件绑定
+            For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
+                AddHandler item.CheckedChanged, AddressOf CheckedChanged
+            Next
+
+            '默认选中第一项
+            Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
+            tmpMaterialInfoControl.Checked = True
+
+            '隐藏只有一项的配置项
+            If FlowLayoutPanel1.Controls.Count > 1 Then
+                Me.Visible = True
+                Me.AutoSize = True
+                Dim tmpHeight = Me.Height
+                Me.AutoSize = False
+                Me.Height = tmpHeight
+            Else
+                Me.Visible = False
+            End If
+
+        Else
+            Me.Visible = False
+        End If
 
         IsUserChecked = True
 
@@ -242,11 +261,17 @@ Public Class ConfigurationNodeControl
             Dim tmpMaterialInfoControl As MaterialInfoControl = FlowLayoutPanel1.Controls(0)
             tmpMaterialInfoControl.Checked = True
 
-            Me.Visible = True
-            Me.AutoSize = True
-            Dim tmpHeight = Me.Height
-            Me.AutoSize = False
-            Me.Height = tmpHeight
+            '隐藏只有一项的配置项
+            If FlowLayoutPanel1.Controls.Count > 1 Then
+                Me.Visible = True
+                Me.AutoSize = True
+                Dim tmpHeight = Me.Height
+                Me.AutoSize = False
+                Me.Height = tmpHeight
+            Else
+                Me.Visible = False
+            End If
+
         Else
             Me.Visible = False
         End If

@@ -574,8 +574,8 @@ Partial Class MainForm
         '
         Me.ToolStripLabel3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
         Me.ToolStripLabel3.Name = "ToolStripLabel3"
-        Me.ToolStripLabel3.Size = New System.Drawing.Size(79, 24)
-        Me.ToolStripLabel3.Text = "%的替换物料"
+        Me.ToolStripLabel3.Size = New System.Drawing.Size(55, 24)
+        Me.ToolStripLabel3.Text = "%的物料"
         '
         'MinimumTotalPricePercentage
         '
