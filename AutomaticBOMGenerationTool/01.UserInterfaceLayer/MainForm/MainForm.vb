@@ -131,7 +131,7 @@ Public Class MainForm
                                 Dim stepCount = 10
 
                                 be.Write("清空数据库", 100 / stepCount * 0)
-                                LocalDatabaseHelper.ClearLocalDatabase()
+                                LocalDatabaseHelper.Clear()
 
                                 be.Write("预处理源文件", 100 / stepCount * 1)
                                 EPPlusHelper.PreproccessSourceFile()
@@ -146,7 +146,7 @@ Public Class MainForm
                                 Dim tmpList = EPPlusHelper.GetMaterialInfoList(configurationTablepIDList)
 
                                 be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 5)
-                                LocalDatabaseHelper.SaveMaterialInfoToLocalDatabase(tmpList)
+                                LocalDatabaseHelper.SaveMaterialInfo(tmpList)
 
                                 be.Write("解析配置节点信息", 100 / stepCount * 6)
                                 EPPlusHelper.TransformationConfigurationTable()
@@ -158,7 +158,7 @@ Public Class MainForm
                                 Dim tmpRowIDList = EPPlusHelper.GetMaterialRowIDInTemplate()
 
                                 be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 9)
-                                LocalDatabaseHelper.SaveMaterialRowIDToLocalDatabase(tmpRowIDList)
+                                LocalDatabaseHelper.SaveMaterialRowID(tmpRowIDList)
 
                                 '测试耗时
                                 'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 处理完成", 100 / stepCount * 10)
@@ -205,7 +205,7 @@ Public Class MainForm
 
         For Each item In tmpGroupList
             Dim addConfigurationGroupControl = New ConfigurationGroupControl With {
-                .GroupInfo = item
+                .CacheGroupInfo = item
             }
 
             ConfigurationGroupList.Controls.Add(addConfigurationGroupControl)
@@ -221,7 +221,7 @@ Public Class MainForm
             Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
                 .GroupControl = tmpConfigurationGroupControl,
                 .NodeInfo = item,
-                .ParentSortID = tmpConfigurationGroupControl.GroupInfo.SortID + 1,
+                .ParentSortID = tmpConfigurationGroupControl.CacheGroupInfo.SortID + 1,
                 .SortID = tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Count + 1
             }
 
@@ -273,8 +273,8 @@ Public Class MainForm
         '获取位置及物料信息
         For Each item In tmpConfigurationNodeRowInfoList
 
-            item.MaterialRowIDList = LocalDatabaseHelper.GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
-            item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
+            item.MaterialRowIDList = LocalDatabaseHelper.GetMaterialRowID(item.ConfigurationNodeID)
+            item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.SelectedValueID)
 
         Next
 
@@ -302,6 +302,16 @@ Public Class MainForm
 
         For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
             item.UpdateTotalPrice()
+        Next
+
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.GroupPrice = 0
+            item.GroupTotalPricePercentage = 0
+        Next
+
+        For Each nodeitem In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+            nodeitem.GroupControl.GroupPrice += nodeitem.NodeInfo.TotalPrice
+            nodeitem.GroupControl.GroupTotalPricePercentage += nodeitem.NodeInfo.TotalPricePercentage
         Next
 
         ShowTotalPrice()
@@ -393,7 +403,7 @@ Public Class MainForm
                                     item.Value = findNode.SelectedValue
                                     item.IsMaterial = findNode.NodeInfo.IsMaterial
                                     If item.IsMaterial Then
-                                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.ValueID)
                                     End If
 
                                 Next
@@ -482,7 +492,7 @@ Public Class MainForm
                                     item.Value = findNode.SelectedValue
                                     item.IsMaterial = findNode.NodeInfo.IsMaterial
                                     If item.IsMaterial Then
-                                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.ValueID)
                                     End If
 
                                 Next
@@ -493,8 +503,8 @@ Public Class MainForm
                                         Continue For
                                     End If
 
-                                    item.MaterialRowIDList = LocalDatabaseHelper.GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
-                                    item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
+                                    item.MaterialRowIDList = LocalDatabaseHelper.GetMaterialRowID(item.ConfigurationNodeID)
+                                    item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.SelectedValueID)
 
                                 Next
 
@@ -582,7 +592,7 @@ Public Class MainForm
                                         item.Value = findNode.SelectedValue
                                         item.IsMaterial = findNode.IsMaterial
                                         If item.IsMaterial Then
-                                            item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                                            item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.ValueID)
                                         End If
 
                                     Next
@@ -592,8 +602,8 @@ Public Class MainForm
                                             Continue For
                                         End If
 
-                                        item.MaterialRowIDList = LocalDatabaseHelper.GetMaterialRowIDInLocalDatabase(item.ConfigurationNodeID)
-                                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.SelectedValueID)
+                                        item.MaterialRowIDList = LocalDatabaseHelper.GetMaterialRowID(item.ConfigurationNodeID)
+                                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.SelectedValueID)
 
                                     Next
 
@@ -689,10 +699,20 @@ Public Class MainForm
         End Using
     End Sub
 
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+    Private Sub ToolStripSplitButton1_ButtonClick(sender As Object, e As EventArgs) Handles ToolStripSplitButton1.ButtonClick
         For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
             item.CheckBox1.Checked = True
         Next
+    End Sub
+
+    Private Sub ShowHideItems_CheckedChanged(sender As Object, e As EventArgs) Handles ShowHideItems.CheckedChanged
+        '显示隐藏项
+        AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems = ShowHideItems.Checked
+
+        For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+            item.UpdateVisible()
+        Next
+
     End Sub
 
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
@@ -728,32 +748,6 @@ Public Class MainForm
 
     Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
         UIFormHelper.ToastWarning("功能未开发")
-
-        'Using tmpDialog As New OpenFileDialog
-        '    If tmpDialog.ShowDialog <> DialogResult.OK Then
-        '        Exit Sub
-        '    End If
-
-        '    Using readFS = New FileStream(tmpDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-        '        Using tmpExcelPackage As New ExcelPackage(readFS)
-        '            Dim tmpWorkBook = tmpExcelPackage.Workbook
-        '            Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-        '            Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
-
-        '            EPPlusHelper.CalculateUnitPrice(tmpExcelPackage)
-
-        '            tmpWorkSheet.Column(pIDColumnID + 5).AutoFit()
-
-        '            '另存为
-        '            Using tmpSaveFileStream = New FileStream(tmpDialog.FileName & "1.xlsx", FileMode.Create)
-        '                tmpExcelPackage.SaveAs(tmpSaveFileStream)
-        '            End Using
-
-        '        End Using
-        '    End Using
-        'End Using
-        'UIFormHelper.ToastWarning("计算完成")
     End Sub
 
     Private Sub ButtonItem7_Click(sender As Object, e As EventArgs) Handles ButtonItem7.Click

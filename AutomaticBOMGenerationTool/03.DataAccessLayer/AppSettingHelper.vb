@@ -294,4 +294,10 @@ Public Class AppSettingHelper
     <Newtonsoft.Json.JsonIgnore>
     Public MaterialTotalPriceTable As New Dictionary(Of String, Decimal)
 
+    ''' <summary>
+    ''' 显示隐藏配置项
+    ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
+    Public ShowHideConfigurationNodeItems As Boolean = False
+
 End Class

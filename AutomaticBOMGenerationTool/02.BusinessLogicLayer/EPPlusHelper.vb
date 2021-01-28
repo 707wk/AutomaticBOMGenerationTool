@@ -360,14 +360,14 @@ Public NotInheritable Class EPPlusHelper
                             .GroupID = .ID
                         }
                         '查重
-                        If LocalDatabaseHelper.GetConfigurationNodeInfoByNameFromLocalDatabase(tmpStr) IsNot Nothing Then
+                        If LocalDatabaseHelper.GetConfigurationNodeInfoByName(tmpStr) IsNot Nothing Then
                             Throw New Exception($"第 {rID} 行 配置选项 {tmpStr} 名称重复")
                         End If
 
-                        LocalDatabaseHelper.SaveConfigurationNodeInfoToLocalDatabase(tmpRootNode)
+                        LocalDatabaseHelper.SaveConfigurationNodeInfo(tmpRootNode)
                         rootSortID += 1
 
-                        LocalDatabaseHelper.SaveConfigurationGroupInfoToLocalDatabase(New ConfigurationGroupInfo With {
+                        LocalDatabaseHelper.SaveConfigurationGroupInfo(New ConfigurationGroupInfo With {
                                                                   .ID = tmpRootNode.ID,
                                                                   .Name = tmpRootNode.Name,
                                                                   .SortID = groupSortID
@@ -383,7 +383,7 @@ Public NotInheritable Class EPPlusHelper
                             .SortID = childSortID,
                             .Value = If(String.IsNullOrWhiteSpace(tmpChildNodeName), $"{tmpRootNode.Name}默认配置", tmpChildNodeName)
                         }
-                        LocalDatabaseHelper.SaveConfigurationNodeValueInfoToLocalDatabase(tmpChildNode)
+                        LocalDatabaseHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
                         childSortID += 1
 
                     Else
@@ -402,7 +402,7 @@ Public NotInheritable Class EPPlusHelper
                                 .SortID = childSortID,
                                 .Value = tmpChildNodeName
                             }
-                            LocalDatabaseHelper.SaveConfigurationNodeValueInfoToLocalDatabase(tmpChildNode)
+                            LocalDatabaseHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
                             childSortID += 1
 
                         Else
@@ -428,7 +428,7 @@ Public NotInheritable Class EPPlusHelper
                     End If
 
 #Region "解析细分选项"
-                    Dim tmpNode = LocalDatabaseHelper.GetConfigurationNodeInfoByNameFromLocalDatabase(tmpNodeStr)
+                    Dim tmpNode = LocalDatabaseHelper.GetConfigurationNodeInfoByName(tmpNodeStr)
                     If tmpNode Is Nothing Then
                         tmpNode = New ConfigurationNodeInfo With {
                     .ID = Wangk.Resource.IDHelper.NewID,
@@ -437,7 +437,7 @@ Public NotInheritable Class EPPlusHelper
                     .IsMaterial = True,
                     .GroupID = tmpRootNode.ID
                 }
-                        LocalDatabaseHelper.SaveConfigurationNodeInfoToLocalDatabase(tmpNode)
+                        LocalDatabaseHelper.SaveConfigurationNodeInfo(tmpNode)
                         rootSortID += 1
                     End If
 #End Region
@@ -454,11 +454,11 @@ Public NotInheritable Class EPPlusHelper
 
                         Dim tmppID = item.Trim()
 
-                        Dim tmpMaterialNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpNode.ID, tmppID)
+                        Dim tmpMaterialNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpNode.ID, tmppID)
                         '不存在则添加配置值信息
                         If tmpMaterialNode Is Nothing Then
 
-                            Dim tmpMaterialInfo = LocalDatabaseHelper.GetMaterialInfoBypIDFromLocalDatabase(tmppID)
+                            Dim tmpMaterialInfo = LocalDatabaseHelper.GetMaterialInfoBypID(tmppID)
                             If tmpMaterialInfo Is Nothing Then
                                 Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 未找到品号 {tmppID} 对应物料信息")
                             End If
@@ -469,7 +469,7 @@ Public NotInheritable Class EPPlusHelper
                                 .SortID = childSortID,
                                 .Value = tmppID
                             }
-                            LocalDatabaseHelper.SaveConfigurationNodeValueInfoToLocalDatabase(tmpMaterialNode)
+                            LocalDatabaseHelper.SaveConfigurationNodeValueInfo(tmpMaterialNode)
                             childSortID += 1
                         End If
 
@@ -481,7 +481,7 @@ Public NotInheritable Class EPPlusHelper
                         .LinkNodeID = tmpNode.ID,
                         .LinkNodeValueID = tmpMaterialNode.ID
                     }
-                        LocalDatabaseHelper.SaveMaterialLinkInfoToLocalDatabase(tmpLinkNode)
+                        LocalDatabaseHelper.SaveMaterialLinkInfo(tmpLinkNode)
 
                     Next
 #End Region
@@ -532,18 +532,61 @@ Public NotInheritable Class EPPlusHelper
                         Dim tmpStr = item.Replace("AND", ",")
                         Dim tmpMaterialArray = tmpStr.Split(",")
 
-                        Dim parentNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(0).Trim())
+                        Dim parentNode As ConfigurationNodeValueInfo
+
+                        If tmpMaterialArray(0).Contains("(") Then
+                            '品号不唯一
+                            Dim nodeNameStartIndex = tmpMaterialArray(0).IndexOf("(") + 1
+                            Dim nodeNameLength = tmpMaterialArray(0).IndexOf(")") - nodeNameStartIndex
+                            Dim configurationNodeName = tmpMaterialArray(0).Substring(nodeNameStartIndex, nodeNameLength).Trim
+                            Dim pIDStr = tmpMaterialArray(0).Substring(0, nodeNameStartIndex - 1).Trim
+                            Dim tmpConfigurationNodeInfo = LocalDatabaseHelper.GetConfigurationNodeInfoByName(configurationNodeName)
+
+                            If tmpConfigurationNodeInfo Is Nothing Then
+                                Throw New Exception($"1第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
+                            End If
+
+                            parentNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
+
+                        Else
+                            '品号唯一
+                            parentNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(0).Trim())
+
+                        End If
+
                         If parentNode Is Nothing Then
                             Throw New Exception($"第 {rID} 行 替换物料 {tmpMaterialArray(0).Trim()} 在配置表中不存在")
                         End If
 
                         For i001 = 1 To tmpMaterialArray.Count - 1
-                            Dim linkNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValueFromLocalDatabase(tmpMaterialArray(i001).Trim())
+
+                            Dim linkNode As ConfigurationNodeValueInfo
+
+                            If tmpMaterialArray(i001).Contains("(") Then
+                                '品号不唯一
+                                Dim nodeNameStartIndex = tmpMaterialArray(i001).IndexOf("(") + 1
+                                Dim nodeNameLength = tmpMaterialArray(i001).IndexOf(")") - nodeNameStartIndex
+                                Dim configurationNodeName = tmpMaterialArray(i001).Substring(nodeNameStartIndex, nodeNameLength).Trim
+                                Dim pIDStr = tmpMaterialArray(i001).Substring(0, nodeNameStartIndex - 1).Trim
+                                Dim tmpConfigurationNodeInfo = LocalDatabaseHelper.GetConfigurationNodeInfoByName(configurationNodeName)
+
+                                If tmpConfigurationNodeInfo Is Nothing Then
+                                    Throw New Exception($"2第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
+                                End If
+
+                                linkNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
+
+                            Else
+                                '品号唯一
+                                linkNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(i001).Trim())
+
+                            End If
+
                             If linkNode Is Nothing Then
                                 Throw New Exception($"第 {rID} 行 替换物料 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
                             End If
 
-                            LocalDatabaseHelper.SaveMaterialLinkInfoToLocalDatabase(New MaterialLinkInfo With {
+                            LocalDatabaseHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
                                                                 .ID = Wangk.Resource.IDHelper.NewID,
                                                                 .NodeID = parentNode.ConfigurationNodeID,
                                                                 .NodeValueID = parentNode.ID,
@@ -993,7 +1036,7 @@ Public NotInheritable Class EPPlusHelper
                         tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.Font.Color.SetColor(Color.Red)
                     Else
                         Dim tmpDecimal As Decimal = Decimal.Parse(tmpStr)
-                        tmpWorkSheet.Cells(rid, pIDColumnID + 4).Value = tmpDecimal
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 5).Value = tmpDecimal
                     End If
                     tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
 
@@ -1436,7 +1479,7 @@ Public NotInheritable Class EPPlusHelper
                     item.Value = findNode.SelectedValue
                     item.IsMaterial = findNode.IsMaterial
                     If item.IsMaterial Then
-                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByIDFromLocalDatabase(item.ValueID)
+                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.ValueID)
                     End If
 
                     tmpWorkSheet.Cells(i001 + 1 + 1, item.ColIndex + 3).Value = EPPlusHelper.JoinConfigurationName(item)

@@ -22,23 +22,22 @@ Partial Class ConfigurationGroupControl
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
+        Me.CheckBox1 = New AutomaticBOMGenerationTool.ConfigurationGroupCheckBox()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.SuspendLayout()
         '
         'CheckBox1
         '
         Me.CheckBox1.Appearance = System.Windows.Forms.Appearance.Button
-        Me.CheckBox1.AutoSize = True
         Me.CheckBox1.FlatAppearance.BorderSize = 0
         Me.CheckBox1.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.CheckBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.CheckBox1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.CheckBox1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.expand_16px
         Me.CheckBox1.ImageAlign = System.Drawing.ContentAlignment.TopLeft
-        Me.CheckBox1.Location = New System.Drawing.Point(3, 3)
+        Me.CheckBox1.Location = New System.Drawing.Point(0, 0)
         Me.CheckBox1.Name = "CheckBox1"
-        Me.CheckBox1.Size = New System.Drawing.Size(70, 27)
+        Me.CheckBox1.Size = New System.Drawing.Size(1224, 27)
         Me.CheckBox1.TabIndex = 0
         Me.CheckBox1.Text = "分组名"
         Me.CheckBox1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
@@ -74,6 +73,6 @@ Partial Class ConfigurationGroupControl
 
     End Sub
 
-    Friend WithEvents CheckBox1 As CheckBox
+    Friend WithEvents CheckBox1 As ConfigurationGroupCheckBox
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
 End Class

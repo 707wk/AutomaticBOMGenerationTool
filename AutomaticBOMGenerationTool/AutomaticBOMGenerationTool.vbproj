@@ -161,6 +161,9 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupCheckBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.Designer.vb">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
     </Compile>

@@ -29,5 +29,26 @@ Namespace My
             AppSettingHelper.GetInstance.ClearTempFiles()
         End Sub
 
+        Private Sub MyApplication_Startup(sender As Object, e As StartupEventArgs) Handles Me.Startup
+
+            Dim currentProcess = Process.GetCurrentProcess
+
+            Dim ProcessItems = Process.GetProcessesByName(currentProcess.ProcessName)
+
+            '检测同名进程
+            Dim sameProcessCount = 0
+            For Each item In ProcessItems
+                '判断程序路径是否相同
+                If item.MainModule.FileName.Equals(currentProcess.MainModule.FileName) Then
+                    sameProcessCount += 1
+                End If
+            Next
+
+            If sameProcessCount > 1 Then
+                MsgBox("不能重复运行同一路径的程序", MsgBoxStyle.Critical, "进程检测")
+                End
+            End If
+
+        End Sub
     End Class
 End Namespace

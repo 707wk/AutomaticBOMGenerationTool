@@ -1,8 +1,43 @@
 ﻿Public Class ConfigurationGroupControl
 
-    Public GroupInfo As ConfigurationGroupInfo
+    Public CacheGroupInfo As ConfigurationGroupInfo
 
     Private NodeHashset As New HashSet(Of String)
+
+    ''' <summary>
+    ''' 分组内总价
+    ''' </summary>
+    Public Property GroupPrice() As Decimal
+        Get
+            Return CacheGroupInfo.GroupPrice
+        End Get
+        Set(ByVal value As Decimal)
+            CacheGroupInfo.GroupPrice = value
+
+            CheckBox1.Refresh()
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' 分组内总价占总价的百分比
+    ''' </summary>
+    Public Property GroupTotalPricePercentage As Decimal
+        Get
+            Return CacheGroupInfo.GroupTotalPricePercentage
+        End Get
+        Set(ByVal value As Decimal)
+            CacheGroupInfo.GroupTotalPricePercentage = value
+
+            CheckBox1.Refresh()
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' 更新标题
+    ''' </summary>
+    Private Sub UpdateTitle()
+        CheckBox1.Text = $"{CacheGroupInfo.SortID + 1}. { CacheGroupInfo.Name}({NodeHashset.Count})"
+    End Sub
 
     Public Sub New()
 
@@ -16,9 +51,13 @@
 
     Private Sub ConfigurationGroupControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        CheckBox1.Text = $"{GroupInfo.SortID + 1}. { GroupInfo.Name}"
+        CheckBox1.CacheGroupInfo = CacheGroupInfo
+        CheckBox1.ProgressBarWidth = 800
+
+        UpdateTitle()
 
         CheckBox1_CheckedChanged(Nothing, Nothing)
+
     End Sub
 
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
@@ -47,7 +86,7 @@
             NodeHashset.Remove(nodeName)
         End If
 
-        CheckBox1.Text = $"{GroupInfo.SortID + 1}. { GroupInfo.Name}({NodeHashset.Count})"
+        UpdateTitle()
 
     End Sub
 #End Region

@@ -32,7 +32,8 @@ Partial Class MainForm
         Me.ConfigurationGroupList = New System.Windows.Forms.FlowLayoutPanel()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripSplitButton1 = New System.Windows.Forms.ToolStripSplitButton()
+        Me.ShowHideItems = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
         Me.AddCurrentToExportBOMListButton = New System.Windows.Forms.ToolStripButton()
@@ -122,21 +123,30 @@ Partial Class MainForm
         '
         Me.ToolStrip1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripSeparator2, Me.AddCurrentToExportBOMListButton, Me.ExportCurrentButton, Me.ToolStripSeparator1, Me.ToolStripLabel1})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSplitButton1, Me.ToolStripButton2, Me.ToolStripSeparator2, Me.AddCurrentToExportBOMListButton, Me.ExportCurrentButton, Me.ToolStripSeparator1, Me.ToolStripLabel1})
         Me.ToolStrip1.Location = New System.Drawing.Point(3, 19)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(729, 27)
         Me.ToolStrip1.TabIndex = 4
         Me.ToolStrip1.Text = "ToolStrip1"
         '
-        'ToolStripButton1
+        'ToolStripSplitButton1
         '
-        Me.ToolStripButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.fold_20px
-        Me.ToolStripButton1.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(80, 24)
-        Me.ToolStripButton1.Text = "全部展开"
+        Me.ToolStripSplitButton1.DropDownButtonWidth = 18
+        Me.ToolStripSplitButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowHideItems})
+        Me.ToolStripSplitButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.fold_20px
+        Me.ToolStripSplitButton1.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton1.Name = "ToolStripSplitButton1"
+        Me.ToolStripSplitButton1.Size = New System.Drawing.Size(99, 24)
+        Me.ToolStripSplitButton1.Text = "全部展开"
+        '
+        'ShowHideItems
+        '
+        Me.ShowHideItems.CheckOnClick = True
+        Me.ShowHideItems.Name = "ShowHideItems"
+        Me.ShowHideItems.Size = New System.Drawing.Size(180, 22)
+        Me.ShowHideItems.Text = "显示隐藏项"
         '
         'ToolStripButton2
         '
@@ -748,7 +758,6 @@ Partial Class MainForm
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents RibbonBar4 As DevComponents.DotNetBar.RibbonBar
     Friend WithEvents ButtonItem1 As DevComponents.DotNetBar.ButtonItem
-    Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents ToolStripButton2 As ToolStripButton
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
     Friend WithEvents ButtonItem3 As DevComponents.DotNetBar.ButtonItem
@@ -765,4 +774,6 @@ Partial Class MainForm
     Friend WithEvents ToolStripLabel3 As ToolStripLabel
     Friend WithEvents MinimumTotalPricePercentage As ToolStripComboBox
     Friend WithEvents ButtonItem7 As DevComponents.DotNetBar.ButtonItem
+    Friend WithEvents ToolStripSplitButton1 As ToolStripSplitButton
+    Friend WithEvents ShowHideItems As ToolStripMenuItem
 End Class

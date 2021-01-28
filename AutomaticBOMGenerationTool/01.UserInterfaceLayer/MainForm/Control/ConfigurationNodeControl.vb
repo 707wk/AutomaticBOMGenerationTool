@@ -93,6 +93,7 @@ Public Class ConfigurationNodeControl
         End If
 
         If FlowLayoutPanel1.Controls.Count > 0 Then
+            Me.Label1.BackColor = Color.FromArgb(70, 70, 74)
 
             '添加事件绑定
             For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
@@ -106,17 +107,19 @@ Public Class ConfigurationNodeControl
             '隐藏只有一项的配置项
             If FlowLayoutPanel1.Controls.Count > 1 Then
                 Me.Visible = True
-                Me.AutoSize = True
-                Dim tmpHeight = Me.Height
-                Me.AutoSize = False
-                Me.Height = tmpHeight
             Else
-                Me.Visible = False
+                Me.Visible = If(AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems, True, False)
             End If
 
         Else
-            Me.Visible = False
+            Me.Label1.BackColor = UIFormHelper.ErrorColor
+            Me.Visible = If(AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems, True, False)
         End If
+
+        Me.AutoSize = True
+        Dim tmpHeight = Me.Height
+        Me.AutoSize = False
+        Me.Height = tmpHeight
 
         IsUserChecked = True
 
@@ -251,6 +254,7 @@ Public Class ConfigurationNodeControl
 
 
         If FlowLayoutPanel1.Controls.Count > 0 Then
+            Me.Label1.BackColor = Color.FromArgb(70, 70, 74)
 
             '添加事件绑定
             For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
@@ -264,17 +268,19 @@ Public Class ConfigurationNodeControl
             '隐藏只有一项的配置项
             If FlowLayoutPanel1.Controls.Count > 1 Then
                 Me.Visible = True
-                Me.AutoSize = True
-                Dim tmpHeight = Me.Height
-                Me.AutoSize = False
-                Me.Height = tmpHeight
             Else
-                Me.Visible = False
+                Me.Visible = If(AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems, True, False)
             End If
 
         Else
-            Me.Visible = False
+            Me.Label1.BackColor = UIFormHelper.ErrorColor
+            Me.Visible = If(AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems, True, False)
         End If
+
+        Me.AutoSize = True
+        Dim tmpHeight = Me.Height
+        Me.AutoSize = False
+        Me.Height = tmpHeight
 
         IsUserChecked = True
 
@@ -298,4 +304,44 @@ Public Class ConfigurationNodeControl
     Private Sub ConfigurationNodeControl_VisibleChanged(sender As Object, e As EventArgs) Handles Me.VisibleChanged
         GroupControl.UpdateControlVisible(NodeInfo.Name, Me.Visible)
     End Sub
+
+    ''' <summary>
+    ''' 更新可见性
+    ''' </summary>
+    Public Sub UpdateVisible()
+        Dim tmpVisible As Boolean
+
+        If AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems Then
+            '强制显示
+            Me.Visible = True
+            tmpVisible = True
+        Else
+            '按原有规则显示
+
+            If FlowLayoutPanel1.Controls.Count > 0 Then
+                '隐藏只有一项的配置项
+                If FlowLayoutPanel1.Controls.Count > 1 Then
+                    Me.Visible = True
+                    tmpVisible = True
+                Else
+                    Me.Visible = False
+                    tmpVisible = False
+                End If
+
+            Else
+                '隐藏没有选项的配置项
+                Me.Visible = False
+                tmpVisible = False
+            End If
+        End If
+
+        Me.AutoSize = True
+        Dim tmpHeight = Me.Height
+        Me.AutoSize = False
+        Me.Height = tmpHeight
+
+        GroupControl.UpdateControlVisible(NodeInfo.Name, tmpVisible)
+
+    End Sub
+
 End Class

@@ -15,7 +15,7 @@ Public NotInheritable Class LocalDatabaseHelper
                 }
                 _DatabaseConnection.Open()
 
-                'InitLocalDatabase()
+                'Init()
 
             End If
 
@@ -56,7 +56,7 @@ Public NotInheritable Class LocalDatabaseHelper
     ''' <summary>
     ''' 初始化数据库
     ''' </summary>
-    Public Shared Sub InitLocalDatabase()
+    Public Shared Sub Init()
 
         Using tmpCommand As New SQLite.SQLiteCommand(DatabaseConnection)
             tmpCommand.CommandText = "
@@ -75,7 +75,7 @@ PRAGMA journal_mode = OFF;"
     ''' <summary>
     ''' 清空数据库
     ''' </summary>
-    Public Shared Sub ClearLocalDatabase()
+    Public Shared Sub Clear()
 
         Using tmpCommand As New SQLite.SQLiteCommand(DatabaseConnection)
             tmpCommand.CommandText = "
@@ -96,7 +96,7 @@ delete from ConfigurationGroupInfo;"
     ''' <summary>
     ''' 导入替换物料信息到临时数据库
     ''' </summary>
-    Public Shared Sub SaveMaterialInfoToLocalDatabase(values As List(Of MaterialInfo))
+    Public Shared Sub SaveMaterialInfo(values As List(Of MaterialInfo))
 
         '使用事务提交
         Using Transaction As DbTransaction = DatabaseConnection.BeginTransaction()
@@ -141,7 +141,7 @@ values(
     ''' <summary>
     ''' 添加分组信息到临时数据库
     ''' </summary>
-    Public Shared Sub SaveConfigurationGroupInfoToLocalDatabase(value As ConfigurationGroupInfo)
+    Public Shared Sub SaveConfigurationGroupInfo(value As ConfigurationGroupInfo)
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "insert into ConfigurationGroupInfo 
@@ -164,7 +164,7 @@ values(
     ''' <summary>
     ''' 添加配置节点信息到临时数据库
     ''' </summary>
-    Public Shared Sub SaveConfigurationNodeInfoToLocalDatabase(value As ConfigurationNodeInfo)
+    Public Shared Sub SaveConfigurationNodeInfo(value As ConfigurationNodeInfo)
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "insert into ConfigurationNodeInfo 
@@ -191,7 +191,7 @@ values(
     ''' <summary>
     ''' 根据配置名获取配置节点信息
     ''' </summary>
-    Public Shared Function GetConfigurationNodeInfoByNameFromLocalDatabase(name As String) As ConfigurationNodeInfo
+    Public Shared Function GetConfigurationNodeInfoByName(name As String) As ConfigurationNodeInfo
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from ConfigurationNodeInfo 
@@ -217,7 +217,7 @@ where Name=@Name"
     ''' <summary>
     ''' 添加配置节点值到临时数据库
     ''' </summary>
-    Public Shared Sub SaveConfigurationNodeValueInfoToLocalDatabase(value As ConfigurationNodeValueInfo)
+    Public Shared Sub SaveConfigurationNodeValueInfo(value As ConfigurationNodeValueInfo)
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "insert into ConfigurationNodeValueInfo 
@@ -246,9 +246,9 @@ values(
     ''' <summary>
     ''' 根据配置值获取配置值信息
     ''' </summary>
-    Public Shared Function GetConfigurationNodeValueInfoByValueFromLocalDatabase(
-                                                                                configurationNodeID As String,
-                                                                                value As String) As ConfigurationNodeValueInfo
+    Public Shared Function GetConfigurationNodeValueInfoByValue(
+                                                               configurationNodeID As String,
+                                                               value As String) As ConfigurationNodeValueInfo
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from ConfigurationNodeValueInfo 
@@ -276,7 +276,7 @@ where ConfigurationNodeID=@ConfigurationNodeID and Value=@Value"
     ''' <summary>
     ''' 根据配置值获取配置值信息(仅限物料只与一个配置项关联的情况)
     ''' </summary>
-    Public Shared Function GetConfigurationNodeValueInfoByValueFromLocalDatabase(value As String) As ConfigurationNodeValueInfo
+    Public Shared Function GetConfigurationNodeValueInfoByValue(value As String) As ConfigurationNodeValueInfo
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from ConfigurationNodeValueInfo 
@@ -303,7 +303,7 @@ where Value=@Value"
     ''' <summary>
     ''' 根据品号获取物料信息
     ''' </summary>
-    Public Shared Function GetMaterialInfoBypIDFromLocalDatabase(pID As String) As MaterialInfo
+    Public Shared Function GetMaterialInfoBypID(pID As String) As MaterialInfo
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from MaterialInfo 
@@ -332,7 +332,7 @@ where pID=@pID"
     ''' <summary>
     ''' 根据ID获取物料信息
     ''' </summary>
-    Public Shared Function GetMaterialInfoByIDFromLocalDatabase(id As String) As MaterialInfo
+    Public Shared Function GetMaterialInfoByID(id As String) As MaterialInfo
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select * from MaterialInfo 
@@ -357,33 +357,11 @@ where ID=@ID"
     End Function
 #End Region
 
-#Region "根据品号获取配置项ID(仅限物料只与一个配置项关联的情况)"
-    ''' <summary>
-    ''' 根据品号获取配置项ID(仅限物料只与一个配置项关联的情况)
-    ''' </summary>
-    Public Shared Function GetConfigurationNodeIDByppIDFromLocalDatabase(pID As String) As String
-
-        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
-                .CommandText = "select ConfigurationNodeID from ConfigurationNodeValueInfo 
-where Value=@pID"
-            }
-        cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = pID})
-
-        Using reader As SQLiteDataReader = cmd.ExecuteReader()
-            If reader.Read Then
-                Return reader(0)
-            End If
-        End Using
-
-        Return Nothing
-    End Function
-#End Region
-
 #Region "添加物料关联信息到临时数据库"
     ''' <summary>
     ''' 添加物料关联信息到临时数据库
     ''' </summary>
-    Public Shared Sub SaveMaterialLinkInfoToLocalDatabase(value As MaterialLinkInfo)
+    Public Shared Sub SaveMaterialLinkInfo(value As MaterialLinkInfo)
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "insert into MaterialLinkInfo 
@@ -438,7 +416,7 @@ values(
     ''' <summary>
     ''' 导入替换物料位置到临时数据库
     ''' </summary>
-    Public Shared Sub SaveMaterialRowIDToLocalDatabase(values As List(Of ConfigurationNodeRowInfo))
+    Public Shared Sub SaveMaterialRowID(values As List(Of ConfigurationNodeRowInfo))
 
         '使用事务提交
         Using Transaction As DbTransaction = DatabaseConnection.BeginTransaction()
@@ -500,7 +478,7 @@ values(
     ''' <summary>
     ''' 获取替换物料的位置
     ''' </summary>
-    Public Shared Function GetMaterialRowIDInLocalDatabase(configurationNodeID As String) As List(Of Integer)
+    Public Shared Function GetMaterialRowID(configurationNodeID As String) As List(Of Integer)
         Dim tmpList As New List(Of Integer)
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
