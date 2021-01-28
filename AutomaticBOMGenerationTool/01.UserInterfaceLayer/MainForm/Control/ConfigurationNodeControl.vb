@@ -108,12 +108,12 @@ Public Class ConfigurationNodeControl
             If FlowLayoutPanel1.Controls.Count > 1 Then
                 Me.Visible = True
             Else
-                Me.Visible = If(AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems, True, False)
+                Me.Visible = AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems
             End If
 
         Else
             Me.Label1.BackColor = UIFormHelper.ErrorColor
-            Me.Visible = If(AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems, True, False)
+            Me.Visible = AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems
         End If
 
         Me.AutoSize = True
@@ -232,7 +232,7 @@ Public Class ConfigurationNodeControl
 
         '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
-            Dim tmpList = LocalDatabaseHelper.GetMaterialInfoItems(originDictionary.Keys.ToList)
+            Dim tmpList = LocalDatabaseHelper.GetMaterialInfoItems(NodeInfo.ID, originDictionary.Keys.ToList)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -269,12 +269,12 @@ Public Class ConfigurationNodeControl
             If FlowLayoutPanel1.Controls.Count > 1 Then
                 Me.Visible = True
             Else
-                Me.Visible = If(AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems, True, False)
+                Me.Visible = AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems
             End If
 
         Else
             Me.Label1.BackColor = UIFormHelper.ErrorColor
-            Me.Visible = If(AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems, True, False)
+            Me.Visible = AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems
         End If
 
         Me.AutoSize = True

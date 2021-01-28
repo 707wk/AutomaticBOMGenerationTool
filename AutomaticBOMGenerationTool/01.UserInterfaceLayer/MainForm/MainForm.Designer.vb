@@ -145,7 +145,7 @@ Partial Class MainForm
         '
         Me.ShowHideItems.CheckOnClick = True
         Me.ShowHideItems.Name = "ShowHideItems"
-        Me.ShowHideItems.Size = New System.Drawing.Size(180, 22)
+        Me.ShowHideItems.Size = New System.Drawing.Size(136, 22)
         Me.ShowHideItems.Text = "显示隐藏项"
         '
         'ToolStripButton2

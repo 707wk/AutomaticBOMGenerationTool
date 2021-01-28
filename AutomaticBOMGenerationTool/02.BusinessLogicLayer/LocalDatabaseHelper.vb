@@ -715,7 +715,7 @@ and ConfigurationNodeInfo.ID=@ConfigurationNodeID
 inner join MaterialInfo
 on MaterialInfo.ID=ConfigurationNodeValueInfo.ID
 
-order by MaterialInfo.pUnitPrice"
+order by ConfigurationNodeValueInfo.SortID"
             }
         cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = configurationNodeID})
 
@@ -771,7 +771,9 @@ on MaterialInfo.ID=ConfigurationNodeValueInfo.ID"
     ''' <summary>
     ''' 获取物料信息
     ''' </summary>
-    Public Shared Function GetMaterialInfoItems(values As List(Of String)) As List(Of MaterialInfo)
+    Public Shared Function GetMaterialInfoItems(
+                                               nodeID As String,
+                                               values As List(Of String)) As List(Of MaterialInfo)
 
         Dim tmpIDArray = From item In values Select $"'{item}'"
 
@@ -779,13 +781,17 @@ on MaterialInfo.ID=ConfigurationNodeValueInfo.ID"
 
 #Disable Warning CA2100 ' Review SQL queries for security vulnerabilities
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
-                .CommandText = $"select *
+                .CommandText = $"select MaterialInfo.*
 from MaterialInfo
-where ID in ({String.Join(",", tmpIDArray)})
-
-order by MaterialInfo.pUnitPrice"
+inner join ConfigurationNodeValueInfo
+on ConfigurationNodeValueInfo.ID=MaterialInfo.ID
+and ConfigurationNodeValueInfo.ConfigurationNodeID=@ConfigurationNodeID
+and MaterialInfo.ID in ({String.Join(",", tmpIDArray)})
+group by MaterialInfo.ID
+order by ConfigurationNodeValueInfo.SortID"
             }
 #Enable Warning CA2100 ' Review SQL queries for security vulnerabilities
+        cmd.Parameters.Add(New SQLiteParameter("@ConfigurationNodeID", DbType.String) With {.Value = nodeID})
 
         Using reader As SQLiteDataReader = cmd.ExecuteReader()
             While reader.Read

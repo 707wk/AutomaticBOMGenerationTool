@@ -26,7 +26,7 @@
     End Sub
 
     Private ReadOnly TitleFontSolidBrush As New SolidBrush(Color.Black)
-    Private ReadOnly ForegroundSolidBrush As New SolidBrush(UIFormHelper.SuccessColor)
+    Private ReadOnly ForegroundSolidBrush As New SolidBrush(UIFormHelper.NormalColor)
     Private ReadOnly BackgroundSolidBrush As New SolidBrush(Color.FromArgb(120, 120, 126))
     Private ReadOnly StringFormatFar As New StringFormat()
     Private ReadOnly OldFont As New Font("微软雅黑", Me.Font.Size)
