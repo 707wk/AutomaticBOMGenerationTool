@@ -1193,7 +1193,7 @@ Public NotInheritable Class EPPlusHelper
                 Continue For
             End If
 
-            Dim pName = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}".Trim
+            Dim pName = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}-{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".Trim
 
             Dim tmpPrice As Decimal = Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, pUnitPriceColumnID).Value}")) *
                     Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, tmpCountColumnID).Value}"))

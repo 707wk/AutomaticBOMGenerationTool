@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Imports System.Globalization
+Imports System.IO
 Imports Newtonsoft.Json
 ''' <summary>
 ''' 全局配置辅助类
@@ -47,6 +48,23 @@ Public Class AppSettingHelper
             Return _ProductVersion
         End Get
     End Property
+#End Region
+
+#Region "是否长时间未更新"
+    ''' <summary>
+    ''' 是否长时间未更新
+    ''' </summary>
+    Public Shared Function IsLongTimeNoUpdate() As Boolean
+
+        Dim fileVersionStr = instance.ProductVersion.Substring(instance.ProductVersion.IndexOf(".") + 1)
+        fileVersionStr = fileVersionStr.Substring(fileVersionStr.IndexOf(".") + 1)
+
+        Dim fileVersion As DateTime = DateTime.ParseExact(fileVersionStr, "yyyy.MMdd", System.Globalization.CultureInfo.CurrentCulture)
+        Dim tmpTimeSpan As TimeSpan = Now - fileVersion
+
+        Return tmpTimeSpan.TotalDays > 365
+
+    End Function
 #End Region
 
 #Region "配置参数"

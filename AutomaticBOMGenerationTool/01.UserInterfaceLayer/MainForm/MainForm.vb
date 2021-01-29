@@ -58,6 +58,10 @@ Public Class MainForm
 
     Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
 
+        If AppSettingHelper.IsLongTimeNoUpdate() Then
+            MsgBox("程序版本过低,请尽快使用最新版程序", MsgBoxStyle.Information)
+        End If
+
         If LocalDatabaseHelper.HaveData() Then
             If File.Exists(AppSettingHelper.GetInstance.SourceFilePath) Then
                 ToolStripStatusLabel1.Text = AppSettingHelper.GetInstance.SourceFilePath
