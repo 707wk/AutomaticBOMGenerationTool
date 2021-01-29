@@ -7,14 +7,6 @@ Public NotInheritable Class UIFormHelper
     Public Shared UIForm As MainForm
 
     ''' <summary>
-    ''' 删除状态的单元格样式
-    ''' </summary>
-    Public Shared DeleteDataGridViewCellStyle As New DataGridViewCellStyle With {
-        .Font = New Font(MainForm.Font.Name, MainForm.Font.Size, FontStyle.Italic Or FontStyle.Strikeout),
-        .ForeColor = Color.Gray
-    }
-
-    ''' <summary>
     ''' 常规背景色
     ''' </summary>
     Public Shared NormalColor As Color = Color.FromArgb(18, 150, 219)

@@ -22,7 +22,7 @@ Public NotInheritable Class EPPlusHelper
                 Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
                 Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
 
-#Region "检测阶层"
+#Region "检测阶层合法性"
                 Dim lastLevel = GetLevel(tmpExcelPackage, MaterialRowMinID)
 
                 '检测根节点阶层
@@ -61,22 +61,43 @@ Public NotInheritable Class EPPlusHelper
                     tmpWorkSheet.Cells(rid, 1).Value = rid
                 Next
 
+                '先检测物料是否缺失阶层标记
+                '然后检测阶层是否有对应的基础物料信息
+
 #Region "删除空行"
-                For rid = MaterialRowMaxID To MaterialRowMinID Step -1
+                For rID = MaterialRowMaxID To MaterialRowMinID Step -1
 
-                    '合并当前行内容
-                    Dim tmpStringBuilder As New StringBuilder
-                    For i001 = levelColumnID To levelColumnID + LevelCount + 3
-                        tmpStringBuilder.Append($"{tmpWorkSheet.Cells(rid, i001).Value}")
-                    Next
-                    Dim tmpStr = tmpStringBuilder.ToString
+                    If GetLevel(tmpExcelPackage, rID) > 0 Then
+                        '有阶层
 
-                    If String.IsNullOrWhiteSpace(tmpStr) Then
-                        tmpWorkSheet.DeleteRow(rid)
+                    ElseIf String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}") Then
+                        '普通物料
+
+                        '合并物料信息
+                        Dim tmpStringBuilder As New StringBuilder
+                        For i001 = pIDColumnID To pIDColumnID + 5
+                            tmpStringBuilder.Append($"{tmpWorkSheet.Cells(rID, i001).Value}")
+                        Next
+                        Dim tmpStr = tmpStringBuilder.ToString
+
+                        If String.IsNullOrWhiteSpace(tmpStr) Then
+                            '空行
+                            tmpWorkSheet.DeleteRow(rID)
+                        Else
+                            '未标记阶层的物料
+                            Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料未标记阶层")
+                        End If
+
+                    Else
+                        '替换物料
+
                     End If
 
                 Next
 #End Region
+
+                '组合物料未做物料信息检测
+                CheckIntegrityOfMaterialInfo(tmpExcelPackage)
 
                 '另存为
                 Using tmpSaveFileStream = New FileStream(AppSettingHelper.TempfilePath, FileMode.Create)
@@ -85,6 +106,109 @@ Public NotInheritable Class EPPlusHelper
 
             End Using
         End Using
+
+    End Sub
+#End Region
+
+#Region "基础物料信息完整性检测"
+    ''' <summary>
+    ''' 基础物料信息完整性检测
+    ''' </summary>
+    Private Shared Sub CheckIntegrityOfMaterialInfo(wb As ExcelPackage)
+        ReadBOMInfo(wb)
+
+        SetBaseMaterialMark(wb)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+
+        For rID = MaterialRowMinID To MaterialRowMaxID
+
+            Dim baseMaterialFlagStr = $"{tmpWorkSheet.Cells(rID, baseMaterialFlagColumnID).Value}"
+
+            Dim baseMaterialFlag = Boolean.Parse(baseMaterialFlagStr)
+
+            If baseMaterialFlag Then
+                '基础物料
+
+                Dim pIDStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}"
+                Dim pNameStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}"
+                Dim pConfigStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 2).Value}"
+                Dim pUnitStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 3).Value}"
+                Dim pUnitPriceStr = Val($"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}")
+
+                '有内容为空则报错
+                If String.IsNullOrWhiteSpace(pIDStr) OrElse
+                    String.IsNullOrWhiteSpace(pNameStr) OrElse
+                    String.IsNullOrWhiteSpace(pConfigStr) OrElse
+                    String.IsNullOrWhiteSpace(pUnitStr) OrElse
+                    String.IsNullOrWhiteSpace(pUnitPriceStr) Then
+
+                    Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料信息不完整")
+                End If
+
+            Else
+                '组合物料
+            End If
+
+        Next
+
+    End Sub
+#End Region
+
+#Region "标记基础物料"
+    ''' <summary>
+    ''' 标记基础物料(基础物料为True,组合物料为False)
+    ''' </summary>
+    Private Shared Sub SetBaseMaterialMark(wb As ExcelPackage)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+        tmpWorkSheet.InsertColumn(baseMaterialFlagColumnID, 1)
+        tmpWorkSheet.Cells(MaterialRowMinID - 1, baseMaterialFlagColumnID).Value = "基础物料标记"
+
+        For rID = MaterialRowMinID To MaterialRowMaxID
+            tmpWorkSheet.Cells(rID, baseMaterialFlagColumnID).Value = True
+        Next
+
+        Dim lastLevel = 1
+        Dim lastRID = MaterialRowMinID
+        For rID = MaterialRowMinID + 1 To MaterialRowMaxID
+            Dim nowLevel = GetLevel(tmpExcelPackage, rID)
+
+            If nowLevel = 0 Then
+                '无阶层标记
+
+                If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}") Then
+                    '空行
+                    Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 未处理的空行")
+                Else
+                    '替换物料
+                End If
+
+                Continue For
+
+            ElseIf lastLevel = nowLevel - 1 Then
+                '当前行是上一行的子节点
+                tmpWorkSheet.Cells(lastRID, baseMaterialFlagColumnID).Value = False
+
+            End If
+
+            lastLevel = nowLevel
+            lastRID = rID
+        Next
 
     End Sub
 #End Region
@@ -169,10 +293,6 @@ Public NotInheritable Class EPPlusHelper
 
                     '判断是否是替换物料
                     If Not String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}") Then
-                        If String.IsNullOrWhiteSpace(tmpStr) Then
-                            Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料缺失品号信息")
-                        End If
-
                         tmpHashSet.Add(tmpStr.Trim)
                     End If
 
@@ -229,31 +349,21 @@ Public NotInheritable Class EPPlusHelper
 #Region "遍历物料信息"
                 For rID = MaterialRowMinID To MaterialRowMaxID
 
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".ToUpper.Trim
+                    Dim pIDStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".ToUpper.Trim
 
                     '单元格内容为空跳过
-                    If String.IsNullOrWhiteSpace(tmpStr) Then Continue For
+                    If String.IsNullOrWhiteSpace(pIDStr) Then Continue For
 
-                    If values.Contains(tmpStr) Then
+                    If values.Contains(pIDStr) Then
                         Dim addMaterialInfo = New MaterialInfo With {
-                            .pID = tmpStr,
+                            .pID = pIDStr,
                             .pName = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}",
                             .pConfig = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 2).Value}",
                             .pUnit = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 3).Value}",
                             .pUnitPrice = Val($"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}")
                         }
 
-                        '有内容为空则报错
-                        If String.IsNullOrWhiteSpace(addMaterialInfo.pID) OrElse
-                            String.IsNullOrWhiteSpace(addMaterialInfo.pName) OrElse
-                            String.IsNullOrWhiteSpace(addMaterialInfo.pConfig) OrElse
-                            String.IsNullOrWhiteSpace(addMaterialInfo.pUnit) OrElse
-                            String.IsNullOrWhiteSpace(addMaterialInfo.pUnitPrice) Then
-
-                            Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料信息不完整")
-                        End If
-
-                        values.Remove(tmpStr)
+                        values.Remove(pIDStr)
 
                         tmpList.Add(addMaterialInfo)
 
@@ -274,8 +384,8 @@ Public NotInheritable Class EPPlusHelper
     ''' 查找表头位置
     ''' </summary>
     Public Shared Function FindHeaderLocation(
-                                       wb As ExcelPackage,
-                                       headText As String) As Point
+                                             wb As ExcelPackage,
+                                             headText As String) As Point
 
         Dim findStr = StrConv(headText, VbStrConv.Narrow).ToUpper
 
@@ -676,32 +786,7 @@ Public NotInheritable Class EPPlusHelper
                 Next
 #End Region
 
-#Region "清空组合料节点的价格"
-                ReadBOMInfo(tmpExcelPackage)
-
-                MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
-                Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
-                tmpWorkSheet.InsertColumn(baseMaterialFlagColumnID, 1)
-                tmpWorkSheet.Cells(MaterialRowMinID - 1, baseMaterialFlagColumnID).Value = "基础料标记"
-
-                For rID = MaterialRowMinID To MaterialRowMaxID
-                    tmpWorkSheet.Cells(rID, baseMaterialFlagColumnID).Value = True
-                Next
-
-                Dim lastLevel = 1
-                For rID = MaterialRowMinID + 1 To MaterialRowMaxID
-                    Dim nowLevel = GetLevel(tmpExcelPackage, rID)
-
-                    If lastLevel = nowLevel - 1 Then
-                        tmpWorkSheet.Cells(rID - 1, pIDColumnID + 5).Value = 0
-                        tmpWorkSheet.Cells(rID - 1, baseMaterialFlagColumnID).Value = False
-                    End If
-
-                    lastLevel = nowLevel
-                Next
-#End Region
+                ClearCompositeMaterialPrice(tmpExcelPackage)
 
                 CalculateMaterialCount(tmpExcelPackage)
 
@@ -712,6 +797,40 @@ Public NotInheritable Class EPPlusHelper
 
             End Using
         End Using
+
+    End Sub
+#End Region
+
+#Region "清空组合料节点的价格"
+    ''' <summary>
+    ''' 清空组合料节点的价格
+    ''' </summary>
+    Public Shared Sub ClearCompositeMaterialPrice(wb As ExcelPackage)
+        ReadBOMInfo(wb)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+
+        For rID = MaterialRowMinID To MaterialRowMaxID
+
+            Dim baseMaterialFlagStr = $"{tmpWorkSheet.Cells(rID, baseMaterialFlagColumnID).Value}"
+
+            Dim baseMaterialFlag = Boolean.Parse(baseMaterialFlagStr)
+
+            If baseMaterialFlag Then
+                '基础物料
+            Else
+                '组合物料
+                tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value = 0
+            End If
+
+        Next
 
     End Sub
 #End Region
@@ -991,14 +1110,10 @@ Public NotInheritable Class EPPlusHelper
 #Region "删除空行"
                 For rid = MaterialRowMaxID To MaterialRowMinID Step -1
 
-                    '合并当前行内容
-                    Dim tmpStringBuilder As New StringBuilder
-                    For i001 = levelColumnID To levelColumnID + LevelCount + 3
-                        tmpStringBuilder.Append($"{tmpWorkSheet.Cells(rid, i001).Value}")
-                    Next
-                    Dim tmpStr = tmpStringBuilder.ToString
-
-                    If String.IsNullOrWhiteSpace(tmpStr) Then
+                    If GetLevel(tmpExcelPackage, rid) > 0 Then
+                        '有阶层
+                    Else
+                        '无阶层
                         tmpWorkSheet.DeleteRow(rid)
                     End If
 
@@ -1380,9 +1495,6 @@ Public NotInheritable Class EPPlusHelper
 
         Dim levelColumnID = AppSettingHelper.GetInstance.BOMlevelColumnID
         Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
 
         For i001 = levelColumnID To levelColumnID + LevelCount - 1
             If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rowID, i001).Value}") Then
