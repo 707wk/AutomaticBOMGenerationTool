@@ -1099,6 +1099,8 @@ Public NotInheritable Class EPPlusHelper
 
                 '更改焦点
                 tmpWorkSheet.Select(tmpWorkSheet.Cells(1, 1).Address, True)
+                '更改启动时显示位置
+                tmpWorkSheet.View.TopLeftCell = tmpWorkSheet.Cells(1, 1).Address
 
                 headerLocation = FindHeaderLocation(tmpExcelPackage, "阶层")
                 Dim levelColumnID = headerLocation.X

@@ -35,11 +35,11 @@
 
         If CacheGroupInfo IsNot Nothing Then
 
-            e.Graphics.FillRectangle(BackgroundSolidBrush, Me.Width - ProgressBarWidth - 1, 1, ProgressBarWidth, Me.Height - 2)
+            e.Graphics.FillRectangle(BackgroundSolidBrush, Me.Width - ProgressBarWidth - 1, (Me.Height - 18) \ 2, ProgressBarWidth, 18)
 
             Dim tmpWidth = CacheGroupInfo.GroupTotalPricePercentage * (ProgressBarWidth) \ 100
 
-            e.Graphics.FillRectangle(ForegroundSolidBrush, Me.Width - tmpWidth, 1, tmpWidth, Me.Height - 2)
+            e.Graphics.FillRectangle(ForegroundSolidBrush, Me.Width - tmpWidth, (Me.Height - 18) \ 2, tmpWidth, 18)
 
             e.Graphics.DrawString($"￥{CacheGroupInfo.GroupPrice:n2} 占比:{CacheGroupInfo.GroupTotalPricePercentage:n1}%", OldFont, TitleFontSolidBrush, Me.Width - 2, Me.Height / 2, StringFormatFar)
 
