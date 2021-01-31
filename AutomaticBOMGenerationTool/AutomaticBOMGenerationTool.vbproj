@@ -149,6 +149,18 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ExportSettingsForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ImportMaterialPriceInfo\ImportPriceFilesForm.Designer.vb">
+      <DependentUpon>ImportPriceFilesForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ImportMaterialPriceInfo\ImportPriceFilesForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ImportMaterialPriceInfo\ManualUpdateMaterialPriceForm.Designer.vb">
+      <DependentUpon>ManualUpdateMaterialPriceForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ImportMaterialPriceInfo\ManualUpdateMaterialPriceForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.Designer.vb">
       <DependentUpon>ShowTxtContentForm.vb</DependentUpon>
     </Compile>
@@ -182,9 +194,15 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\MainForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="02.BusinessLogicLayer\EPPlusHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\BOMTemplateHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\FileHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\LocalDatabaseHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\BOMCostingTemplateByLZTypeHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\BOMCostingTemplateByWKTypeHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\BOMFromBOMTemplateTypeHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\BOMTemplateTypeHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\ImportMaterialPriceTableTypeHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
     <Compile Include="03.DataAccessLayer\BOMConfigurationInfo.vb" />
@@ -192,9 +210,12 @@
     <Compile Include="03.DataAccessLayer\ConfigurationNodeInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeRowInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNodeValueInfo.vb" />
+    <Compile Include="03.DataAccessLayer\EnumHelpervb.vb" />
     <Compile Include="03.DataAccessLayer\ExportConfigurationNodeInfo.vb" />
+    <Compile Include="03.DataAccessLayer\MaterialPrice\ImportPriceFileInfo.vb" />
     <Compile Include="03.DataAccessLayer\MaterialInfo.vb" />
     <Compile Include="03.DataAccessLayer\MaterialLinkInfo.vb" />
+    <Compile Include="03.DataAccessLayer\MaterialPrice\MaterialPriceInfo.vb" />
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -219,6 +240,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ExportSettingsForm.resx">
       <DependentUpon>ExportSettingsForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ImportMaterialPriceInfo\ImportPriceFilesForm.resx">
+      <DependentUpon>ImportPriceFilesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ImportMaterialPriceInfo\ManualUpdateMaterialPriceForm.resx">
+      <DependentUpon>ManualUpdateMaterialPriceForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.resx">
       <DependentUpon>ShowTxtContentForm.vb</DependentUpon>
@@ -262,6 +289,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="res\cleanData_32px.png" />
     <None Include="res\exportData_32px.png" />
     <None Include="res\importData_32px.png" />
     <None Include="res\copy_20px.png" />

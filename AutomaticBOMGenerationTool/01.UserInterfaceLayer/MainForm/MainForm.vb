@@ -5,6 +5,8 @@ Imports System.Windows.Forms.DataVisualization.Charting
 Imports OfficeOpenXml
 
 Public Class MainForm
+
+#Region "样式初始化"
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.GetInstance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit"
 
@@ -54,7 +56,10 @@ Public Class MainForm
         Dim selectedID = MinimumTotalPricePercentage.Items.IndexOf(AppSettingHelper.GetInstance.MinimumTotalPricePercentage)
         MinimumTotalPricePercentage.SelectedIndex = If(selectedID > -1, selectedID, 0)
 
+        UpdateMaterialPriceInfoCount()
+
     End Sub
+#End Region
 
     Private Sub MainForm_Shown(sender As Object, e As EventArgs) Handles Me.Shown
 
@@ -96,10 +101,11 @@ Public Class MainForm
                 )
     End Sub
 
+#Region "选择BOM模板文件"
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles ButtonItem2.Click
         Using tmpDialog As New OpenFileDialog With {
                             .Filter = "BON模板文件|*.xlsx",
-                            .Multiselect = True
+                            .Multiselect = False
                         }
 
             If tmpDialog.ShowDialog <> DialogResult.OK Then
@@ -112,6 +118,7 @@ Public Class MainForm
 
         End Using
     End Sub
+#End Region
 
     Private Sub ButtonItem3_Click(sender As Object, e As EventArgs) Handles ButtonItem3.Click
         FileHelper.Open(AppSettingHelper.GetInstance.SourceFilePath)
@@ -138,28 +145,28 @@ Public Class MainForm
                                 LocalDatabaseHelper.Clear()
 
                                 be.Write("预处理源文件", 100 / stepCount * 1)
-                                EPPlusHelper.PreproccessSourceFile()
+                                BOMTemplateHelper.PreproccessSourceFile()
 
                                 be.Write("获取替换物料品号", 100 / stepCount * 2)
-                                Dim configurationTablepIDList = EPPlusHelper.GetMaterialpIDListFromConfigurationTable()
+                                Dim configurationTablepIDList = BOMTemplateHelper.GetMaterialpIDListFromConfigurationTable()
 
                                 be.Write("检测替换物料完整性", 100 / stepCount * 3)
-                                EPPlusHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
+                                BOMTemplateHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
 
                                 be.Write("获取替换物料信息", 100 / stepCount * 4)
-                                Dim tmpList = EPPlusHelper.GetMaterialInfoList(configurationTablepIDList)
+                                Dim tmpList = BOMTemplateHelper.GetMaterialInfoList(configurationTablepIDList)
 
                                 be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 5)
                                 LocalDatabaseHelper.SaveMaterialInfo(tmpList)
 
                                 be.Write("解析配置节点信息", 100 / stepCount * 6)
-                                EPPlusHelper.TransformationConfigurationTable()
+                                BOMTemplateHelper.TransformationConfigurationTable()
 
                                 be.Write("制作提取模板", 100 / stepCount * 7)
-                                EPPlusHelper.CreateTemplate()
+                                BOMTemplateHelper.CreateTemplate()
 
                                 be.Write("获取替换物料在模板中的位置", 100 / stepCount * 8)
-                                Dim tmpRowIDList = EPPlusHelper.GetMaterialRowIDInTemplate()
+                                Dim tmpRowIDList = BOMTemplateHelper.GetMaterialRowIDInTemplate()
 
                                 be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 9)
                                 LocalDatabaseHelper.SaveMaterialRowID(tmpRowIDList)
@@ -288,18 +295,18 @@ Public Class MainForm
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                EPPlusHelper.ReadBOMInfo(tmpExcelPackage)
+                BOMTemplateHelper.ReadBOMInfo(tmpExcelPackage)
 
-                EPPlusHelper.ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
+                BOMTemplateHelper.ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
 
-                Dim headerLocation = EPPlusHelper.FindHeaderLocation(tmpExcelPackage, "单价")
+                Dim headerLocation = BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "单价")
 
                 AppSettingHelper.GetInstance.TotalPrice = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
                 ToolStripLabel1.Text = $"当前总价: ￥{AppSettingHelper.GetInstance.TotalPrice:n4}"
 
-                EPPlusHelper.CalculateConfigurationMaterialTotalPrice(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
+                BOMTemplateHelper.CalculateConfigurationMaterialTotalPrice(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
 
-                EPPlusHelper.CalculateMaterialTotalPrice(tmpExcelPackage)
+                BOMTemplateHelper.CalculateMaterialTotalPrice(tmpExcelPackage)
 
             End Using
         End Using
@@ -418,7 +425,7 @@ Public Class MainForm
                                         Dim tmpWorkBook = tmpExcelPackage.Workbook
                                         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                                        tmpResult.Name = EPPlusHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
+                                        tmpResult.Name = BOMTemplateHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
 
                                     End Using
                                 End Using
@@ -513,7 +520,7 @@ Public Class MainForm
                                 Next
 
                                 be.Write("处理物料信息", 100 / stepCount * 4)
-                                EPPlusHelper.ReplaceMaterialAndSave(outputFilePath, tmpConfigurationNodeRowInfoList)
+                                BOMTemplateHelper.ReplaceMaterialAndSave(outputFilePath, tmpConfigurationNodeRowInfoList)
 
                                 be.Write("打开保存文件夹", 100 / stepCount * 5)
                                 FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
@@ -573,7 +580,7 @@ Public Class MainForm
                                 Next
 
                                 be.Write("生成配置清单")
-                                EPPlusHelper.CreateConfigurationListFile(Path.Combine(saveFolderPath, $"_文件配置清单.xlsx"), tmpBOMList)
+                                BOMTemplateHelper.CreateConfigurationListFile(Path.Combine(saveFolderPath, $"_文件配置清单.xlsx"), tmpBOMList)
 
                                 be.Write("导出中")
                                 For i001 = 0 To tmpBOMList.Count - 1
@@ -611,7 +618,7 @@ Public Class MainForm
 
                                     Next
 
-                                    EPPlusHelper.ReplaceMaterialAndSave(Path.Combine(saveFolderPath, tmpBOMConfigurationInfo.FileName), tmpBOMConfigurationInfo.ConfigurationItems)
+                                    BOMTemplateHelper.ReplaceMaterialAndSave(Path.Combine(saveFolderPath, tmpBOMConfigurationInfo.FileName), tmpBOMConfigurationInfo.ConfigurationItems)
 
                                 Next
 
@@ -694,6 +701,7 @@ Public Class MainForm
     End Sub
 #End Region
 
+#Region "显示编写规则"
     Private Sub ButtonItem1_Click(sender As Object, e As EventArgs) Handles ButtonItem1.Click
         Using tmpDialog As New ShowTxtContentForm With {
                 .Text = ButtonItem1.Text,
@@ -702,7 +710,9 @@ Public Class MainForm
             tmpDialog.ShowDialog()
         End Using
     End Sub
+#End Region
 
+#Region "展开/折叠配置项"
     Private Sub ToolStripSplitButton1_ButtonClick(sender As Object, e As EventArgs) Handles ToolStripSplitButton1.ButtonClick
         For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
             item.CheckBox1.Checked = True
@@ -724,6 +734,8 @@ Public Class MainForm
             item.CheckBox1.Checked = False
         Next
     End Sub
+#End Region
+
 
     Private Sub ExportBOMList_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles ExportBOMList.CellContentClick
         If e.RowIndex < 0 Then
@@ -748,14 +760,6 @@ Public Class MainForm
 #End Region
 
         End Select
-    End Sub
-
-    Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
-        UIFormHelper.ToastWarning("功能未开发")
-    End Sub
-
-    Private Sub ButtonItem7_Click(sender As Object, e As EventArgs) Handles ButtonItem7.Click
-        UIFormHelper.ToastWarning("功能未开发")
     End Sub
 
     Private Sub FeedbackButton_Click(sender As Object, e As EventArgs) Handles FeedbackButton.Click
@@ -783,4 +787,196 @@ Public Class MainForm
 
     End Sub
 
+#Region "导入物料价格"
+    Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
+        'Using tmpDialog As New ImportPriceFilesForm
+        '    tmpDialog.ShowDialog()
+        'End Using
+
+        Dim importFilePath As String
+
+        Using tmpDialog As New OpenFileDialog With {
+                            .Filter = "价格文件|*.xlsx",
+                            .Multiselect = False
+                        }
+
+            If tmpDialog.ShowDialog <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+            importFilePath = tmpDialog.FileName
+
+        End Using
+
+        Dim sameMaterialPriceInfoItems As New List(Of MaterialPriceInfo)
+
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "解析文件"
+        }
+
+            tmpDialog.Start(Sub(uie As Wangk.Resource.BackgroundWorkEventArgs)
+
+                                Dim tmpImportPriceFileInfo = PriceFileHelper.GetFileInfo(importFilePath)
+
+                                If tmpImportPriceFileInfo.FileType = PriceFileHelper.PriceFileType.UnknownType Then
+                                    Throw New Exception("不支持的导入格式")
+                                End If
+
+                                PriceFileHelper.GetMaterialPriceInfo(tmpImportPriceFileInfo)
+
+                                For i001 = 0 To tmpImportPriceFileInfo.MaterialItems.Count - 1
+
+                                    uie.Write(i001 * 100 \ tmpImportPriceFileInfo.MaterialItems.Count)
+
+                                    Dim item = tmpImportPriceFileInfo.MaterialItems(i001)
+
+                                    Dim findMaterialPriceInfo = LocalDatabaseHelper.GetMaterialPriceInfo(item.pID)
+
+                                    If findMaterialPriceInfo Is Nothing Then
+                                        LocalDatabaseHelper.SaveMaterialPriceInfo(item)
+                                    Else
+                                        If findMaterialPriceInfo.pUnitPrice = item.pUnitPrice Then
+                                            '相等则不处理
+                                        Else
+                                            '不相等则添加到手动选择列表
+                                            item.pUnitPriceOld = findMaterialPriceInfo.pUnitPrice
+                                            item.SourceFileOld = findMaterialPriceInfo.SourceFile
+                                            item.UpdateDateOld = findMaterialPriceInfo.UpdateDate
+
+                                            sameMaterialPriceInfoItems.Add(item)
+
+                                        End If
+
+                                    End If
+
+                                Next
+
+                            End Sub)
+
+            If tmpDialog.Error IsNot Nothing Then
+                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "解析文件")
+                Exit Sub
+            End If
+
+        End Using
+
+        If sameMaterialPriceInfoItems.Count > 0 Then
+            Using tmpDialog As New ManualUpdateMaterialPriceForm With {
+                .SameMaterialPriceInfoItems = sameMaterialPriceInfoItems
+            }
+                tmpDialog.ShowDialog()
+            End Using
+        End If
+
+        UIFormHelper.ToastSuccess("导入成功")
+
+        UpdateMaterialPriceInfoCount()
+
+    End Sub
+#End Region
+
+    ''' <summary>
+    ''' 显示物料价格总记录数
+    ''' </summary>
+    Private Sub UpdateMaterialPriceInfoCount()
+        ToolStripStatusLabel3.Text = $"基础物料价格库总记录数: {LocalDatabaseHelper.GetMaterialPriceInfoCount:n0}"
+    End Sub
+
+#Region "导出物料价格"
+    Private Sub ButtonItem7_Click(sender As Object, e As EventArgs) Handles ButtonItem7.Click
+        Dim outputFilePath As String
+
+        Using tmpDialog As New SaveFileDialog With {
+            .Filter = "价格文件|*.xlsx",
+            .FileName = $"物料价格文件-{Now:yyyyMMddHHmmssfff}"
+        }
+            If tmpDialog.ShowDialog() <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+            outputFilePath = tmpDialog.FileName
+
+        End Using
+
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "导出物料价格"
+        }
+
+            tmpDialog.Start(Sub(uie As Wangk.Resource.BackgroundWorkEventArgs)
+                                Dim recordCount = LocalDatabaseHelper.GetMaterialPriceInfoCount
+                                Dim pageID = 1
+                                Dim pageSize = 50
+                                Dim index = 1
+
+                                Using tmpExcelPackage As New ExcelPackage()
+                                    Dim tmpWorkBook = tmpExcelPackage.Workbook
+                                    Dim tmpWorkSheet = tmpWorkBook.Worksheets.Add("导出物料价格表")
+
+                                    '表头
+                                    Dim tmpColumns = {"序号", "品号", "品名", "规格", "存货单位", "单价", "更新日期", "采集来源", "备注"}
+                                    For i001 = 0 To tmpColumns.Count - 1
+                                        tmpWorkSheet.Cells(1, i001 + 1).Value = tmpColumns(i001)
+                                    Next
+
+                                    Do
+
+                                        uie.Write((pageID - 1) * 100 \ recordCount)
+
+                                        Dim tmpList = LocalDatabaseHelper.GetMaterialPriceInfoItems(pageID, pageSize)
+
+                                        For Each item In tmpList
+                                            tmpWorkSheet.Cells(index + 1, 1).Value = index
+                                            tmpWorkSheet.Cells(index + 1, 2).Value = item.pID
+                                            tmpWorkSheet.Cells(index + 1, 3).Value = item.pName
+                                            tmpWorkSheet.Cells(index + 1, 4).Value = item.pConfig
+                                            tmpWorkSheet.Cells(index + 1, 5).Value = item.pUnit
+                                            tmpWorkSheet.Cells(index + 1, 6).Value = item.pUnitPrice
+                                            tmpWorkSheet.Cells(index + 1, 7).Value = $"{item.UpdateDate:g}"
+                                            tmpWorkSheet.Cells(index + 1, 8).Value = item.SourceFile
+                                            tmpWorkSheet.Cells(index + 1, 9).Value = item.Remark
+
+                                            index += 1
+                                        Next
+
+                                        pageID += 1
+
+                                    Loop While pageID * pageSize <= recordCount
+
+                                    '自动调整列宽度
+                                    For i001 = 1 To tmpColumns.Count
+                                        tmpWorkSheet.Column(i001).AutoFit()
+                                    Next
+
+                                    '另存为
+                                    Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
+                                        tmpExcelPackage.SaveAs(tmpSaveFileStream)
+                                    End Using
+
+                                End Using
+
+                            End Sub)
+
+            FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
+
+        End Using
+
+    End Sub
+#End Region
+
+    Private Sub ButtonItem8_Click(sender As Object, e As EventArgs) Handles ButtonItem8.Click
+        If MsgBox("确定要清空物料价格库吗?", MsgBoxStyle.YesNo, "一次确认") <> MsgBoxResult.Yes Then
+            Exit Sub
+        End If
+
+        If MsgBox("确定要清空物料价格库吗?", MsgBoxStyle.YesNo, "二次确认") <> MsgBoxResult.Yes Then
+            Exit Sub
+        End If
+
+        LocalDatabaseHelper.ClearMaterialPrice()
+
+        UIFormHelper.ToastSuccess("物料价格库已清空")
+
+        UpdateMaterialPriceInfoCount()
+
+    End Sub
 End Class

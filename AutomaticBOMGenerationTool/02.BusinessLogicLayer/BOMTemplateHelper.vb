@@ -2,7 +2,10 @@
 Imports System.Text
 Imports OfficeOpenXml
 
-Public NotInheritable Class EPPlusHelper
+''' <summary>
+''' BOM模板辅助模块
+''' </summary>
+Public NotInheritable Class BOMTemplateHelper
 
 #Region "预处理源文件"
     ''' <summary>
@@ -1596,7 +1599,7 @@ Public NotInheritable Class EPPlusHelper
                         item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.ValueID)
                     End If
 
-                    tmpWorkSheet.Cells(i001 + 1 + 1, item.ColIndex + 3).Value = EPPlusHelper.JoinConfigurationName(item)
+                    tmpWorkSheet.Cells(i001 + 1 + 1, item.ColIndex + 3).Value = JoinConfigurationName(item)
 
                 Next
 
