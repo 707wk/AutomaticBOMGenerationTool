@@ -822,8 +822,10 @@ Public Class MainForm
                                     Throw New Exception("不支持的导入格式")
                                 End If
 
+                                uie.Write("获取物料价格信息")
                                 PriceFileHelper.GetMaterialPriceInfo(tmpImportPriceFileInfo)
 
+                                uie.Write("导入物料价格信息")
                                 For i001 = 0 To tmpImportPriceFileInfo.MaterialItems.Count - 1
 
                                     uie.Write(i001 * 100 \ tmpImportPriceFileInfo.MaterialItems.Count)
@@ -868,7 +870,7 @@ Public Class MainForm
             End Using
         End If
 
-        UIFormHelper.ToastSuccess("导入成功")
+        UIFormHelper.ToastSuccess("导入完成")
 
         UpdateMaterialPriceInfoCount()
 

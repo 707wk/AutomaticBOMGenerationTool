@@ -14,7 +14,7 @@ Public Class ImportMaterialPriceTableTypeHelper
 
                 For rID = BOMMaterialRowMinID To BOMMaterialRowMaxID
 
-                    Dim pIDStr = $"{tmpWorkSheet.Cells(rID, 2).Value}".ToUpper
+                    Dim pIDStr = $"{tmpWorkSheet.Cells(rID, 2).Value}".ToUpper.Trim
                     Dim pNameStr = $"{tmpWorkSheet.Cells(rID, 3).Value}"
                     Dim pConfigStr = $"{tmpWorkSheet.Cells(rID, 4).Value}"
                     Dim pUnitStr = $"{tmpWorkSheet.Cells(rID, 5).Value}"

@@ -318,4 +318,9 @@ Public Class AppSettingHelper
     <Newtonsoft.Json.JsonIgnore>
     Public ShowHideConfigurationNodeItems As Boolean = False
 
+    ''' <summary>
+    ''' 已经替换了价格的物料品号(大写)集合
+    ''' </summary>
+    Public ReplaceMaterialPricepIDItems As New HashSet(Of String)
+
 End Class

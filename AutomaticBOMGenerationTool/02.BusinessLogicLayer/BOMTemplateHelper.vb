@@ -102,6 +102,9 @@ Public NotInheritable Class BOMTemplateHelper
                 '组合物料未做物料信息检测
                 CheckIntegrityOfMaterialInfo(tmpExcelPackage)
 
+                '替换物料价格为价格库价格
+                ReplaceMaterialPrice(tmpExcelPackage)
+
                 '另存为
                 Using tmpSaveFileStream = New FileStream(AppSettingHelper.TempfilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
@@ -144,14 +147,13 @@ Public NotInheritable Class BOMTemplateHelper
                 Dim pNameStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}"
                 Dim pConfigStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 2).Value}"
                 Dim pUnitStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 3).Value}"
-                Dim pUnitPriceStr = Val($"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}")
+                'Dim pUnitPriceValue = Val($"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}")
 
                 '有内容为空则报错
                 If String.IsNullOrWhiteSpace(pIDStr) OrElse
                     String.IsNullOrWhiteSpace(pNameStr) OrElse
                     String.IsNullOrWhiteSpace(pConfigStr) OrElse
-                    String.IsNullOrWhiteSpace(pUnitStr) OrElse
-                    String.IsNullOrWhiteSpace(pUnitPriceStr) Then
+                    String.IsNullOrWhiteSpace(pUnitStr) Then
 
                     Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料信息不完整")
                 End If
@@ -212,6 +214,74 @@ Public NotInheritable Class BOMTemplateHelper
             lastLevel = nowLevel
             lastRID = rID
         Next
+
+    End Sub
+#End Region
+
+#Region "替换物料价格为价格库价格"
+    ''' <summary>
+    ''' 替换物料价格为价格库价格
+    ''' </summary>
+    Private Shared Sub ReplaceMaterialPrice(wb As ExcelPackage)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
+        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
+        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+
+        AppSettingHelper.GetInstance.ReplaceMaterialPricepIDItems.Clear()
+
+        Dim noPriceMaterialItems As New List(Of String)
+
+        For rID = MaterialRowMinID To MaterialRowMaxID
+
+            Dim baseMaterialFlagStr = $"{tmpWorkSheet.Cells(rID, baseMaterialFlagColumnID).Value}"
+
+            Dim baseMaterialFlag = Boolean.Parse(baseMaterialFlagStr)
+
+            If baseMaterialFlag Then
+                '基础物料
+
+                Dim pIDStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".ToUpper.Trim
+
+                Dim findMaterialPriceInfo = LocalDatabaseHelper.GetMaterialPriceInfo(pIDStr)
+
+                If findMaterialPriceInfo Is Nothing Then
+                    '不在价格库
+                    Dim pUnitPriceStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}"
+
+                    If String.IsNullOrWhiteSpace(pUnitPriceStr) Then
+                        '没有价格
+                        noPriceMaterialItems.Add($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料没有价格")
+                        Continue For
+                    End If
+
+                    If Not Decimal.TryParse(pUnitPriceStr, Nothing) Then
+                        '不能转换成数值
+                        noPriceMaterialItems.Add($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料价格不合法")
+                        Continue For
+                    End If
+
+                Else
+                    '在价格库存在
+                    tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value = findMaterialPriceInfo.pUnitPrice
+
+                    AppSettingHelper.GetInstance.ReplaceMaterialPricepIDItems.Add(pIDStr)
+                End If
+
+            Else
+                '组合物料
+            End If
+
+        Next
+
+        If noPriceMaterialItems.Count > 0 Then
+            Throw New Exception(String.Join(vbCrLf, noPriceMaterialItems))
+        End If
 
     End Sub
 #End Region
@@ -1135,6 +1205,14 @@ Public NotInheritable Class BOMTemplateHelper
 
 #Region "标记数量和价格"
                 For rid = MaterialRowMinID To MaterialRowMaxID
+
+                    '标记更新了的价格
+                    Dim pIDStr = $"{tmpWorkSheet.Cells(rid, pIDColumnID).Value}".ToUpper.Trim
+                    'If LocalDatabaseHelper.GetMaterialPriceInfo(pIDStr) IsNot Nothing Then
+                    If AppSettingHelper.GetInstance.ReplaceMaterialPricepIDItems.Contains(pIDStr) Then
+                            tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                            tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
+                    End If
 
                     '数量
                     Dim tmpStr = $"{tmpWorkSheet.Cells(rid, pIDColumnID + 4).Value}"

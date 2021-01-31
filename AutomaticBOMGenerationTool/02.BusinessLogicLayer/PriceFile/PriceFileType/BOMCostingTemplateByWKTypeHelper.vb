@@ -35,14 +35,20 @@ Public Class BOMCostingTemplateByWKTypeHelper
                     If baseMaterialFlag Then
                         '基础物料
 
-                        Dim pIDStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID).Value}".ToUpper
+                        Dim pIDStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID).Value}".ToUpper.Trim
                         Dim pNameStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 1).Value}"
                         Dim pConfigStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 2).Value}"
                         Dim pUnitStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 3).Value}"
-                        Dim pUnitPriceValue = Val($"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 5).Value}")
+                        Dim pUnitPriceStr = Val($"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 5).Value}")
+                        Dim pUnitPriceValue = Val(pUnitPriceStr)
 
                         '品号为空则跳过
                         If String.IsNullOrWhiteSpace(pIDStr) Then
+                            Continue For
+                        End If
+
+                        '价格为空则跳过
+                        If String.IsNullOrWhiteSpace(pUnitPriceStr) Then
                             Continue For
                         End If
 
