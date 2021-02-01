@@ -1,4 +1,4 @@
-﻿Public Class ExportSettingsForm
+﻿Public Class SettingsForm
     Private Sub ExportSettingsForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         With CheckBoxDataGridView1
             .EditMode = DataGridViewEditMode.EditOnEnter

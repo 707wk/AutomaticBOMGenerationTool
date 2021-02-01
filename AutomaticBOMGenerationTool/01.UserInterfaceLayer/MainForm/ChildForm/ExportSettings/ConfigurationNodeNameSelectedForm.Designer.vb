@@ -69,7 +69,7 @@ Partial Class ConfigurationNodeNameSelectedForm
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "ConfigurationNodeNameSelectedForm"
+        Me.Text = "选择导出选项"
         Me.ResumeLayout(False)
 
     End Sub

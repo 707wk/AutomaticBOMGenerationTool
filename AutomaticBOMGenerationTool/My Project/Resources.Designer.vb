@@ -243,6 +243,46 @@ Namespace My.Resources
         '''<summary>
         '''  查找 System.Drawing.Bitmap 类型的本地化资源。
         '''</summary>
+        Friend ReadOnly Property pageFirst_16px() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("pageFirst_16px", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
+        '''</summary>
+        Friend ReadOnly Property pageLast_16px() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("pageLast_16px", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
+        '''</summary>
+        Friend ReadOnly Property pageNext_16px() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("pageNext_16px", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
+        '''</summary>
+        Friend ReadOnly Property pagePrevious_16px() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("pagePrevious_16px", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
+        '''</summary>
         Friend ReadOnly Property save_20px() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("save_20px", resourceCulture)
@@ -326,6 +366,16 @@ Namespace My.Resources
         Friend ReadOnly Property view_32px() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("view_32px", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
+        '''</summary>
+        Friend ReadOnly Property viewData_32px() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("viewData_32px", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

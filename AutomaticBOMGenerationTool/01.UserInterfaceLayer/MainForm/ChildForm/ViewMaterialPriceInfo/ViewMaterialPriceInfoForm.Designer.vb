@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ImportPriceFilesForm
+Partial Class ViewMaterialPriceInfoForm
     Inherits System.Windows.Forms.Form
 
     'Form 重写 Dispose，以清理组件列表。
@@ -27,14 +27,9 @@ Partial Class ImportPriceFilesForm
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.CheckBoxDataGridView1 = New Wangk.Resource.CheckBoxDataGridView()
-        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
-        Me.CancelButton = New System.Windows.Forms.Button()
-        Me.AddOrSaveButton = New System.Windows.Forms.Button()
+        Me.PageControl1 = New AutomaticBOMGenerationTool.PageControl()
         Me.GroupBox1.SuspendLayout()
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox1
@@ -43,13 +38,13 @@ Partial Class ImportPriceFilesForm
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.CheckBoxDataGridView1)
-        Me.GroupBox1.Controls.Add(Me.ToolStrip1)
+        Me.GroupBox1.Controls.Add(Me.PageControl1)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(939, 385)
-        Me.GroupBox1.TabIndex = 49
+        Me.GroupBox1.Size = New System.Drawing.Size(1160, 581)
+        Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "待导入文件"
+        Me.GroupBox1.Text = "物料价格列表"
         '
         'CheckBoxDataGridView1
         '
@@ -70,7 +65,7 @@ Partial Class ImportPriceFilesForm
         Me.CheckBoxDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.CheckBoxDataGridView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.CheckBoxDataGridView1.GridColor = System.Drawing.Color.FromArgb(CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer))
-        Me.CheckBoxDataGridView1.Location = New System.Drawing.Point(3, 46)
+        Me.CheckBoxDataGridView1.Location = New System.Drawing.Point(3, 19)
         Me.CheckBoxDataGridView1.Name = "CheckBoxDataGridView1"
         Me.CheckBoxDataGridView1.ReadOnly = True
         DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
@@ -82,94 +77,40 @@ Partial Class ImportPriceFilesForm
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(933, 336)
-        Me.CheckBoxDataGridView1.TabIndex = 1
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(1154, 530)
+        Me.CheckBoxDataGridView1.TabIndex = 0
         '
-        'ToolStrip1
+        'PageControl1
         '
-        Me.ToolStrip1.BackColor = System.Drawing.SystemColors.Control
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2})
-        Me.ToolStrip1.Location = New System.Drawing.Point(3, 19)
-        Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(933, 27)
-        Me.ToolStrip1.TabIndex = 0
-        Me.ToolStrip1.Text = "ToolStrip1"
+        Me.PageControl1.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.PageControl1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.PageControl1.Location = New System.Drawing.Point(3, 549)
+        Me.PageControl1.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.PageControl1.Name = "PageControl1"
+        Me.PageControl1.Size = New System.Drawing.Size(1154, 29)
+        Me.PageControl1.TabIndex = 1
         '
-        'ToolStripButton1
-        '
-        Me.ToolStripButton1.BackColor = System.Drawing.SystemColors.Control
-        Me.ToolStripButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.add_20px1
-        Me.ToolStripButton1.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(89, 24)
-        Me.ToolStripButton1.Text = "添加文件..."
-        '
-        'ToolStripButton2
-        '
-        Me.ToolStripButton2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.stop_20px
-        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(88, 24)
-        Me.ToolStripButton2.Text = "移除选中项"
-        '
-        'CancelButton
-        '
-        Me.CancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.CancelButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.no_16px
-        Me.CancelButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CancelButton.Location = New System.Drawing.Point(855, 403)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(96, 25)
-        Me.CancelButton.TabIndex = 48
-        Me.CancelButton.Text = "取消"
-        Me.CancelButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.CancelButton.UseVisualStyleBackColor = True
-        '
-        'AddOrSaveButton
-        '
-        Me.AddOrSaveButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AddOrSaveButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.yes_16px
-        Me.AddOrSaveButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.AddOrSaveButton.Location = New System.Drawing.Point(678, 403)
-        Me.AddOrSaveButton.Name = "AddOrSaveButton"
-        Me.AddOrSaveButton.Size = New System.Drawing.Size(171, 25)
-        Me.AddOrSaveButton.TabIndex = 47
-        Me.AddOrSaveButton.Text = "开始导入物料价格信息"
-        Me.AddOrSaveButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.AddOrSaveButton.UseVisualStyleBackColor = True
-        '
-        'ImportPriceFilesForm
+        'ViewMaterialPriceInfoForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(963, 440)
+        Me.ClientSize = New System.Drawing.Size(1184, 605)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.CancelButton)
-        Me.Controls.Add(Me.AddOrSaveButton)
         Me.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.MinimizeBox = False
-        Me.Name = "ImportPriceFilesForm"
+        Me.Name = "ViewMaterialPriceInfoForm"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "选择导入文件"
+        Me.Text = "物料价格库"
         Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ToolStrip1.ResumeLayout(False)
-        Me.ToolStrip1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
 
-    Friend Shadows WithEvents CancelButton As Button
-    Friend WithEvents AddOrSaveButton As Button
     Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents ToolStrip1 As ToolStrip
-    Friend WithEvents ToolStripButton1 As ToolStripButton
-    Friend WithEvents ToolStripButton2 As ToolStripButton
     Friend WithEvents CheckBoxDataGridView1 As Wangk.Resource.CheckBoxDataGridView
+    Friend WithEvents PageControl1 As PageControl
 End Class

@@ -369,7 +369,7 @@ Public Class MainForm
 #End Region
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles ButtonItem6.Click
-        Dim tmpDialog As New ExportSettingsForm
+        Dim tmpDialog As New SettingsForm
         tmpDialog.ShowDialog()
     End Sub
 
@@ -965,6 +965,7 @@ Public Class MainForm
     End Sub
 #End Region
 
+#Region "清空物料价格库"
     Private Sub ButtonItem8_Click(sender As Object, e As EventArgs) Handles ButtonItem8.Click
         If MsgBox("确定要清空物料价格库吗?", MsgBoxStyle.YesNo, "一次确认") <> MsgBoxResult.Yes Then
             Exit Sub
@@ -981,4 +982,14 @@ Public Class MainForm
         UpdateMaterialPriceInfoCount()
 
     End Sub
+#End Region
+
+#Region "查看物料价格库"
+    Private Sub ButtonItem9_Click(sender As Object, e As EventArgs) Handles ButtonItem9.Click
+        Using tmpDialog As New ViewMaterialPriceInfoForm
+            tmpDialog.ShowDialog()
+        End Using
+    End Sub
+#End Region
+
 End Class

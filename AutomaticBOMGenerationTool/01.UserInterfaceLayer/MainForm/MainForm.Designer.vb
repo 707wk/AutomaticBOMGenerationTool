@@ -50,6 +50,7 @@ Partial Class MainForm
         Me.RibbonBar2 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem5 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem7 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem9 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem8 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar1 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem2 = New DevComponents.DotNetBar.ButtonItem()
@@ -275,7 +276,7 @@ Partial Class MainForm
         Me.RibbonBar4.DragDropSupport = True
         Me.RibbonBar4.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem1, Me.FeedbackButton})
         Me.RibbonBar4.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar4.Location = New System.Drawing.Point(813, 0)
+        Me.RibbonBar4.Location = New System.Drawing.Point(871, 0)
         Me.RibbonBar4.Name = "RibbonBar4"
         Me.RibbonBar4.Size = New System.Drawing.Size(224, 99)
         Me.RibbonBar4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
@@ -324,12 +325,12 @@ Partial Class MainForm
         Me.RibbonBar3.DragDropSupport = True
         Me.RibbonBar3.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem6})
         Me.RibbonBar3.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar3.Location = New System.Drawing.Point(687, 0)
+        Me.RibbonBar3.Location = New System.Drawing.Point(745, 0)
         Me.RibbonBar3.Name = "RibbonBar3"
         Me.RibbonBar3.Size = New System.Drawing.Size(126, 99)
         Me.RibbonBar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar3.TabIndex = 2
-        Me.RibbonBar3.Text = "其它"
+        Me.RibbonBar3.Text = "工具"
         '
         '
         '
@@ -362,14 +363,14 @@ Partial Class MainForm
         Me.RibbonBar2.ContainerControlProcessDialogKey = True
         Me.RibbonBar2.Dock = System.Windows.Forms.DockStyle.Left
         Me.RibbonBar2.DragDropSupport = True
-        Me.RibbonBar2.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem5, Me.ButtonItem7, Me.ButtonItem8})
+        Me.RibbonBar2.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem5, Me.ButtonItem7, Me.ButtonItem9, Me.ButtonItem8})
         Me.RibbonBar2.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
         Me.RibbonBar2.Location = New System.Drawing.Point(369, 0)
         Me.RibbonBar2.Name = "RibbonBar2"
-        Me.RibbonBar2.Size = New System.Drawing.Size(318, 99)
+        Me.RibbonBar2.Size = New System.Drawing.Size(376, 99)
         Me.RibbonBar2.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar2.TabIndex = 1
-        Me.RibbonBar2.Text = "物料"
+        Me.RibbonBar2.Text = "物料信息"
         '
         '
         '
@@ -396,6 +397,15 @@ Partial Class MainForm
         Me.ButtonItem7.Name = "ButtonItem7"
         Me.ButtonItem7.SubItemsExpandWidth = 14
         Me.ButtonItem7.Text = "导出" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "物料价格..."
+        '
+        'ButtonItem9
+        '
+        Me.ButtonItem9.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem9.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.viewData_32px
+        Me.ButtonItem9.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem9.Name = "ButtonItem9"
+        Me.ButtonItem9.SubItemsExpandWidth = 14
+        Me.ButtonItem9.Text = "查看" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "物料价格库"
         '
         'ButtonItem8
         '
@@ -499,7 +509,7 @@ Partial Class MainForm
         'ToolStripStatusLabel2
         '
         Me.ToolStripStatusLabel2.Name = "ToolStripStatusLabel2"
-        Me.ToolStripStatusLabel2.Size = New System.Drawing.Size(1136, 17)
+        Me.ToolStripStatusLabel2.Size = New System.Drawing.Size(1167, 17)
         Me.ToolStripStatusLabel2.Spring = True
         '
         'ToolStripStatusLabel3
@@ -802,4 +812,5 @@ Partial Class MainForm
     Friend WithEvents ButtonItem8 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents ToolStripStatusLabel2 As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabel3 As ToolStripStatusLabel
+    Friend WithEvents ButtonItem9 As DevComponents.DotNetBar.ButtonItem
 End Class
