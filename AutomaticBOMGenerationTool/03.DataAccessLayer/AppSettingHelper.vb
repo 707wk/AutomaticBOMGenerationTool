@@ -119,10 +119,11 @@ Public Class AppSettingHelper
                 System.IO.File.ReadAllText($".\Data\Setting.json",
                                            System.Text.Encoding.UTF8))
 
+#Disable Warning CA1031 ' Do not catch general exception types
         Catch ex As Exception
             '设置默认参数
             instance = New AppSettingHelper
-
+#Enable Warning CA1031 ' Do not catch general exception types
         End Try
 
     End Sub
@@ -150,9 +151,10 @@ Public Class AppSettingHelper
                 t.Write(JsonConvert.SerializeObject(instance))
             End Using
 
+#Disable Warning CA1031 ' Do not catch general exception types
         Catch ex As Exception
             MsgBox(ex.ToString, MsgBoxStyle.Exclamation, My.Application.Info.Title)
-
+#Enable Warning CA1031 ' Do not catch general exception types
         End Try
 
     End Sub
@@ -211,9 +213,13 @@ Public Class AppSettingHelper
         For Each item In IO.Directory.EnumerateFiles(Me.TempDownloadPath)
             Try
                 IO.File.Delete(item)
+
+#Disable Warning CA1031 ' Do not catch general exception types
             Catch ex As Exception
+#Enable Warning CA1031 ' Do not catch general exception types
             End Try
         Next
+
     End Sub
 #End Region
 

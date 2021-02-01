@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports OfficeOpenXml
 
-Public Class BOMCostingTemplateByWKTypeHelper
+Public NotInheritable Class BOMCostingTemplateByWKTypeHelper
 #Region "获取物料价格信息"
     ''' <summary>
     ''' 获取物料价格信息
@@ -87,8 +87,6 @@ Public Class BOMCostingTemplateByWKTypeHelper
 
 #Region "读取BOM基本信息"
 
-    Private Shared BOMlevelColumnID As Integer
-    Private Shared BOMLevelCount As Integer
     Private Shared BOMpIDColumnID As Integer
     Private Shared BOMMaterialRowMinID As Integer
     Private Shared BOMMaterialRowMaxID As Integer
@@ -102,11 +100,9 @@ Public Class BOMCostingTemplateByWKTypeHelper
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-        Dim headerLocation = BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "阶层")
-        BOMlevelColumnID = headerLocation.X
+        Dim headerLocation = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "阶层")
         BOMMaterialRowMinID = headerLocation.Y + 1
-        BOMpIDColumnID = BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "品 号").X
-        BOMLevelCount = BOMpIDColumnID - headerLocation.X
+        BOMpIDColumnID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "品 号").X
 
         BOMMaterialRowMaxID = tmpWorkSheet.Dimension.End.Row
 

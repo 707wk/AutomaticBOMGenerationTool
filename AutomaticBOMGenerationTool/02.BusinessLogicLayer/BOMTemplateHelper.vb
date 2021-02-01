@@ -298,10 +298,10 @@ Public NotInheritable Class BOMTemplateHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "说明")
+                Dim headerLocation = FindTextLocation(tmpExcelPackage, "说明")
                 Dim rowMaxID = headerLocation.Y - 1
 
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "替代料品号集")
+                headerLocation = FindTextLocation(tmpExcelPackage, "替代料品号集")
 
 #Region "解析品号"
                 For rID = headerLocation.Y + 1 To rowMaxID
@@ -452,13 +452,13 @@ Public NotInheritable Class BOMTemplateHelper
     End Function
 #End Region
 
-#Region "查找表头位置"
+#Region "查找文本所在位置"
     ''' <summary>
-    ''' 查找表头位置
+    ''' 查找文本所在位置
     ''' </summary>
-    Public Shared Function FindHeaderLocation(
-                                             wb As ExcelPackage,
-                                             headText As String) As Point
+    Public Shared Function FindTextLocation(
+                                           wb As ExcelPackage,
+                                           headText As String) As Point
 
         Dim findStr = StrConv(headText, VbStrConv.Narrow).ToUpper
 
@@ -518,9 +518,9 @@ Public NotInheritable Class BOMTemplateHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "说明")
+                Dim headerLocation = FindTextLocation(tmpExcelPackage, "说明")
                 Dim rowMaxID = headerLocation.Y - 1
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "产品配置选项")
+                headerLocation = FindTextLocation(tmpExcelPackage, "产品配置选项")
 
                 Dim tmpRootNode As ConfigurationNodeInfo = Nothing
                 Dim tmpChildNode As ConfigurationNodeValueInfo = Nothing
@@ -687,9 +687,9 @@ Public NotInheritable Class BOMTemplateHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "说明")
+                Dim headerLocation = FindTextLocation(tmpExcelPackage, "说明")
                 Dim rowMaxID = headerLocation.Y - 1
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "料品固定搭配集")
+                headerLocation = FindTextLocation(tmpExcelPackage, "料品固定搭配集")
 
                 For rID = headerLocation.Y + 1 To rowMaxID
 
@@ -803,7 +803,7 @@ Public NotInheritable Class BOMTemplateHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 '移除核价产品配置表
-                Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "显示屏规格")
+                Dim headerLocation = FindTextLocation(tmpExcelPackage, "显示屏规格")
                 tmpWorkSheet.DeleteRow(tmpWorkSheet.Dimension.Start.Row, headerLocation.Y - 1)
 
                 ReadBOMInfo(tmpExcelPackage)
@@ -1146,19 +1146,19 @@ Public NotInheritable Class BOMTemplateHelper
                 Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
 
                 '删除物料标记列
-                Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "替换料")
+                Dim headerLocation = FindTextLocation(tmpExcelPackage, "替换料")
                 tmpWorkSheet.DeleteColumn(headerLocation.X)
                 pIDColumnID -= 1
 
                 '删除临时总数列
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "备注")
+                headerLocation = FindTextLocation(tmpExcelPackage, "备注")
                 tmpWorkSheet.DeleteColumn(headerLocation.X + 1)
 
                 '删除临时物料类型列
                 tmpWorkSheet.DeleteColumn(headerLocation.X + 1)
 
                 '更新BOM名称
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "显示屏规格")
+                headerLocation = FindTextLocation(tmpExcelPackage, "显示屏规格")
                 Dim BOMName = JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
                 tmpWorkSheet.Cells(headerLocation.Y, headerLocation.X + 2).Value = BOMName
 
@@ -1175,10 +1175,10 @@ Public NotInheritable Class BOMTemplateHelper
                 '更改启动时显示位置
                 tmpWorkSheet.View.TopLeftCell = tmpWorkSheet.Cells(1, 1).Address
 
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "阶层")
+                headerLocation = FindTextLocation(tmpExcelPackage, "阶层")
                 Dim levelColumnID = headerLocation.X
                 Dim MaterialRowMinID = headerLocation.Y + 2
-                Dim MaterialRowMaxID = FindHeaderLocation(tmpExcelPackage, "版次").Y - 1
+                Dim MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
 
                 Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
 
@@ -1196,9 +1196,9 @@ Public NotInheritable Class BOMTemplateHelper
 #End Region
 
                 '重新计算序号
-                headerLocation = FindHeaderLocation(tmpExcelPackage, "阶层")
+                headerLocation = FindTextLocation(tmpExcelPackage, "阶层")
                 MaterialRowMinID = headerLocation.Y + 2
-                MaterialRowMaxID = FindHeaderLocation(tmpExcelPackage, "版次").Y - 1
+                MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
                 For rid = MaterialRowMinID To MaterialRowMaxID
                     tmpWorkSheet.Cells(rid, 1).Value = $"{rid - MaterialRowMinID + 1}"
                 Next
@@ -1210,8 +1210,8 @@ Public NotInheritable Class BOMTemplateHelper
                     Dim pIDStr = $"{tmpWorkSheet.Cells(rid, pIDColumnID).Value}".ToUpper.Trim
                     'If LocalDatabaseHelper.GetMaterialPriceInfo(pIDStr) IsNot Nothing Then
                     If AppSettingHelper.GetInstance.ReplaceMaterialPricepIDItems.Contains(pIDStr) Then
-                            tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-                            tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                        tmpWorkSheet.Cells(rid, pIDColumnID + 5).Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
                     End If
 
                     '数量
@@ -1320,7 +1320,7 @@ Public NotInheritable Class BOMTemplateHelper
 
         Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
         Dim pUnitPriceColumnID = pIDColumnID + 5
-        Dim tmpCountColumnID = FindHeaderLocation(wb, "备注").X + 1
+        Dim tmpCountColumnID = FindTextLocation(wb, "备注").X + 1
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1369,7 +1369,7 @@ Public NotInheritable Class BOMTemplateHelper
         Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
         Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
         Dim pUnitPriceColumnID = pIDColumnID + 5
-        Dim tmpCountColumnID = FindHeaderLocation(wb, "备注").X + 1
+        Dim tmpCountColumnID = FindTextLocation(wb, "备注").X + 1
         Dim baseMaterialFlagColumnID = tmpCountColumnID + 1
 
         Dim tmpExcelPackage = wb
@@ -1418,7 +1418,7 @@ Public NotInheritable Class BOMTemplateHelper
                                 wb As ExcelPackage,
                                 values As List(Of ExportConfigurationNodeInfo)) As String
 
-        Dim headerLocation = FindHeaderLocation(wb, "品  名")
+        Dim headerLocation = FindTextLocation(wb, "品  名")
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1599,18 +1599,18 @@ Public NotInheritable Class BOMTemplateHelper
     Public Shared Sub ReadBOMInfo(wb As ExcelPackage)
         Dim tmpExcelPackage = wb
 
-        Dim headerLocation = FindHeaderLocation(tmpExcelPackage, "阶层")
+        Dim headerLocation = FindTextLocation(tmpExcelPackage, "阶层")
         AppSettingHelper.GetInstance.BOMlevelColumnID = headerLocation.X
         AppSettingHelper.GetInstance.BOMMaterialRowMinID = headerLocation.Y + 2
-        AppSettingHelper.GetInstance.BOMLevelCount = FindHeaderLocation(tmpExcelPackage, "替换料").X - headerLocation.X
+        AppSettingHelper.GetInstance.BOMLevelCount = FindTextLocation(tmpExcelPackage, "替换料").X - headerLocation.X
 
-        headerLocation = FindHeaderLocation(tmpExcelPackage, "版次")
+        headerLocation = FindTextLocation(tmpExcelPackage, "版次")
         AppSettingHelper.GetInstance.BOMMaterialRowMaxID = headerLocation.Y - 1
 
-        headerLocation = FindHeaderLocation(tmpExcelPackage, "品 号")
+        headerLocation = FindTextLocation(tmpExcelPackage, "品 号")
         AppSettingHelper.GetInstance.BOMpIDColumnID = headerLocation.X
 
-        headerLocation = FindHeaderLocation(tmpExcelPackage, "备注")
+        headerLocation = FindTextLocation(tmpExcelPackage, "备注")
         AppSettingHelper.GetInstance.BOMRemarkColumnID = headerLocation.X
 
     End Sub

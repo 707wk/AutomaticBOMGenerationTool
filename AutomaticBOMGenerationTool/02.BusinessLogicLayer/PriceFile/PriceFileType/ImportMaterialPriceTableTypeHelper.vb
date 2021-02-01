@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports OfficeOpenXml
 
-Public Class ImportMaterialPriceTableTypeHelper
+Public NotInheritable Class ImportMaterialPriceTableTypeHelper
     Public Shared Sub GetMaterialPriceInfo(value As ImportPriceFileInfo)
 
         Using readFS = New FileStream(value.SourceFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)

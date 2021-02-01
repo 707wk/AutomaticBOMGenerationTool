@@ -2,7 +2,7 @@
 
     Public CacheGroupInfo As ConfigurationGroupInfo
 
-    Private NodeHashset As New HashSet(Of String)
+    Private ReadOnly NodeHashset As New HashSet(Of String)
 
     ''' <summary>
     ''' 分组内总价

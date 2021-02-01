@@ -3,11 +3,9 @@
     ''' <summary>
     ''' 勾选的节点名集合
     ''' </summary>
-    Public ReadOnly Property CheckedItems As String()
-        Get
-            Return _checkedItems
-        End Get
-    End Property
+    Public Function GetCheckedItems() As String()
+        Return _checkedItems
+    End Function
 
     ''' <summary>
     ''' 排除项

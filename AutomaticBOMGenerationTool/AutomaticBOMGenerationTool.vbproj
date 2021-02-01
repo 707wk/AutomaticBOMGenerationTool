@@ -179,25 +179,25 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewMaterialPriceInfo\ViewMaterialPriceInfoForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupControl.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\ConfigurationGroupControl.Designer.vb">
       <DependentUpon>ConfigurationGroupControl.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupControl.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\ConfigurationGroupControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupCheckBox.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\ConfigurationGroupCheckBox.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\ConfigurationNodeControl.Designer.vb">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\ConfigurationNodeControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeLabel.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\ConfigurationNodeLabel.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\MaterialInfoControl.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\MaterialInfoControl.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\MainForm.Designer.vb">
@@ -217,16 +217,16 @@
     <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\ImportMaterialPriceTableTypeHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
-    <Compile Include="03.DataAccessLayer\BOMConfigurationInfo.vb" />
-    <Compile Include="03.DataAccessLayer\ConfigurationGroupInfo.vb" />
-    <Compile Include="03.DataAccessLayer\ConfigurationNodeInfo.vb" />
-    <Compile Include="03.DataAccessLayer\ConfigurationNodeRowInfo.vb" />
-    <Compile Include="03.DataAccessLayer\ConfigurationNodeValueInfo.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationNode\BOMConfigurationInfo.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationNode\ConfigurationGroupInfo.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationNode\ConfigurationNodeInfo.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationNode\ConfigurationNodeRowInfo.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationNode\ConfigurationNodeValueInfo.vb" />
     <Compile Include="03.DataAccessLayer\EnumHelpervb.vb" />
     <Compile Include="03.DataAccessLayer\ExportConfigurationNodeInfo.vb" />
     <Compile Include="03.DataAccessLayer\MaterialPrice\ImportPriceFileInfo.vb" />
-    <Compile Include="03.DataAccessLayer\MaterialInfo.vb" />
-    <Compile Include="03.DataAccessLayer\MaterialLinkInfo.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationNode\MaterialInfo.vb" />
+    <Compile Include="03.DataAccessLayer\ConfigurationNode\MaterialLinkInfo.vb" />
     <Compile Include="03.DataAccessLayer\MaterialPrice\MaterialPriceInfo.vb" />
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -269,10 +269,10 @@
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewMaterialPriceInfo\ViewMaterialPriceInfoForm.resx">
       <DependentUpon>ViewMaterialPriceInfoForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroupControl.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\ConfigurationGroupControl.resx">
       <DependentUpon>ConfigurationGroupControl.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationNodeControl.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\ConfigurationNodeControl.resx">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\MainForm.resx">

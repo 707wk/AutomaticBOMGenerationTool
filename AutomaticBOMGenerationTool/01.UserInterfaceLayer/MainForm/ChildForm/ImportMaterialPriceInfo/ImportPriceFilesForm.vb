@@ -3,12 +3,12 @@
     ''' <summary>
     ''' 文件类型显示值查找表
     ''' </summary>
-    Private PriceFileTypeList = EnumHelper.GetEnumDescription(Of PriceFileHelper.PriceFileType)
+    Private ReadOnly PriceFileTypeList = EnumHelper.GetEnumDescription(Of PriceFileHelper.PriceFileType)
 
     ''' <summary>
     ''' 文件查找表
     ''' </summary>
-    Private FileList As New HashSet(Of String)
+    Private ReadOnly FileList As New HashSet(Of String)
 
     Private Sub ImportPriceFilesForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 

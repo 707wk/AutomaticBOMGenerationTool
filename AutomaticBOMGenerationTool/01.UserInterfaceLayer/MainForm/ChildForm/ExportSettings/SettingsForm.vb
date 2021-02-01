@@ -42,7 +42,7 @@
                 Exit Sub
             End If
 
-            For Each item In tmpDialog.CheckedItems
+            For Each item In tmpDialog.GetCheckedItems()
                 CheckBoxDataGridView1.Rows.Add({
                                            False,
                                            item,
@@ -109,8 +109,10 @@
 
                 FileHelper.Open(IO.Path.GetDirectoryName(tmpDialog.FileName))
 
+#Disable Warning CA1031 ' Do not catch general exception types
             Catch ex As Exception
                 MsgBox($"导出错误:{ex.Message}", MsgBoxStyle.Exclamation, "导出设置")
+#Enable Warning CA1031 ' Do not catch general exception types
             End Try
 
         End Using
@@ -136,8 +138,10 @@
 
                 UIFormHelper.ToastSuccess("导入成功")
 
+#Disable Warning CA1031 ' Do not catch general exception types
             Catch ex As Exception
                 MsgBox($"导入错误:{ex.Message}", MsgBoxStyle.Exclamation, "导入设置")
+#Enable Warning CA1031 ' Do not catch general exception types
             End Try
 
         End Using

@@ -299,7 +299,7 @@ Public Class MainForm
 
                 BOMTemplateHelper.ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
 
-                Dim headerLocation = BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "单价")
+                Dim headerLocation = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "单价")
 
                 AppSettingHelper.GetInstance.TotalPrice = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
                 ToolStripLabel1.Text = $"当前总价: ￥{AppSettingHelper.GetInstance.TotalPrice:n4}"

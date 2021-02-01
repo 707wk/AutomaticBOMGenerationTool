@@ -2,7 +2,7 @@
 ''' <summary>
 ''' 枚举辅助类
 ''' </summary>
-Public Class EnumHelper
+Public NotInheritable Class EnumHelper
 
     ''' <summary>
     ''' 获取枚举注释

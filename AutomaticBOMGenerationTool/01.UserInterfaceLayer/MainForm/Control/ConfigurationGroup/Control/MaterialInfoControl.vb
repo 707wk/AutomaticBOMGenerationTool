@@ -16,7 +16,6 @@
     End Property
 
     Public Sub New()
-        Me.DoubleBuffered = True
         Me.Appearance = Appearance.Button
         Me.FlatStyle = FlatStyle.Flat
         Me.FlatAppearance.BorderColor = Color.FromArgb(173, 173, 173)
@@ -24,7 +23,7 @@
         Me.TextAlign = ContentAlignment.MiddleLeft
         Me.Cursor = Cursors.Hand
 
-        StringFormatFar.Alignment = StringAlignment.Far
+        Me.DoubleBuffered = True
 
     End Sub
 
@@ -45,12 +44,14 @@
         End If
     End Sub
 
-    Private ReadOnly ZeroUnitPriceSolidBrush As New SolidBrush(UIFormHelper.ErrorColor)
-    Private ReadOnly TitleFontSolidBrush As New SolidBrush(Color.White)
-    Private ReadOnly ContextFontSolidBrush As New SolidBrush(Color.LightGray)
-    Private ReadOnly StringFormatFar As New StringFormat()
-    Private ReadOnly BorderPen As New Pen(Color.FromArgb(0, 122, 204), 2)
-    Private ReadOnly OldFont As New Font("微软雅黑", Me.Font.Size)
+    Private Shared ReadOnly ZeroUnitPriceSolidBrush As New SolidBrush(UIFormHelper.ErrorColor)
+    Private Shared ReadOnly TitleFontSolidBrush As New SolidBrush(Color.White)
+    Private Shared ReadOnly ContextFontSolidBrush As New SolidBrush(Color.LightGray)
+    Private Shared ReadOnly StringFormatFar As New StringFormat() With {
+        .Alignment = StringAlignment.Far
+    }
+    Private Shared ReadOnly BorderPen As New Pen(Color.FromArgb(0, 122, 204), 2)
+    Private Shared ReadOnly OldFont As New Font("微软雅黑", 9)
     Private Sub MaterialInfoControl_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
 
         If _Cache IsNot Nothing Then
@@ -64,24 +65,15 @@
             e.Graphics.DrawString($"{_Cache.pName}", Me.Font, TitleFontSolidBrush, 1, 1)
             e.Graphics.DrawString($"￥{_Cache.pUnitPrice}", Me.Font, TitleFontSolidBrush, Me.Width - 2, 1, StringFormatFar)
 
-            e.Graphics.DrawString($"品号 : {_Cache.pID}", Me.OldFont, ContextFontSolidBrush, 1, tmpFontSize.Height + 1)
+            e.Graphics.DrawString($"品号 : {_Cache.pID}", OldFont, ContextFontSolidBrush, 1, tmpFontSize.Height + 1)
 
-            e.Graphics.DrawString($"规格 : {_Cache.pConfig}", Me.OldFont, ContextFontSolidBrush, New Rectangle(1, tmpFontSize.Height * 2 + 1, Me.Width - 2, Me.Height - tmpFontSize.Height * 2 - 2))
+            e.Graphics.DrawString($"规格 : {_Cache.pConfig}", OldFont, ContextFontSolidBrush, New Rectangle(1, tmpFontSize.Height * 2 + 1, Me.Width - 2, Me.Height - tmpFontSize.Height * 2 - 2))
         End If
 
         If Me.Checked Then
             e.Graphics.DrawRectangle(BorderPen, 1, 1, Me.Width - 2, Me.Height - 2)
         End If
 
-    End Sub
-
-    Private Sub MaterialInfoControl_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
-        ZeroUnitPriceSolidBrush?.Dispose()
-        TitleFontSolidBrush?.Dispose()
-        ContextFontSolidBrush?.Dispose()
-        StringFormatFar?.Dispose()
-        BorderPen?.Dispose()
-        OldFont?.Dispose()
     End Sub
 
 End Class

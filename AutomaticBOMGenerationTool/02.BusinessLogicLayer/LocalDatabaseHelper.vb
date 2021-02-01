@@ -26,9 +26,12 @@ Public NotInheritable Class LocalDatabaseHelper
     Public Shared Sub Close()
         Try
             _DatabaseConnection.Close()
-        Catch ex As Exception
 
+#Disable Warning CA1031 ' Do not catch general exception types
+        Catch ex As Exception
+#Enable Warning CA1031 ' Do not catch general exception types
         End Try
+
     End Sub
 
 #Region "是否有数据"

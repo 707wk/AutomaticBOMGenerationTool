@@ -110,13 +110,14 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "每平方价格")
+                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "每平方价格")
 
                     Return True
 
+#Disable Warning CA1031 ' Do not catch general exception types
                 Catch ex As Exception
                     Return False
-
+#Enable Warning CA1031 ' Do not catch general exception types
                 End Try
 
             End Using
@@ -137,13 +138,14 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "每平方价格:")
+                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "每平方价格:")
 
                     Return True
 
+#Disable Warning CA1031 ' Do not catch general exception types
                 Catch ex As Exception
                     Return False
-
+#Enable Warning CA1031 ' Do not catch general exception types
                 End Try
 
             End Using
@@ -164,13 +166,14 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "核价产品配置表")
+                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "核价产品配置表")
 
                     Return True
 
+#Disable Warning CA1031 ' Do not catch general exception types
                 Catch ex As Exception
                     Return False
-
+#Enable Warning CA1031 ' Do not catch general exception types
                 End Try
 
             End Using
@@ -191,13 +194,14 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "版次")
+                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "版次")
 
                     Return True
 
+#Disable Warning CA1031 ' Do not catch general exception types
                 Catch ex As Exception
                     Return False
-
+#Enable Warning CA1031 ' Do not catch general exception types
                 End Try
 
             End Using
@@ -218,13 +222,14 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindHeaderLocation(tmpExcelPackage, "采集来源")
+                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "采集来源")
 
                     Return True
 
+#Disable Warning CA1031 ' Do not catch general exception types
                 Catch ex As Exception
                     Return False
-
+#Enable Warning CA1031 ' Do not catch general exception types
                 End Try
 
             End Using

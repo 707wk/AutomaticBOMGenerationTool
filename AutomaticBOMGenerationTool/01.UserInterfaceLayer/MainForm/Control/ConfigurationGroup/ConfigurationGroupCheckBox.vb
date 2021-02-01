@@ -11,8 +11,6 @@
     Public Sub New()
         Me.AutoSize = False
         Me.Size = New Size(240, 20)
-        StringFormatFar.Alignment = StringAlignment.Far
-        StringFormatFar.LineAlignment = StringAlignment.Center
 
         Me.DoubleBuffered = True
 
@@ -25,11 +23,14 @@
         Me.Refresh()
     End Sub
 
-    Private ReadOnly TitleFontSolidBrush As New SolidBrush(Color.Black)
-    Private ReadOnly ForegroundSolidBrush As New SolidBrush(UIFormHelper.NormalColor)
-    Private ReadOnly BackgroundSolidBrush As New SolidBrush(Color.FromArgb(120, 120, 126))
-    Private ReadOnly StringFormatFar As New StringFormat()
-    Private ReadOnly OldFont As New Font("微软雅黑", Me.Font.Size)
+    Private Shared ReadOnly TitleFontSolidBrush As New SolidBrush(Color.Black)
+    Private Shared ReadOnly ForegroundSolidBrush As New SolidBrush(UIFormHelper.NormalColor)
+    Private Shared ReadOnly BackgroundSolidBrush As New SolidBrush(Color.FromArgb(120, 120, 126))
+    Private Shared ReadOnly StringFormatFar As New StringFormat() With {
+        .Alignment = StringAlignment.Far,
+        .LineAlignment = StringAlignment.Center
+    }
+    Private Shared ReadOnly OldFont As New Font("微软雅黑", 9)
 
     Private Sub ConfigurationGroup_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
 
