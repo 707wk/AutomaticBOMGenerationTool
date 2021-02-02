@@ -891,7 +891,9 @@ order by ConfigurationNodeValueInfo.SortID"
     Public Shared Sub ClearMaterialPrice()
 
         Using tmpCommand As New SQLite.SQLiteCommand(DatabaseConnection)
-            tmpCommand.CommandText = "delete from MaterialPriceInfo;"
+            tmpCommand.CommandText = "
+delete from MaterialPriceInfo;
+VACUUM;"
 
             tmpCommand.ExecuteNonQuery()
         End Using

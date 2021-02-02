@@ -975,7 +975,14 @@ Public Class MainForm
             Exit Sub
         End If
 
-        LocalDatabaseHelper.ClearMaterialPrice()
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "清空物料价格库"
+        }
+
+            tmpDialog.Start(Sub(uie As Wangk.Resource.BackgroundWorkEventArgs)
+                                LocalDatabaseHelper.ClearMaterialPrice()
+                            End Sub)
+        End Using
 
         UIFormHelper.ToastSuccess("物料价格库已清空")
 
