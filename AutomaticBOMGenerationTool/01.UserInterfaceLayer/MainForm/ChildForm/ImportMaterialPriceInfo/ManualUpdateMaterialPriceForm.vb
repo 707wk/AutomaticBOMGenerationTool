@@ -99,7 +99,7 @@
 
                                     Dim item = SameMaterialPriceInfoItems(i001)
 
-                                    LocalDatabaseHelper.UpdateMaterialPriceInfo(item)
+                                    LocalDatabaseHelper.UpdateSameMaterialPriceInfo(item)
 
                                 Next
 

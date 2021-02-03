@@ -966,11 +966,11 @@ values(
     End Sub
 #End Region
 
-#Region "更新物料价格信息"
+#Region "更新相同物料价格信息"
     ''' <summary>
-    ''' 更新物料价格信息
+    ''' 更新相同物料价格信息
     ''' </summary>
-    Public Shared Sub UpdateMaterialPriceInfo(value As MaterialPriceInfo)
+    Public Shared Sub UpdateSameMaterialPriceInfo(value As MaterialPriceInfo)
 
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "update MaterialPriceInfo 
@@ -984,6 +984,57 @@ where pID=@pID"
         cmd.Parameters.Add(New SQLiteParameter("@pUnitPrice", DbType.Double) With {.Value = value.pUnitPrice})
         cmd.Parameters.Add(New SQLiteParameter("@UpdateDate", DbType.DateTime) With {.Value = value.UpdateDate})
         cmd.Parameters.Add(New SQLiteParameter("@SourceFile", DbType.String) With {.Value = value.SourceFile})
+
+        cmd.ExecuteNonQuery()
+
+    End Sub
+#End Region
+
+#Region "更新物料价格信息"
+    ''' <summary>
+    ''' 更新物料价格信息
+    ''' </summary>
+    Public Shared Sub UpdateMaterialPriceInfo(value As MaterialPriceInfo)
+
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+                .CommandText = "update MaterialPriceInfo 
+set 
+pName=@pName,
+pConfig=@pConfig,
+pUnit=@pUnit,
+pUnitPrice=@pUnitPrice,
+UpdateDate=@UpdateDate,
+SourceFile=@SourceFile,
+Remark=@Remark
+where pID=@pID"
+        }
+
+        cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = value.pID})
+        cmd.Parameters.Add(New SQLiteParameter("@pName", DbType.String) With {.Value = value.pName})
+        cmd.Parameters.Add(New SQLiteParameter("@pConfig", DbType.String) With {.Value = value.pConfig})
+        cmd.Parameters.Add(New SQLiteParameter("@pUnit", DbType.String) With {.Value = value.pUnit})
+        cmd.Parameters.Add(New SQLiteParameter("@pUnitPrice", DbType.Double) With {.Value = value.pUnitPrice})
+        cmd.Parameters.Add(New SQLiteParameter("@UpdateDate", DbType.DateTime) With {.Value = value.UpdateDate})
+        cmd.Parameters.Add(New SQLiteParameter("@SourceFile", DbType.String) With {.Value = value.SourceFile})
+        cmd.Parameters.Add(New SQLiteParameter("@Remark", DbType.String) With {.Value = value.Remark})
+
+        cmd.ExecuteNonQuery()
+
+    End Sub
+#End Region
+
+#Region "删除物料价格信息"
+    ''' <summary>
+    ''' 删除物料价格信息
+    ''' </summary>
+    Public Shared Sub DeleteMaterialPriceInfo(pID As String)
+
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+            .CommandText = "delete
+from MaterialPriceInfo
+where pID=@pID"
+        }
+        cmd.Parameters.Add(New SQLiteParameter("@pID", DbType.String) With {.Value = pID})
 
         cmd.ExecuteNonQuery()
 

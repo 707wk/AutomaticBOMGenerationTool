@@ -789,10 +789,6 @@ Public Class MainForm
 
 #Region "导入物料价格"
     Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
-        'Using tmpDialog As New ImportPriceFilesForm
-        '    tmpDialog.ShowDialog()
-        'End Using
-
         Dim importFilePath As String
 
         Using tmpDialog As New OpenFileDialog With {
@@ -880,7 +876,7 @@ Public Class MainForm
     ''' <summary>
     ''' 显示物料价格总记录数
     ''' </summary>
-    Private Sub UpdateMaterialPriceInfoCount()
+    Public Sub UpdateMaterialPriceInfoCount()
         ToolStripStatusLabel3.Text = $"基础物料价格库总记录数: {LocalDatabaseHelper.GetMaterialPriceInfoCount:n0}"
     End Sub
 

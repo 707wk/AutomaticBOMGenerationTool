@@ -39,7 +39,7 @@ Public NotInheritable Class BOMTemplateTypeHelper
                         Dim pNameStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 1).Value}"
                         Dim pConfigStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 2).Value}"
                         Dim pUnitStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 3).Value}"
-                        Dim pUnitPriceStr = Val($"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 5).Value}")
+                        Dim pUnitPriceStr = $"{tmpWorkSheet.Cells(rID, BOMpIDColumnID + 5).Value}"
                         Dim pUnitPriceValue = Val(pUnitPriceStr)
 
                         '品号为空则跳过
@@ -49,6 +49,11 @@ Public NotInheritable Class BOMTemplateTypeHelper
 
                         '价格为空则跳过
                         If String.IsNullOrWhiteSpace(pUnitPriceStr) Then
+                            Continue For
+                        End If
+
+                        '价格为0则跳过
+                        If pUnitPriceValue = 0 Then
                             Continue For
                         End If
 
