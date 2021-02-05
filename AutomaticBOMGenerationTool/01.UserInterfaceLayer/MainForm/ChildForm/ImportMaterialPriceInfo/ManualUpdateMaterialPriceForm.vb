@@ -8,8 +8,7 @@
             .ReadOnly = True
             .ColumnHeadersDefaultCellStyle.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
             .RowHeadersWidth = 80
-
-            .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
 
             .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "品号", .Width = 120})
             .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "品名", .Width = 120})

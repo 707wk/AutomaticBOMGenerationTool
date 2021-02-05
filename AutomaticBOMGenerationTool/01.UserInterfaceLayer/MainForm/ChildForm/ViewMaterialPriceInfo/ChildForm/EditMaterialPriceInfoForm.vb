@@ -26,7 +26,7 @@
         NumericUpDown1.Value = tmpMaterialPriceInfo.pUnitPrice
         WaterTextBox4.Text = tmpMaterialPriceInfo.Remark
 
-        TextBox6.Text = $"{tmpMaterialPriceInfo.UpdateDate:g}"
+        TextBox6.Text = $"{tmpMaterialPriceInfo.UpdateDate:G}"
         TextBox7.Text = tmpMaterialPriceInfo.SourceFile
 
     End Sub

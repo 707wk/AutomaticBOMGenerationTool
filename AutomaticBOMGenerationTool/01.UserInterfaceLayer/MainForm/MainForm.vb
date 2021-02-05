@@ -132,60 +132,74 @@ Public Class MainForm
         ConfigurationGroupList.Controls.Clear()
 
         Dim tmpStopwatch = New Stopwatch
-        tmpStopwatch.Start()
 
-        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-            .Text = "解析数据"
-        }
+        Do
+            tmpStopwatch.Restart()
 
-            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                Dim stepCount = 10
+            Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+                        .Text = "解析数据"
+                    }
 
-                                be.Write("清空数据库", 100 / stepCount * 0)
-                                LocalDatabaseHelper.Clear()
+                tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+                                    Dim stepCount = 10
 
-                                be.Write("预处理源文件", 100 / stepCount * 1)
-                                BOMTemplateHelper.PreproccessSourceFile()
+                                    be.Write("清空数据库", 100 / stepCount * 0)
+                                    LocalDatabaseHelper.Clear()
 
-                                be.Write("获取替换物料品号", 100 / stepCount * 2)
-                                Dim configurationTablepIDList = BOMTemplateHelper.GetMaterialpIDListFromConfigurationTable()
+                                    be.Write("预处理源文件", 100 / stepCount * 1)
+                                    BOMTemplateHelper.PreproccessSourceFile()
 
-                                be.Write("检测替换物料完整性", 100 / stepCount * 3)
-                                BOMTemplateHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
+                                    be.Write("获取替换物料品号", 100 / stepCount * 2)
+                                    Dim configurationTablepIDList = BOMTemplateHelper.GetMaterialpIDListFromConfigurationTable()
 
-                                be.Write("获取替换物料信息", 100 / stepCount * 4)
-                                Dim tmpList = BOMTemplateHelper.GetMaterialInfoList(configurationTablepIDList)
+                                    be.Write("检测替换物料完整性", 100 / stepCount * 3)
+                                    BOMTemplateHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
 
-                                be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 5)
-                                LocalDatabaseHelper.SaveMaterialInfo(tmpList)
+                                    be.Write("获取替换物料信息", 100 / stepCount * 4)
+                                    Dim tmpList = BOMTemplateHelper.GetMaterialInfoList(configurationTablepIDList)
 
-                                be.Write("解析配置节点信息", 100 / stepCount * 6)
-                                BOMTemplateHelper.TransformationConfigurationTable()
+                                    be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 5)
+                                    LocalDatabaseHelper.SaveMaterialInfo(tmpList)
 
-                                be.Write("制作提取模板", 100 / stepCount * 7)
-                                BOMTemplateHelper.CreateTemplate()
+                                    be.Write("解析配置节点信息", 100 / stepCount * 6)
+                                    BOMTemplateHelper.TransformationConfigurationTable()
 
-                                be.Write("获取替换物料在模板中的位置", 100 / stepCount * 8)
-                                Dim tmpRowIDList = BOMTemplateHelper.GetMaterialRowIDInTemplate()
+                                    be.Write("制作提取模板", 100 / stepCount * 7)
+                                    BOMTemplateHelper.CreateTemplate()
 
-                                be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 9)
-                                LocalDatabaseHelper.SaveMaterialRowID(tmpRowIDList)
+                                    be.Write("获取替换物料在模板中的位置", 100 / stepCount * 8)
+                                    Dim tmpRowIDList = BOMTemplateHelper.GetMaterialRowIDInTemplate()
 
-                                '测试耗时
-                                'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 处理完成", 100 / stepCount * 10)
-                                'Do While Not be.IsCancel
-                                '    Threading.Thread.Sleep(200)
-                                'Loop
+                                    be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 9)
+                                    LocalDatabaseHelper.SaveMaterialRowID(tmpRowIDList)
 
-                            End Sub)
+                                    '测试耗时
+                                    'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 处理完成", 100 / stepCount * 10)
+                                    'Do While Not be.IsCancel
+                                    '    Threading.Thread.Sleep(200)
+                                    'Loop
 
-            If tmpDialog.Error IsNot Nothing Then
-                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "解析出错")
-                ToolStripStatusLabel1.Text = "文件解析出错"
-                Exit Sub
-            End If
+                                End Sub)
 
-        End Using
+                If tmpDialog.Error IsNot Nothing Then
+
+                    If MsgBox($"文件 {AppSettingHelper.GetInstance.SourceFilePath}
+{tmpDialog.Error.Message}",
+                              MsgBoxStyle.RetryCancel Or MsgBoxStyle.Exclamation,
+                              "解析出错") <> MsgBoxResult.Cancel Then
+                        Continue Do
+                    Else
+                        ToolStripStatusLabel1.Text = "文件解析出错"
+                        Exit Sub
+                    End If
+
+                End If
+
+                Exit Do
+
+            End Using
+
+        Loop
 
         tmpStopwatch.Stop()
         Dim dateTimeSpan = tmpStopwatch.Elapsed
@@ -877,7 +891,7 @@ Public Class MainForm
     ''' 显示物料价格总记录数
     ''' </summary>
     Public Sub UpdateMaterialPriceInfoCount()
-        ToolStripStatusLabel3.Text = $"基础物料价格库总记录数: {LocalDatabaseHelper.GetMaterialPriceInfoCount:n0}"
+        ToolStripStatusLabel3.Text = $"物料价格库总记录数: {LocalDatabaseHelper.GetMaterialPriceInfoCount:n0}"
     End Sub
 
 #Region "导出物料价格"
@@ -929,7 +943,7 @@ Public Class MainForm
                                             tmpWorkSheet.Cells(index + 1, 4).Value = item.pConfig
                                             tmpWorkSheet.Cells(index + 1, 5).Value = item.pUnit
                                             tmpWorkSheet.Cells(index + 1, 6).Value = item.pUnitPrice
-                                            tmpWorkSheet.Cells(index + 1, 7).Value = $"{item.UpdateDate:g}"
+                                            tmpWorkSheet.Cells(index + 1, 7).Value = $"{item.UpdateDate:G}"
                                             tmpWorkSheet.Cells(index + 1, 8).Value = item.SourceFile
                                             tmpWorkSheet.Cells(index + 1, 9).Value = item.Remark
 
@@ -990,6 +1004,14 @@ Public Class MainForm
 #Region "查看物料价格库"
     Private Sub ButtonItem9_Click(sender As Object, e As EventArgs) Handles ButtonItem9.Click
         Using tmpDialog As New ViewMaterialPriceInfoForm
+            tmpDialog.ShowDialog()
+        End Using
+    End Sub
+#End Region
+
+#Region "物料价格更新"
+    Private Sub ButtonItem10_Click_1(sender As Object, e As EventArgs) Handles ButtonItem10.Click
+        Using tmpDialog As New ReplaceMaterialPriceForm
             tmpDialog.ShowDialog()
         End Using
     End Sub

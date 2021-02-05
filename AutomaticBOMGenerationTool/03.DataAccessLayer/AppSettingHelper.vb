@@ -88,7 +88,7 @@ Public Class AppSettingHelper
                 instance._TempDownloadPath = IO.Path.Combine(
                     IO.Path.GetTempPath,
                     $"{{{instance.GUID}}}")
-                IO.Directory.CreateDirectory(IO.Path.Combine(IO.Path.GetTempPath, instance._TempDownloadPath))
+                IO.Directory.CreateDirectory(instance._TempDownloadPath)
 
                 '程序集文件版本
                 Dim assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location
@@ -108,8 +108,6 @@ Public Class AppSettingHelper
     Private Shared Sub LoadFromLocaltion()
         'Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 
-        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech")
-        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}")
         'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
         System.IO.Directory.CreateDirectory($".\Data")
 
@@ -136,8 +134,6 @@ Public Class AppSettingHelper
     Public Shared Sub SaveToLocaltion()
         'Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 
-        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech")
-        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}")
         'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
         System.IO.Directory.CreateDirectory($".\Data")
 
@@ -323,10 +319,5 @@ Public Class AppSettingHelper
     ''' </summary>
     <Newtonsoft.Json.JsonIgnore>
     Public ShowHideConfigurationNodeItems As Boolean = False
-
-    ''' <summary>
-    ''' 已经替换了价格的物料品号(大写)集合
-    ''' </summary>
-    Public ReplaceMaterialPricepIDItems As New HashSet(Of String)
 
 End Class

@@ -42,7 +42,7 @@
                                            item.pConfig,
                                            item.pUnit,
                                            item.pUnitPrice,
-                                           $"{item.UpdateDate:g}",
+                                           $"{item.UpdateDate:G}",
                                            item.SourceFile,
                                            item.Remark,
                                            "编辑",
