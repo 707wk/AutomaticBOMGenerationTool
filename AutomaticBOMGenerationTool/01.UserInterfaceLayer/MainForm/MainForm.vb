@@ -356,6 +356,10 @@ Public Class MainForm
 
         Chart1.Series(0).Points.Clear()
 
+        If AppSettingHelper.GetInstance.TotalPrice = 0 Then
+            Exit Sub
+        End If
+
         Dim tmpNodeItem = From item In AppSettingHelper.GetInstance.MaterialTotalPriceTable
                           Where item.Value * 100 / AppSettingHelper.GetInstance.TotalPrice >= AppSettingHelper.GetInstance.MinimumTotalPricePercentage
                           Select item

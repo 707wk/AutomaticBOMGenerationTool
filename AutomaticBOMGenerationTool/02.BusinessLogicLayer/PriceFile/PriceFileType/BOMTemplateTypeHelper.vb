@@ -80,7 +80,7 @@ Public NotInheritable Class BOMTemplateTypeHelper
                 Next
 
                 ''调试
-                'Using tmpSaveFileStream = New FileStream(value.SourceFilePath & "done.xlsx", FileMode.Create)
+                'Using tmpSaveFileStream = New FileStream(value.SourceFilePath & "_after.xlsx", FileMode.Create)
                 '    tmpExcelPackage.SaveAs(tmpSaveFileStream)
                 'End Using
 
@@ -112,7 +112,7 @@ Public NotInheritable Class BOMTemplateTypeHelper
         BOMlevelColumnID = headerLocation.X
         BOMMaterialRowMinID = headerLocation.Y + 2
         BOMpIDColumnID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "品 号").X
-        BOMLevelCount = BOMpIDColumnID - headerLocation.X
+        BOMLevelCount = BOMpIDColumnID - headerLocation.X - 1
 
         BOMMaterialRowMaxID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "版次").Y - 1
 
