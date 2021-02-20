@@ -52,6 +52,7 @@ Partial Class MainForm
         Me.ButtonItem7 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem9 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem8 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem10 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar1 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem2 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem3 = New DevComponents.DotNetBar.ButtonItem()
@@ -78,7 +79,6 @@ Partial Class MainForm
         Me.ExportAllBOMButton = New System.Windows.Forms.ToolStripButton()
         Me.DeleteButton = New System.Windows.Forms.ToolStripButton()
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.ButtonItem10 = New DevComponents.DotNetBar.ButtonItem()
         Me.GroupBox1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         Me.RibbonControl1.SuspendLayout()
@@ -139,27 +139,27 @@ Partial Class MainForm
         '
         Me.ToolStripSplitButton1.DropDownButtonWidth = 18
         Me.ToolStripSplitButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowHideItems})
-        Me.ToolStripSplitButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.fold_20px
+        Me.ToolStripSplitButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.expand_16px
         Me.ToolStripSplitButton1.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ToolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripSplitButton1.Name = "ToolStripSplitButton1"
-        Me.ToolStripSplitButton1.Size = New System.Drawing.Size(99, 24)
+        Me.ToolStripSplitButton1.Size = New System.Drawing.Size(95, 24)
         Me.ToolStripSplitButton1.Text = "全部展开"
         '
         'ShowHideItems
         '
         Me.ShowHideItems.CheckOnClick = True
         Me.ShowHideItems.Name = "ShowHideItems"
-        Me.ShowHideItems.Size = New System.Drawing.Size(136, 22)
+        Me.ShowHideItems.Size = New System.Drawing.Size(180, 22)
         Me.ShowHideItems.Text = "显示隐藏项"
         '
         'ToolStripButton2
         '
-        Me.ToolStripButton2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.expand_20px
+        Me.ToolStripButton2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.fold_16px
         Me.ToolStripButton2.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(80, 24)
+        Me.ToolStripButton2.Size = New System.Drawing.Size(76, 24)
         Me.ToolStripButton2.Text = "全部折叠"
         '
         'ToolStripSeparator2
@@ -416,6 +416,15 @@ Partial Class MainForm
         Me.ButtonItem8.Name = "ButtonItem8"
         Me.ButtonItem8.SubItemsExpandWidth = 14
         Me.ButtonItem8.Text = "清空" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "物料价格库..."
+        '
+        'ButtonItem10
+        '
+        Me.ButtonItem10.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem10.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.updatePrice_32px
+        Me.ButtonItem10.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem10.Name = "ButtonItem10"
+        Me.ButtonItem10.SubItemsExpandWidth = 14
+        Me.ButtonItem10.Text = "物料价格" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "更新工具"
         '
         'RibbonBar1
         '
@@ -717,15 +726,6 @@ Partial Class MainForm
         '
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
         Me.ContextMenuStrip1.Size = New System.Drawing.Size(61, 4)
-        '
-        'ButtonItem10
-        '
-        Me.ButtonItem10.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem10.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.updatePrice_32px
-        Me.ButtonItem10.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem10.Name = "ButtonItem10"
-        Me.ButtonItem10.SubItemsExpandWidth = 14
-        Me.ButtonItem10.Text = "物料价格" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "更新工具"
         '
         'MainForm
         '

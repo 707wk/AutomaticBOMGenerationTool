@@ -574,7 +574,8 @@ Public NotInheritable Class BOMTemplateHelper
                             .ID = Wangk.Resource.IDHelper.NewID,
                             .SortID = rootSortID,
                             .Name = tmpStr,
-                            .GroupID = .ID
+                            .GroupID = .ID,
+                            .Priority = 0
                         }
                         '查重
                         If LocalDatabaseHelper.GetConfigurationNodeInfoByName(tmpStr) IsNot Nothing Then

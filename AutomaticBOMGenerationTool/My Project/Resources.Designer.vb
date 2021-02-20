@@ -143,16 +143,6 @@ Namespace My.Resources
         '''<summary>
         '''  查找 System.Drawing.Bitmap 类型的本地化资源。
         '''</summary>
-        Friend ReadOnly Property expand_20px() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("expand_20px", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
-        '''</summary>
         Friend ReadOnly Property exportData_32px() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("exportData_32px", resourceCulture)
@@ -166,16 +156,6 @@ Namespace My.Resources
         Friend ReadOnly Property fold_16px() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("fold_16px", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
-        '''</summary>
-        Friend ReadOnly Property fold_20px() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("fold_20px", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

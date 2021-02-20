@@ -176,7 +176,8 @@ values(
 @Name,
 @SortID,
 @IsMaterial,
-@GroupID
+@GroupID,
+@Priority
 )"
             }
         cmd.Parameters.Add(New SQLiteParameter("@ID", DbType.String) With {.Value = value.ID})
@@ -184,6 +185,7 @@ values(
         cmd.Parameters.Add(New SQLiteParameter("@SortID", DbType.Int32) With {.Value = value.SortID})
         cmd.Parameters.Add(New SQLiteParameter("@IsMaterial", DbType.Boolean) With {.Value = value.IsMaterial})
         cmd.Parameters.Add(New SQLiteParameter("@GroupID", DbType.String) With {.Value = value.GroupID})
+        cmd.Parameters.Add(New SQLiteParameter("@Priority", DbType.Int32) With {.Value = value.Priority})
 
         cmd.ExecuteNonQuery()
 
@@ -406,7 +408,8 @@ values(
                     .SortID = reader(NameOf(ConfigurationNodeInfo.SortID)),
                     .Name = reader(NameOf(ConfigurationNodeInfo.Name)),
                     .IsMaterial = reader(NameOf(ConfigurationNodeInfo.IsMaterial)),
-                    .GroupID = reader(NameOf(ConfigurationNodeInfo.GroupID))
+                    .GroupID = reader(NameOf(ConfigurationNodeInfo.GroupID)),
+                    .Priority = reader(NameOf(ConfigurationNodeInfo.Priority))
                 })
             End While
         End Using
@@ -1100,6 +1103,87 @@ limit {pageSize} offset {(pageID - 1) * pageSize}"
 
         Return tmpList
     End Function
+#End Region
+
+#Region "计算配置节点优先级"
+    ''' <summary>
+    ''' 计算配置节点优先级
+    ''' </summary>
+    Public Shared Sub CalculateConfigurationNodePriority()
+
+        Dim parentPriority = 0
+
+        Do
+            UpdateChildConfigurationNodePriority(parentPriority)
+
+            If GetChildConfigurationNodeCount(parentPriority) <= 0 Then
+                Exit Do
+            End If
+
+            parentPriority += 1
+        Loop
+
+    End Sub
+
+#Region "获取某一优先级的子配置节点数"
+    ''' <summary>
+    ''' 获取某一优先级的子配置节点数
+    ''' </summary>
+    Private Shared Function GetChildConfigurationNodeCount(parentPriority As Integer) As Integer
+
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+                .CommandText = "select count(*)
+from (
+select DISTINCT MaterialLinkInfo.LinkNodeID
+from MaterialLinkInfo
+where MaterialLinkInfo.NodeID in (
+select ConfigurationNodeInfo.ID
+from ConfigurationNodeInfo
+where ConfigurationNodeInfo.Priority=@parentPriority
+)
+)"
+            }
+        cmd.Parameters.Add(New SQLiteParameter("@parentPriority", DbType.Int32) With {.Value = parentPriority})
+
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return reader(0)
+            End If
+        End Using
+
+        Return 0
+    End Function
+#End Region
+
+#Region "更新配置节点子节点优先级"
+    ''' <summary>
+    ''' 更新配置节点子节点优先级
+    ''' </summary>
+    Private Shared Sub UpdateChildConfigurationNodePriority(parentPriority As Integer)
+
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+                .CommandText = "update ConfigurationNodeInfo 
+set Priority=@childPriority
+where ID in (
+select DISTINCT ConfigurationNodeInfo.ID 
+from ConfigurationNodeInfo
+inner join MaterialLinkInfo
+on MaterialLinkInfo.LinkNodeID=ConfigurationNodeInfo.ID
+and MaterialLinkInfo.NodeID in (
+select ConfigurationNodeInfo.ID
+from ConfigurationNodeInfo
+where ConfigurationNodeInfo.Priority=@parentPriority
+)
+)"
+            }
+        cmd.Parameters.Add(New SQLiteParameter("@parentPriority", DbType.Int32) With {.Value = parentPriority})
+        cmd.Parameters.Add(New SQLiteParameter("@childPriority", DbType.Int32) With {.Value = parentPriority + 1})
+
+        cmd.ExecuteNonQuery()
+
+    End Sub
+#End Region
+
 #End Region
 
 End Class

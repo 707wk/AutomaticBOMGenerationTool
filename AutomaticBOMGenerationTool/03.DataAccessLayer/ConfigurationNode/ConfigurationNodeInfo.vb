@@ -22,6 +22,11 @@ Public Class ConfigurationNodeInfo
     Public GroupID As String
 
     ''' <summary>
+    ''' 优先级
+    ''' </summary>
+    Public Priority As Integer = -1
+
+    ''' <summary>
     ''' 单项总价
     ''' </summary>
     Public TotalPrice As Decimal

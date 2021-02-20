@@ -141,7 +141,7 @@ Public Class MainForm
                     }
 
                 tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                    Dim stepCount = 10
+                                    Dim stepCount = 11
 
                                     be.Write("清空数据库", 100 / stepCount * 0)
                                     LocalDatabaseHelper.Clear()
@@ -172,6 +172,9 @@ Public Class MainForm
 
                                     be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 9)
                                     LocalDatabaseHelper.SaveMaterialRowID(tmpRowIDList)
+
+                                    be.Write("计算配置节点优先级", 100 / stepCount * 10)
+                                    LocalDatabaseHelper.CalculateConfigurationNodePriority()
 
                                     '测试耗时
                                     'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 处理完成", 100 / stepCount * 10)
@@ -412,7 +415,8 @@ Public Class MainForm
                                                                     .SelectedValueID = item.SelectedValueID,
                                                                     .SelectedValue = item.SelectedValue,
                                                                     .IsMaterial = item.NodeInfo.IsMaterial,
-                                                                    .TotalPrice = item.NodeInfo.TotalPrice
+                                                                    .TotalPrice = item.NodeInfo.TotalPrice,
+                                                                    .ConfigurationNodePriority = item.NodeInfo.Priority
                                                                     }
                                                                     ).ToList
 
@@ -745,6 +749,8 @@ Public Class MainForm
             item.UpdateVisible()
         Next
 
+        UIFormHelper.ToastSuccess("界面更新完成")
+
     End Sub
 
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
@@ -764,7 +770,21 @@ Public Class MainForm
 
             Case 3
 #Region "查看配置"
-                UIFormHelper.ToastWarning("功能未开发")
+                Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = ExportBOMList.Rows(e.RowIndex).Tag
+
+                Dim tmpList = From item In tmpBOMConfigurationInfo.ConfigurationItems
+                              Order By item.ConfigurationNodePriority
+                              Select {item.ConfigurationNodeID, item.SelectedValueID}
+
+                For Each item In tmpList
+                    Dim tmpConfigurationNodeID = $"{item(0)}"
+                    Dim tmpSelectedValueID = $"{item(1)}"
+
+                    Dim tmpConfigurationNodeControl = AppSettingHelper.GetInstance.ConfigurationNodeControlTable(tmpConfigurationNodeID)
+
+                    tmpConfigurationNodeControl.SetValue(tmpSelectedValueID)
+
+                Next
 #End Region
 
             Case 4

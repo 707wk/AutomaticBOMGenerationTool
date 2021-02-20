@@ -59,13 +59,13 @@
             Dim tmpFontSize = e.Graphics.MeasureString("品号", Me.Font)
 
             If _Cache.pUnitPrice = 0 Then
-                e.Graphics.FillRectangle(ZeroUnitPriceSolidBrush, 0, 0, Me.Width, tmpFontSize.Height)
+                e.Graphics.FillRectangle(ZeroUnitPriceSolidBrush, 1, 1, Me.Width - 2, tmpFontSize.Height - 1)
             End If
 
             e.Graphics.DrawString($"{_Cache.pName}", Me.Font, TitleFontSolidBrush, 1, 1)
             e.Graphics.DrawString($"￥{_Cache.pUnitPrice}", Me.Font, TitleFontSolidBrush, Me.Width - 2, 1, StringFormatFar)
 
-            e.Graphics.DrawString($"品号 : {_Cache.pID}", OldFont, ContextFontSolidBrush, 1, tmpFontSize.Height + 1)
+            e.Graphics.DrawString($"品号 : {_Cache.pID}", OldFont, ContextFontSolidBrush, 1, tmpFontSize.Height * 1 + 1)
 
             e.Graphics.DrawString($"规格 : {_Cache.pConfig}", OldFont, ContextFontSolidBrush, New Rectangle(1, tmpFontSize.Height * 2 + 1, Me.Width - 2, Me.Height - tmpFontSize.Height * 2 - 2))
         End If

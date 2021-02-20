@@ -39,4 +39,5 @@ Public NotInheritable Class ImportMaterialPriceTableTypeHelper
             End Using
         End Using
     End Sub
+
 End Class

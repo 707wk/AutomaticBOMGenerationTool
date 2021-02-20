@@ -23,7 +23,8 @@
         Me.Refresh()
     End Sub
 
-    Private Shared ReadOnly TitleFontSolidBrush As New SolidBrush(Color.Black)
+    'Private Shared ReadOnly HeadFontSolidBrush As New SolidBrush(UIFormHelper.SuccessColor)
+    Private Shared ReadOnly TitleFontSolidBrush As New SolidBrush(Color.White)
     Private Shared ReadOnly ForegroundSolidBrush As New SolidBrush(UIFormHelper.SuccessColor)
     Private Shared ReadOnly BackgroundSolidBrush As New SolidBrush(Color.FromArgb(120, 120, 126))
     Private Shared ReadOnly StringFormatFar As New StringFormat() With {
@@ -33,6 +34,8 @@
     Private Shared ReadOnly OldFont As New Font("微软雅黑", 9)
 
     Private Sub ConfigurationNodeLabel_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
+
+        'e.Graphics.FillRectangle(HeadFontSolidBrush, 0, 0, 3, Me.Height)
 
         If NodeInfo IsNot Nothing AndAlso
             NodeInfo.IsMaterial Then

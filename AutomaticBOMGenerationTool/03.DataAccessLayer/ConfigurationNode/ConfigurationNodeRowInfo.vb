@@ -12,6 +12,10 @@ Public Class ConfigurationNodeRowInfo
     ''' 所属配置项名称
     ''' </summary>
     Public ConfigurationNodeName As String
+    ''' <summary>
+    ''' 所属配置项优先级
+    ''' </summary>
+    Public ConfigurationNodePriority As Integer
 
     ''' <summary>
     ''' 物料行号

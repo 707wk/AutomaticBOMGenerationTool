@@ -172,4 +172,5 @@ Public NotInheritable Class BOMCostingTemplateByWKTypeHelper
 
     End Function
 #End Region
+
 End Class

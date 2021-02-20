@@ -65,9 +65,9 @@
         FlowLayoutPanel1.Visible = CheckBox1.Checked
 
         If CheckBox1.Checked Then
-            CheckBox1.Image = My.Resources.fold_16px
-        Else
             CheckBox1.Image = My.Resources.expand_16px
+        Else
+            CheckBox1.Image = My.Resources.fold_16px
         End If
 
     End Sub

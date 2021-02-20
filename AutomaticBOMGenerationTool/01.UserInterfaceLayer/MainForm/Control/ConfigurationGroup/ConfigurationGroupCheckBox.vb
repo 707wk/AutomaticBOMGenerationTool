@@ -23,7 +23,7 @@
         Me.Refresh()
     End Sub
 
-    Private Shared ReadOnly TitleFontSolidBrush As New SolidBrush(Color.Black)
+    Private Shared ReadOnly TitleFontSolidBrush As New SolidBrush(Color.White)
     Private Shared ReadOnly ForegroundSolidBrush As New SolidBrush(UIFormHelper.NormalColor)
     Private Shared ReadOnly BackgroundSolidBrush As New SolidBrush(Color.FromArgb(120, 120, 126))
     Private Shared ReadOnly StringFormatFar As New StringFormat() With {

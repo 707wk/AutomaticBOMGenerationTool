@@ -344,4 +344,27 @@ Public Class ConfigurationNodeControl
 
     End Sub
 
+    Private Shared ReadOnly HeadFontSolidBrush As New SolidBrush(UIFormHelper.SuccessColor)
+    Private Sub ConfigurationNodeControl_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
+        e.Graphics.FillRectangle(HeadFontSolidBrush, 0, 0, 3, Me.Height)
+    End Sub
+
+    ''' <summary>
+    ''' 设置选中值
+    ''' </summary>
+    Public Sub SetValue(valueID As String)
+
+        If String.IsNullOrWhiteSpace(valueID) Then
+            Exit Sub
+        End If
+
+        For Each item As MaterialInfoControl In FlowLayoutPanel1.Controls
+            If item.ID = valueID Then
+                item.Checked = True
+                Exit Sub
+            End If
+        Next
+
+    End Sub
+
 End Class
