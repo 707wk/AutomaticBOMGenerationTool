@@ -1052,7 +1052,6 @@ Public NotInheritable Class BOMTemplateHelper
                     '记录
                     For Each tmpItem In tmpMarkLocations
                         tmpList.Add(New ConfigurationNodeRowInfo With {
-                            .ID = Wangk.Resource.IDHelper.NewID,
                             .ConfigurationNodeID = item.ID,
                             .MaterialRowID = tmpItem
                             })
@@ -1175,6 +1174,8 @@ Public NotInheritable Class BOMTemplateHelper
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                ReadBOMInfo(tmpExcelPackage)
 
                 ReplaceMaterial(tmpExcelPackage, values)
 

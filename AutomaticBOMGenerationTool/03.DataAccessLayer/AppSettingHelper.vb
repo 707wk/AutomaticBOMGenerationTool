@@ -78,6 +78,17 @@ Public Class AppSettingHelper
     Public Shared ReadOnly Property GetInstance As AppSettingHelper
         Get
             If instance Is Nothing Then
+
+                '序列化默认设置
+                JsonConvert.DefaultSettings = New Func(Of JsonSerializerSettings)(Function()
+
+                                                                                      Dim tmpSettings = New Newtonsoft.Json.JsonSerializerSettings
+                                                                                      '忽略值为Null的字段
+                                                                                      tmpSettings.NullValueHandling = NullValueHandling.Ignore
+
+                                                                                      Return tmpSettings
+                                                                                  End Function)
+
                 LoadFromLocaltion()
 
                 '程序集GUID
@@ -275,32 +286,39 @@ Public Class AppSettingHelper
     ''' <summary>
     ''' 当前BOM最大阶层数
     ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
     Public BOMLevelCount As Integer
     ''' <summary>
     ''' 当前BOM阶层首层所在列ID
     ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
     Public BOMlevelColumnID As Integer
     ''' <summary>
     ''' 当前BOM品号所在列ID
     ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
     Public BOMpIDColumnID As Integer
     ''' <summary>
     ''' 当前BOM备注所在列ID
     ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
     Public BOMRemarkColumnID As Integer
 
     ''' <summary>
     ''' BOM第一个物料行号
     ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
     Public BOMMaterialRowMinID As Integer
     ''' <summary>
     ''' BOM最后一个物料行号
     ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
     Public BOMMaterialRowMaxID As Integer
 
     ''' <summary>
     ''' 总价
     ''' </summary>
+    <Newtonsoft.Json.JsonIgnore>
     Public TotalPrice As Decimal
 
     ''' <summary>

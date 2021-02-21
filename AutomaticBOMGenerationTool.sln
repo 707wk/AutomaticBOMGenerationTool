@@ -18,6 +18,7 @@ Global
 		{9E4E04FC-47A6-4A71-AC39-A3AD4EF6E78E}.Debug|x86.Build.0 = Debug|x86
 		{9E4E04FC-47A6-4A71-AC39-A3AD4EF6E78E}.Release|Any CPU.ActiveCfg = Release|x86
 		{9E4E04FC-47A6-4A71-AC39-A3AD4EF6E78E}.Release|x86.ActiveCfg = Release|x86
+		{9E4E04FC-47A6-4A71-AC39-A3AD4EF6E78E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

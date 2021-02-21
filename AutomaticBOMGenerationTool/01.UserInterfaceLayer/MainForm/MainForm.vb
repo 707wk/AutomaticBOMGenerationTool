@@ -9,7 +9,8 @@ Public Class MainForm
 
 #Region "样式初始化"
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.GetInstance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit"
+
+        Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.GetInstance.ProductVersion}"
 
         '设置使用方式为个人使用
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial
@@ -1094,6 +1095,21 @@ Public Class MainForm
             tmpDialog.ShowDialog()
         End Using
     End Sub
+
 #End Region
+
+    Private Sub ButtonItem11_Click(sender As Object, e As EventArgs) Handles ButtonItem11.Click
+        UIFormHelper.ToastWarning("功能未开发")
+    End Sub
+
+    Private Sub ButtonItem12_Click(sender As Object, e As EventArgs) Handles ButtonItem12.Click
+        UIFormHelper.ToastWarning("功能未开发")
+    End Sub
+
+    Private Sub ButtonItem13_Click(sender As Object, e As EventArgs) Handles ButtonItem13.Click
+        Using tmpDialog As New AboutForm
+            tmpDialog.ShowDialog()
+        End Using
+    End Sub
 
 End Class

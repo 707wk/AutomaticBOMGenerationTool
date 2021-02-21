@@ -63,6 +63,16 @@ Namespace My.Resources
         '''<summary>
         '''  查找 System.Drawing.Bitmap 类型的本地化资源。
         '''</summary>
+        Friend ReadOnly Property about() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("about", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
+        '''</summary>
         Friend ReadOnly Property add_20px() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("add_20px", resourceCulture)
@@ -153,6 +163,16 @@ Namespace My.Resources
         '''<summary>
         '''  查找 System.Drawing.Bitmap 类型的本地化资源。
         '''</summary>
+        Friend ReadOnly Property exportFile_20px() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("exportFile_20px", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
+        '''</summary>
         Friend ReadOnly Property fold_16px() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("fold_16px", resourceCulture)
@@ -186,6 +206,16 @@ Namespace My.Resources
         Friend ReadOnly Property link_32px() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("link_32px", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
+        '''</summary>
+        Friend ReadOnly Property logo() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("logo", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -263,19 +293,9 @@ Namespace My.Resources
         '''<summary>
         '''  查找 System.Drawing.Bitmap 类型的本地化资源。
         '''</summary>
-        Friend ReadOnly Property save_20px() As System.Drawing.Bitmap
+        Friend ReadOnly Property saveAsFile_32px() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("save_20px", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
-        '''</summary>
-        Friend ReadOnly Property saveFile_20px() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("saveFile_20px", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("saveAsFile_32px", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

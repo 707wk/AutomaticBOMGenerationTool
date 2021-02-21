@@ -129,6 +129,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.Designer.vb">
+      <DependentUpon>AboutForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ConfigurationNodeNameSelectedForm.Designer.vb">
       <DependentUpon>ConfigurationNodeNameSelectedForm.vb</DependentUpon>
     </Compile>
@@ -245,6 +251,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.resx">
+      <DependentUpon>AboutForm.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ConfigurationNodeNameSelectedForm.resx">
       <DependentUpon>ConfigurationNodeNameSelectedForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -321,6 +330,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\logo.png" />
+    <None Include="res\about.png" />
+    <None Include="res\saveAsFile_32px.png" />
+    <None Include="res\exportFile_20px.png" />
     <None Include="res\updatePrice_32px.png" />
     <None Include="res\pagePrevious_16px.png" />
     <None Include="res\pageNext_16px.png" />
@@ -331,7 +344,6 @@
     <None Include="res\exportData_32px.png" />
     <None Include="res\importData_32px.png" />
     <None Include="res\copy_20px.png" />
-    <None Include="res\save_20px.png" />
     <None Include="res\message_32px.png" />
     <None Include="res\link_32px.png" />
     <None Include="Data\ConfigurationRule.txt">
@@ -343,7 +355,6 @@
     <None Include="res\expand_16px.png" />
     <None Include="res\book_32px.png" />
     <None Include="res\help_32px.png" />
-    <None Include="res\saveFile_20px.png" />
     <None Include="res\setting_32px.png" />
     <None Include="res\all_32px.png" />
     <None Include="res\analysis_32px.png" />

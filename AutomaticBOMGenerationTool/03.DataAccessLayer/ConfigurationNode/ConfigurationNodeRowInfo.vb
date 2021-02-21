@@ -2,7 +2,6 @@
 ''' 配置项选中项的位置信息
 ''' </summary>
 Public Class ConfigurationNodeRowInfo
-    Public ID As String
 
     ''' <summary>
     ''' 所属配置项ID
