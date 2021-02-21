@@ -47,7 +47,6 @@ Public NotInheritable Class UIFormHelper
         End With
 
         Return tmpColumn
-
     End Function
 #End Region
 

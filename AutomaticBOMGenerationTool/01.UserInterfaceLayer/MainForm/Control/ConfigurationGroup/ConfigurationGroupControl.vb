@@ -5,32 +5,26 @@
     Private ReadOnly NodeHashset As New HashSet(Of String)
 
     ''' <summary>
-    ''' 分组内总价
+    ''' 更新单项总价及占比
     ''' </summary>
-    Public Property GroupPrice() As Decimal
-        Get
-            Return CacheGroupInfo.GroupPrice
-        End Get
-        Set(ByVal value As Decimal)
-            CacheGroupInfo.GroupPrice = value
+    Public Sub UpdatePrice(nodeID As String, price As Decimal, pricePercentage As Decimal)
 
-            CheckBox1.Refresh()
-        End Set
-    End Property
+        If CacheGroupInfo.PriceList.ContainsKey(nodeID) Then
+            CacheGroupInfo.PriceList(nodeID) = price
+            CacheGroupInfo.PricePercentageList(nodeID) = pricePercentage
+        Else
+            CacheGroupInfo.PriceList.Add(nodeID, price)
+            CacheGroupInfo.PricePercentageList.Add(nodeID, pricePercentage)
+        End If
 
-    ''' <summary>
-    ''' 分组内总价占总价的百分比
-    ''' </summary>
-    Public Property GroupTotalPricePercentage As Decimal
-        Get
-            Return CacheGroupInfo.GroupTotalPricePercentage
-        End Get
-        Set(ByVal value As Decimal)
-            CacheGroupInfo.GroupTotalPricePercentage = value
+        CacheGroupInfo.GroupPrice = Aggregate item In CacheGroupInfo.PriceList
+                                        Into Sum(item.Value)
 
-            CheckBox1.Refresh()
-        End Set
-    End Property
+        CacheGroupInfo.GroupTotalPricePercentage = Aggregate item In CacheGroupInfo.PricePercentageList
+                                                       Into Sum(item.Value)
+
+        CheckBox1.Refresh()
+    End Sub
 
     ''' <summary>
     ''' 更新标题

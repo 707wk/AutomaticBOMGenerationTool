@@ -25,6 +25,9 @@ Partial Class MainForm
         Me.components = New System.ComponentModel.Container()
         Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
         Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
@@ -67,18 +70,22 @@ Partial Class MainForm
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
-        Me.Chart1 = New System.Windows.Forms.DataVisualization.Charting.Chart()
+        Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripLabel3 = New System.Windows.Forms.ToolStripLabel()
         Me.MinimumTotalPricePercentage = New System.Windows.Forms.ToolStripComboBox()
         Me.ToolStripLabel2 = New System.Windows.Forms.ToolStripLabel()
+        Me.Chart1 = New System.Windows.Forms.DataVisualization.Charting.Chart()
+        Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ExportBOMList = New Wangk.Resource.CheckBoxDataGridView()
         Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
         Me.ExportAllBOMButton = New System.Windows.Forms.ToolStripButton()
         Me.DeleteButton = New System.Windows.Forms.ToolStripButton()
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.CheckBoxDataGridView1 = New Wangk.Resource.CheckBoxDataGridView()
         Me.GroupBox1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         Me.RibbonControl1.SuspendLayout()
@@ -93,11 +100,15 @@ Partial Class MainForm
         Me.SplitContainer2.Panel2.SuspendLayout()
         Me.SplitContainer2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
-        CType(Me.Chart1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
         Me.ToolStrip3.SuspendLayout()
+        CType(Me.Chart1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage2.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.ExportBOMList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip2.SuspendLayout()
+        CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'ConfigurationGroupList
@@ -150,7 +161,7 @@ Partial Class MainForm
         '
         Me.ShowHideItems.CheckOnClick = True
         Me.ShowHideItems.Name = "ShowHideItems"
-        Me.ShowHideItems.Size = New System.Drawing.Size(180, 22)
+        Me.ShowHideItems.Size = New System.Drawing.Size(136, 22)
         Me.ShowHideItems.Text = "显示隐藏项"
         '
         'ToolStripButton2
@@ -567,8 +578,7 @@ Partial Class MainForm
         '
         'GroupBox3
         '
-        Me.GroupBox3.Controls.Add(Me.Chart1)
-        Me.GroupBox3.Controls.Add(Me.ToolStrip3)
+        Me.GroupBox3.Controls.Add(Me.TabControl1)
         Me.GroupBox3.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBox3.ForeColor = System.Drawing.Color.White
         Me.GroupBox3.Location = New System.Drawing.Point(0, 0)
@@ -578,40 +588,40 @@ Partial Class MainForm
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "物料价格占比"
         '
-        'Chart1
+        'TabControl1
         '
-        Me.Chart1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        ChartArea1.Area3DStyle.Enable3D = True
-        ChartArea1.Area3DStyle.Inclination = 1
-        ChartArea1.Area3DStyle.Rotation = 0
-        ChartArea1.Area3DStyle.WallWidth = 1
-        ChartArea1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        ChartArea1.Name = "ChartArea1"
-        Me.Chart1.ChartAreas.Add(ChartArea1)
-        Me.Chart1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Chart1.Location = New System.Drawing.Point(3, 46)
-        Me.Chart1.Name = "Chart1"
-        Series1.ChartArea = "ChartArea1"
-        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Doughnut
-        Series1.CustomProperties = "PieLineColor=DimGray, PieLabelStyle=Outside"
-        Series1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        Series1.LabelForeColor = System.Drawing.Color.White
-        Series1.Name = "Series1"
-        Series1.SmartLabelStyle.IsMarkerOverlappingAllowed = True
-        Me.Chart1.Series.Add(Series1)
-        Me.Chart1.Size = New System.Drawing.Size(639, 346)
-        Me.Chart1.TabIndex = 0
-        Me.Chart1.Text = "Chart1"
+        Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TabControl1.ItemSize = New System.Drawing.Size(120, 22)
+        Me.TabControl1.Location = New System.Drawing.Point(3, 19)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(639, 373)
+        Me.TabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed
+        Me.TabControl1.TabIndex = 2
+        '
+        'TabPage1
+        '
+        Me.TabPage1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.TabPage1.Controls.Add(Me.Chart1)
+        Me.TabPage1.Controls.Add(Me.ToolStrip3)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage1.Size = New System.Drawing.Size(631, 343)
+        Me.TabPage1.TabIndex = 0
+        Me.TabPage1.Text = "价格占比饼图"
         '
         'ToolStrip3
         '
         Me.ToolStrip3.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.ToolStrip3.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3, Me.ToolStripLabel3, Me.MinimumTotalPricePercentage, Me.ToolStripLabel2})
-        Me.ToolStrip3.Location = New System.Drawing.Point(3, 19)
+        Me.ToolStrip3.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip3.Name = "ToolStrip3"
-        Me.ToolStrip3.Size = New System.Drawing.Size(639, 27)
-        Me.ToolStrip3.TabIndex = 1
+        Me.ToolStrip3.Size = New System.Drawing.Size(625, 27)
+        Me.ToolStrip3.TabIndex = 2
         Me.ToolStrip3.Text = "ToolStrip3"
         '
         'ToolStripButton3
@@ -646,6 +656,42 @@ Partial Class MainForm
         Me.ToolStripLabel2.Size = New System.Drawing.Size(104, 24)
         Me.ToolStripLabel2.Text = "隐藏价格占比低于"
         '
+        'Chart1
+        '
+        Me.Chart1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        ChartArea1.Area3DStyle.Enable3D = True
+        ChartArea1.Area3DStyle.Inclination = 1
+        ChartArea1.Area3DStyle.Rotation = 0
+        ChartArea1.Area3DStyle.WallWidth = 1
+        ChartArea1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        ChartArea1.Name = "ChartArea1"
+        Me.Chart1.ChartAreas.Add(ChartArea1)
+        Me.Chart1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Chart1.Location = New System.Drawing.Point(3, 30)
+        Me.Chart1.Name = "Chart1"
+        Series1.ChartArea = "ChartArea1"
+        Series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Doughnut
+        Series1.CustomProperties = "PieLineColor=DimGray, PieLabelStyle=Outside"
+        Series1.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Series1.LabelForeColor = System.Drawing.Color.White
+        Series1.Name = "Series1"
+        Series1.SmartLabelStyle.IsMarkerOverlappingAllowed = True
+        Me.Chart1.Series.Add(Series1)
+        Me.Chart1.Size = New System.Drawing.Size(625, 310)
+        Me.Chart1.TabIndex = 0
+        Me.Chart1.Text = "Chart1"
+        '
+        'TabPage2
+        '
+        Me.TabPage2.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.TabPage2.Controls.Add(Me.CheckBoxDataGridView1)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage2.Size = New System.Drawing.Size(631, 343)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "价格占比列表"
+        '
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.ExportBOMList)
@@ -663,32 +709,32 @@ Partial Class MainForm
         '
         Me.ExportBOMList.AllowUserToAddRows = False
         Me.ExportBOMList.AllowUserToDeleteRows = False
-        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control
-        Me.ExportBOMList.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control
+        Me.ExportBOMList.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle4
         Me.ExportBOMList.BackgroundColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.ExportBOMList.BorderStyle = System.Windows.Forms.BorderStyle.None
-        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle2.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ExportBOMList.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle5.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.ExportBOMList.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle5
         Me.ExportBOMList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.ExportBOMList.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ExportBOMList.GridColor = System.Drawing.Color.FromArgb(CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer))
         Me.ExportBOMList.Location = New System.Drawing.Point(3, 46)
         Me.ExportBOMList.Name = "ExportBOMList"
         Me.ExportBOMList.ReadOnly = True
-        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-        DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle3.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        DataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ExportBOMList.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
+        DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+        DataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle6.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.ExportBOMList.RowHeadersDefaultCellStyle = DataGridViewCellStyle6
         Me.ExportBOMList.RowTemplate.Height = 30
         Me.ExportBOMList.Size = New System.Drawing.Size(1378, 163)
         Me.ExportBOMList.TabIndex = 0
@@ -727,6 +773,40 @@ Partial Class MainForm
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
         Me.ContextMenuStrip1.Size = New System.Drawing.Size(61, 4)
         '
+        'CheckBoxDataGridView1
+        '
+        Me.CheckBoxDataGridView1.AllowUserToAddRows = False
+        Me.CheckBoxDataGridView1.AllowUserToDeleteRows = False
+        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control
+        Me.CheckBoxDataGridView1.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
+        Me.CheckBoxDataGridView1.BackgroundColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.CheckBoxDataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None
+        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.CheckBoxDataGridView1.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
+        Me.CheckBoxDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.CheckBoxDataGridView1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.CheckBoxDataGridView1.GridColor = System.Drawing.Color.FromArgb(CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer))
+        Me.CheckBoxDataGridView1.Location = New System.Drawing.Point(3, 3)
+        Me.CheckBoxDataGridView1.Name = "CheckBoxDataGridView1"
+        Me.CheckBoxDataGridView1.ReadOnly = True
+        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+        DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle3.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
+        Me.CheckBoxDataGridView1.RowTemplate.Height = 30
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 337)
+        Me.CheckBoxDataGridView1.TabIndex = 0
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
@@ -761,15 +841,19 @@ Partial Class MainForm
         CType(Me.SplitContainer2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer2.ResumeLayout(False)
         Me.GroupBox3.ResumeLayout(False)
-        Me.GroupBox3.PerformLayout()
-        CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPage1.ResumeLayout(False)
+        Me.TabPage1.PerformLayout()
         Me.ToolStrip3.ResumeLayout(False)
         Me.ToolStrip3.PerformLayout()
+        CType(Me.Chart1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage2.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.ExportBOMList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip2.ResumeLayout(False)
         Me.ToolStrip2.PerformLayout()
+        CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -811,11 +895,6 @@ Partial Class MainForm
     Friend WithEvents SplitContainer2 As SplitContainer
     Friend WithEvents GroupBox3 As GroupBox
     Friend WithEvents Chart1 As DataVisualization.Charting.Chart
-    Friend WithEvents ToolStrip3 As ToolStrip
-    Friend WithEvents ToolStripButton3 As ToolStripButton
-    Friend WithEvents ToolStripLabel2 As ToolStripLabel
-    Friend WithEvents ToolStripLabel3 As ToolStripLabel
-    Friend WithEvents MinimumTotalPricePercentage As ToolStripComboBox
     Friend WithEvents ButtonItem7 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents ToolStripSplitButton1 As ToolStripSplitButton
     Friend WithEvents ShowHideItems As ToolStripMenuItem
@@ -824,4 +903,13 @@ Partial Class MainForm
     Friend WithEvents ToolStripStatusLabel3 As ToolStripStatusLabel
     Friend WithEvents ButtonItem9 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents ButtonItem10 As DevComponents.DotNetBar.ButtonItem
+    Friend WithEvents TabControl1 As TabControl
+    Friend WithEvents TabPage1 As TabPage
+    Friend WithEvents ToolStrip3 As ToolStrip
+    Friend WithEvents ToolStripButton3 As ToolStripButton
+    Friend WithEvents ToolStripLabel3 As ToolStripLabel
+    Friend WithEvents MinimumTotalPricePercentage As ToolStripComboBox
+    Friend WithEvents ToolStripLabel2 As ToolStripLabel
+    Friend WithEvents TabPage2 As TabPage
+    Friend WithEvents CheckBoxDataGridView1 As Wangk.Resource.CheckBoxDataGridView
 End Class

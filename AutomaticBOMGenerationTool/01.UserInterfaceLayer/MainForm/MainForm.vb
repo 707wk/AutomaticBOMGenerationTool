@@ -1,5 +1,6 @@
 ﻿Imports System.Data.Common
 Imports System.Data.SQLite
+Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports OfficeOpenXml
@@ -26,14 +27,14 @@ Public Class MainForm
             .DefaultCellStyle.WrapMode = DataGridViewTriState.True
             .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
             .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
 
-
-            ExportBOMList.Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .Width = 900})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .Width = 900})
             Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "总价", .Width = 120}
             tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            ExportBOMList.Columns.Add(tmpDataGridViewTextBoxColumn)
-            ExportBOMList.Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
-            ExportBOMList.Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.ErrorColor))
+            .Columns.Add(tmpDataGridViewTextBoxColumn)
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.ErrorColor))
 
             .EnableHeadersVisualStyles = False
             .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
@@ -52,6 +53,35 @@ Public Class MainForm
         For i001 = 1 To 10
             MinimumTotalPricePercentage.Items.Add(i001 * 1D)
         Next
+
+        '价格占比列表
+        With CheckBoxDataGridView1
+            .ReadOnly = True
+            .ColumnHeadersDefaultCellStyle.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
+            .RowHeadersWidth = 80
+
+            .DefaultCellStyle.WrapMode = DataGridViewTriState.True
+            .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "物料项", .Width = 300})
+            Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "价格", .Width = 100}
+            tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            .Columns.Add(tmpDataGridViewTextBoxColumn)
+            tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "比例", .Width = 60}
+            tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+            .Columns.Add(tmpDataGridViewTextBoxColumn)
+
+            .EnableHeadersVisualStyles = False
+            .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
+            .RowHeadersDefaultCellStyle.ForeColor = Color.White
+            .RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single
+            .DefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48)
+            .GridColor = Color.FromArgb(45, 45, 48)
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
+
+        End With
 
         Dim selectedID = MinimumTotalPricePercentage.Items.IndexOf(AppSettingHelper.GetInstance.MinimumTotalPricePercentage)
         MinimumTotalPricePercentage.SelectedIndex = If(selectedID > -1, selectedID, 0)
@@ -332,17 +362,13 @@ Public Class MainForm
             item.UpdateTotalPrice()
         Next
 
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.GroupPrice = 0
-            item.GroupTotalPricePercentage = 0
-        Next
-
         For Each nodeitem In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
-            nodeitem.GroupControl.GroupPrice += nodeitem.NodeInfo.TotalPrice
-            nodeitem.GroupControl.GroupTotalPricePercentage += nodeitem.NodeInfo.TotalPricePercentage
+            nodeitem.GroupControl.UpdatePrice(nodeitem.NodeInfo.ID, nodeitem.NodeInfo.TotalPrice, nodeitem.NodeInfo.TotalPricePercentage)
         Next
 
         ShowTotalPrice()
+
+        ShowTotalList()
 
         UIFormHelper.ToastSuccess($"{Now:HH:mm:ss} 价格更新完成", timeoutInterval:=1000)
 
@@ -385,6 +411,35 @@ Public Class MainForm
 (￥{tmpOtherTotalPrice:n2})"
                                                     })
         End If
+
+    End Sub
+#End Region
+
+#Region "显示单项价格占比列表"
+    ''' <summary>
+    ''' 显示单项价格占比列表
+    ''' </summary>
+    Private Sub ShowTotalList()
+
+        CheckBoxDataGridView1.Rows.Clear()
+
+        If AppSettingHelper.GetInstance.TotalPrice = 0 Then
+            Exit Sub
+        End If
+
+        Dim tmpNodeItem = From item In AppSettingHelper.GetInstance.MaterialTotalPriceTable
+                          Select item
+                          Order By item.Value Descending
+
+        For Each item In tmpNodeItem
+            CheckBoxDataGridView1.Rows.Add({False, item.Key, $"￥{item.Value:n2}", $"{item.Value * 100 / AppSettingHelper.GetInstance.TotalPrice:n1}%"})
+            '            Chart1.Series(0).Points.Add(New DataPoint() With {
+            '                                        .YValues = {item.Value},
+            '                                        .AxisLabel = $"{item.Key}
+            '({item.Value * 100 / AppSettingHelper.GetInstance.TotalPrice:n1}%,￥{item.Value:n2})"
+            '                                        })
+
+        Next
 
     End Sub
 #End Region
