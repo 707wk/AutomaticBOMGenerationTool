@@ -1049,6 +1049,7 @@ Public Class BOMTemplateHelper
         countStack.Push(1)
         Dim lastLevel = 1
         tmpWorkSheet.Cells(MaterialRowMinID, tmpCountColumnID).Value = 1
+
         For rID = MaterialRowMinID + 1 To MaterialRowMaxID
 
             Dim nowLevel = GetLevel(wb, rID)
@@ -1641,7 +1642,7 @@ Public Class BOMTemplateHelper
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
         '从最底层纵向倒序遍历
-        For levelID = LevelCount To 1 Step -1
+        For levelID = LevelCount To 2 Step -1
 
             Dim tmpUnitPrice As Decimal = 0
 
@@ -2048,13 +2049,13 @@ Public Class BOMTemplateHelper
                         Else
                             '不存在值
                             item.MissingConfigurationNodeValueInfoList.Add(tmpSelectedValue)
+                            item.MissingConfigurationNodeInfoList.Add(nodeItem.Name)
                         End If
 
                     End If
 
                 Else
                     '不存在配置项
-
                     item.MissingConfigurationNodeInfoList.Add(nodeItem.Name)
 
                 End If

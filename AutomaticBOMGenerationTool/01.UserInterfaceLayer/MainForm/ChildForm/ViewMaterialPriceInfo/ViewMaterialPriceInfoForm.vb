@@ -45,8 +45,8 @@
                                            $"{item.UpdateDate:G}",
                                            item.SourceFile,
                                            item.Remark,
-                                           "编辑",
-                                           "删除..."})
+                                           "[编辑]",
+                                           "[删除...]"})
         Next
 
     End Sub

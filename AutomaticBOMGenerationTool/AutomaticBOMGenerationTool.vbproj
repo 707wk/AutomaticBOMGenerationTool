@@ -73,8 +73,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DevComponents.DotNetBar2, Version=14.1.0.0, Culture=neutral, PublicKeyToken=7eb7c3a35b91de04, processorArchitecture=MSIL" />
-    <Reference Include="EPPlus, Version=5.5.4.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
-      <HintPath>..\packages\EPPlus.5.5.4\lib\net45\EPPlus.dll</HintPath>
+    <Reference Include="EPPlus, Version=5.5.5.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.5.5.5\lib\net45\EPPlus.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -166,6 +166,12 @@
       <DependentUpon>ShowTxtContentForm.vb</DependentUpon>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewBOMConfigurationInfoForm.Designer.vb">
+      <DependentUpon>ViewBOMConfigurationInfoForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewBOMConfigurationInfoForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewMaterialPriceInfo\ChildForm\EditMaterialPriceInfoForm.Designer.vb">
@@ -274,6 +280,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ShowTxtContentForm.resx">
       <DependentUpon>ShowTxtContentForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewBOMConfigurationInfoForm.resx">
+      <DependentUpon>ViewBOMConfigurationInfoForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewMaterialPriceInfo\ChildForm\EditMaterialPriceInfoForm.resx">
       <DependentUpon>EditMaterialPriceInfoForm.vb</DependentUpon>

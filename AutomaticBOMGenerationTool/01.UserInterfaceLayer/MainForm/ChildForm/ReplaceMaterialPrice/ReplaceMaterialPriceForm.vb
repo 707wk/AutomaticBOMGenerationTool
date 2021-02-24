@@ -37,7 +37,7 @@
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
         Using tmpDialog As New OpenFileDialog With {
-                           .Filter = "BON模板文件|*.xlsx",
+                           .Filter = "BOM模板文件|*.xlsx",
                            .Multiselect = False
                        }
 
@@ -94,7 +94,7 @@
                                            item.SourceFile,
                                            item.UpdateDate,
                                            item.Remark,
-                                           "移除"})
+                                           "[移除]"})
                 CheckBoxDataGridView1.Rows(CheckBoxDataGridView1.Rows.Count - 1).Tag = item
             Next
 
@@ -106,7 +106,7 @@
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Using tmpDialog As New SaveFileDialog With {
-            .Filter = "BON模板文件|*.xlsx",
+            .Filter = "BOM模板文件|*.xlsx",
             .FileName = Now.ToString("yyyyMMddHHmmssfff")
         }
             If tmpDialog.ShowDialog() <> DialogResult.OK Then

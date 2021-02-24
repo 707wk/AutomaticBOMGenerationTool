@@ -720,7 +720,7 @@ Partial Class MainForm
         Me.TabPage2.Location = New System.Drawing.Point(4, 26)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(631, 320)
+        Me.TabPage2.Size = New System.Drawing.Size(631, 345)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "价格占比列表"
         '
@@ -755,7 +755,7 @@ Partial Class MainForm
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 314)
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 339)
         Me.CheckBoxDataGridView1.TabIndex = 0
         '
         'GroupBox2

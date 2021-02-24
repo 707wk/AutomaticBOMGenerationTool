@@ -41,7 +41,7 @@
                                            item.pUnitPriceOld,
                                            item.SourceFileOld,
                                            item.UpdateDateOld,
-                                           "移除"})
+                                           "[移除]"})
         Next
 
     End Sub

@@ -2,6 +2,7 @@
 Imports System.Data.SQLite
 Imports System.Drawing.Drawing2D
 Imports System.IO
+Imports System.Text
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports OfficeOpenXml
 
@@ -41,6 +42,7 @@ Public Class MainForm
             .Columns.Add(tmpDataGridViewTextBoxColumn)
 
             .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.NormalColor))
             .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.ErrorColor))
 
 
@@ -118,7 +120,7 @@ Public Class MainForm
 #Region "选择BOM模板文件"
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles ButtonItem2.Click
         Using tmpDialog As New OpenFileDialog With {
-            .Filter = "BON模板文件|*.xlsx",
+            .Filter = "BOM模板文件|*.xlsx",
             .Multiselect = False
         }
 
@@ -260,8 +262,9 @@ Public Class MainForm
                                    $"￥{item.UnitPrice:n4}",
                                    If(item.HaveMissingValue, $"缺失配置项: {String.Join(",", item.MissingConfigurationNodeInfoList)}
 缺失选项值: {String.Join(",", item.MissingConfigurationNodeValueInfoList)}", ""),
-                                   If(item.HaveMissingValue, Nothing, "查看配置"),
-                                   "移除"})
+                                   "[查看选项信息]",
+                                   If(item.HaveMissingValue, Nothing, "[查看配置]"),
+                                   "[移除]"})
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = item
         Next
     End Sub
@@ -549,8 +552,9 @@ Public Class MainForm
                                    tmpBOMConfigurationInfo.Name,
                                    $"￥{tmpBOMConfigurationInfo.UnitPrice:n4}",
                                    "",
-                                   "查看配置",
-                                   "移除"})
+                                   "[查看选项信息]",
+                                   "[查看配置]",
+                                   "[移除]"})
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpBOMConfigurationInfo
 
         End Using
@@ -563,7 +567,7 @@ Public Class MainForm
         Dim outputFilePath As String
 
         Using tmpDialog As New SaveFileDialog With {
-            .Filter = "BON文件|*.xlsx",
+            .Filter = "BOM文件|*.xlsx",
             .FileName = Now.ToString("yyyyMMddHHmmssfff")
         }
             If tmpDialog.ShowDialog() <> DialogResult.OK Then
@@ -851,6 +855,8 @@ Public Class MainForm
     End Sub
 #End Region
 
+    Public tmpViewBOMConfigurationInfoForm As ViewBOMConfigurationInfoForm
+
     Private Sub ExportBOMList_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles ExportBOMList.CellContentClick
         If e.RowIndex < 0 Then
             Exit Sub
@@ -859,6 +865,17 @@ Public Class MainForm
         Select Case e.ColumnIndex
 
             Case 4
+#Region "查看选项信息"
+                Dim BOMConfigurationInfoItem = ExportBOMList.Rows(e.RowIndex).Tag
+
+                If tmpViewBOMConfigurationInfoForm Is Nothing Then
+                    tmpViewBOMConfigurationInfoForm = New ViewBOMConfigurationInfoForm
+                    tmpViewBOMConfigurationInfoForm.Owner = Me
+                End If
+
+                tmpViewBOMConfigurationInfoForm.CacheBOMConfigurationInfo = BOMConfigurationInfoItem
+#End Region
+            Case 5
 #Region "查看配置"
                 Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = ExportBOMList.Rows(e.RowIndex).Tag
 
@@ -877,7 +894,7 @@ Public Class MainForm
                 Next
 #End Region
 
-            Case 5
+            Case 6
 #Region "移除"
                 If MsgBox($"确定移除 {ExportBOMList.Rows(e.RowIndex).Cells(1).Value} ?", MsgBoxStyle.YesNo Or MsgBoxStyle.Question, "移除") <> MsgBoxResult.Yes Then
                     Exit Sub
@@ -1194,7 +1211,7 @@ Public Class MainForm
         Dim outputFilePath As String
 
         Using tmpDialog As New SaveFileDialog With {
-            .Filter = "BON模板文件|*.xlsx",
+            .Filter = "BOM模板文件|*.xlsx",
             .FileName = IO.Path.GetFileName(AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath)
         }
             If tmpDialog.ShowDialog() <> DialogResult.OK Then

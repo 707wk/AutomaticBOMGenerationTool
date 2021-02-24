@@ -1,0 +1,42 @@
+﻿Imports System.ComponentModel
+
+Public Class ViewBOMConfigurationInfoForm
+
+    Public WriteOnly Property CacheBOMConfigurationInfo As BOMConfigurationInfo
+        Set(value As BOMConfigurationInfo)
+
+            ListView1.Items.Clear()
+
+            For Each item In value.ConfigurationItems
+                Dim addListViewItem = ListView1.Items.Add(New ListViewItem({item.ConfigurationNodeName, item.SelectedValue}))
+
+                If value.MissingConfigurationNodeInfoList.Contains(item.ConfigurationNodeName) Then
+                    '是丢失的配置项
+                    addListViewItem.SubItems(0).BackColor = UIFormHelper.ErrorColor
+
+                Else
+                    '不是丢失的配置项
+                    If String.IsNullOrWhiteSpace(item.SelectedValue) Then
+                        '移除空值
+                        ListView1.Items.Remove(addListViewItem)
+                    End If
+                End If
+
+            Next
+
+            Me.Show()
+        End Set
+    End Property
+
+    Private Sub ViewBOMConfigurationInfoForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        Me.Left = MousePosition.X
+        Me.Top = MousePosition.Y - Me.Height
+
+    End Sub
+
+    Private Sub ViewBOMConfigurationInfoForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        UIFormHelper.UIForm.tmpViewBOMConfigurationInfoForm = Nothing
+    End Sub
+
+End Class

@@ -30,11 +30,11 @@ Public Class BOMConfigurationInfo
     ''' <summary>
     ''' 丢失的配置项信息
     ''' </summary>
-    Public MissingConfigurationNodeInfoList As New List(Of String)
+    Public MissingConfigurationNodeInfoList As New HashSet(Of String)
     ''' <summary>
     ''' 丢失的值信息
     ''' </summary>
-    Public MissingConfigurationNodeValueInfoList As New List(Of String)
+    Public MissingConfigurationNodeValueInfoList As New HashSet(Of String)
 
     ''' <summary>
     ''' 是否有丢失信息
