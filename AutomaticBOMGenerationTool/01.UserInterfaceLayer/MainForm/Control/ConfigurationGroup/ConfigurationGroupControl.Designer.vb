@@ -46,11 +46,12 @@ Partial Class ConfigurationGroupControl
         'FlowLayoutPanel1
         '
         Me.FlowLayoutPanel1.AutoSize = True
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(23, 36)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(23, 30)
+        Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(0)
         Me.FlowLayoutPanel1.MaximumSize = New System.Drawing.Size(1202, 32767)
         Me.FlowLayoutPanel1.MinimumSize = New System.Drawing.Size(1202, 2)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1202, 44)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1202, 50)
         Me.FlowLayoutPanel1.TabIndex = 1
         '
         'ConfigurationGroupControl
@@ -63,7 +64,7 @@ Partial Class ConfigurationGroupControl
         Me.Controls.Add(Me.CheckBox1)
         Me.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.ForeColor = System.Drawing.Color.White
-        Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
         Me.MaximumSize = New System.Drawing.Size(1230, 32767)
         Me.MinimumSize = New System.Drawing.Size(1230, 0)
         Me.Name = "ConfigurationGroupControl"

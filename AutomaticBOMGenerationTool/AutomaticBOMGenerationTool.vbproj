@@ -110,6 +110,9 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="Wangk.Hash">
+      <HintPath>..\..\..\WangkNamespace\DLL\Wangk.Hash.dll</HintPath>
+    </Reference>
     <Reference Include="Wangk.Resource">
       <HintPath>T:\WangkNamespace\DLL\Wangk.Resource.dll</HintPath>
     </Reference>
@@ -210,10 +213,11 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\MainForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="02.BusinessLogicLayer\LocalDatabaseHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\BOMTemplateHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\FileHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileHelper.vb" />
-    <Compile Include="02.BusinessLogicLayer\LocalDatabaseHelper.vb" />
+    <Compile Include="02.BusinessLogicLayer\BOMTemplateDatabaseHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\BOMCostingTemplateByLZTypeHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\BOMCostingTemplateByWKTypeHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\BOMFromBOMTemplateTypeHelper.vb" />
@@ -221,6 +225,7 @@
     <Compile Include="02.BusinessLogicLayer\PriceFile\PriceFileType\ImportMaterialPriceTableTypeHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplateInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNode\BOMConfigurationInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNode\ConfigurationGroupInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNode\ConfigurationNodeInfo.vb" />
@@ -298,6 +303,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\TemplateDatabase.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Data\LocalDatabase.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -330,6 +338,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\temp_16px.png" />
     <None Include="res\logo.png" />
     <None Include="res\about.png" />
     <None Include="res\saveAsFile_32px.png" />

@@ -24,14 +24,14 @@ Public Class AppSettingHelper
 
 #Region "临时文件夹路径"
     <Newtonsoft.Json.JsonIgnore>
-    Private _TempDownloadPath As String
+    Private _TempDirectoryPath As String
     ''' <summary>
     ''' 临时文件夹路径
     ''' </summary>
     <Newtonsoft.Json.JsonIgnore>
-    Public ReadOnly Property TempDownloadPath As String
+    Public ReadOnly Property TempDirectoryPath As String
         Get
-            Return _TempDownloadPath
+            Return _TempDirectoryPath
         End Get
     End Property
 #End Region
@@ -56,7 +56,7 @@ Public Class AppSettingHelper
     ''' </summary>
     Public Shared Function IsLongTimeNoUpdate() As Boolean
 
-        Dim fileVersionStr = instance.ProductVersion.Substring(instance.ProductVersion.IndexOf(".") + 1)
+        Dim fileVersionStr = _instance.ProductVersion.Substring(_instance.ProductVersion.IndexOf(".") + 1)
         fileVersionStr = fileVersionStr.Substring(fileVersionStr.IndexOf(".") + 1)
 
         Dim fileVersion As DateTime = DateTime.ParseExact(fileVersionStr, "yyyy.MMdd", System.Globalization.CultureInfo.CurrentCulture)
@@ -71,20 +71,21 @@ Public Class AppSettingHelper
     ''' <summary>
     ''' 实例
     ''' </summary>
-    Private Shared instance As AppSettingHelper
+    Private Shared _instance As AppSettingHelper
     ''' <summary>
     ''' 获取实例
     ''' </summary>
-    Public Shared ReadOnly Property GetInstance As AppSettingHelper
+    Public Shared ReadOnly Property Instance As AppSettingHelper
         Get
-            If instance Is Nothing Then
+            If _instance Is Nothing Then
 
                 '序列化默认设置
                 JsonConvert.DefaultSettings = New Func(Of JsonSerializerSettings)(Function()
 
-                                                                                      Dim tmpSettings = New Newtonsoft.Json.JsonSerializerSettings
                                                                                       '忽略值为Null的字段
-                                                                                      tmpSettings.NullValueHandling = NullValueHandling.Ignore
+                                                                                      Dim tmpSettings = New JsonSerializerSettings With {
+                                                                                          .NullValueHandling = NullValueHandling.Ignore
+                                                                                      }
 
                                                                                       Return tmpSettings
                                                                                   End Function)
@@ -93,21 +94,21 @@ Public Class AppSettingHelper
 
                 '程序集GUID
                 Dim guid_attr As Attribute = Attribute.GetCustomAttribute(Reflection.Assembly.GetExecutingAssembly(), GetType(Runtime.InteropServices.GuidAttribute))
-                instance._GUID = CType(guid_attr, Runtime.InteropServices.GuidAttribute).Value
+                _instance._GUID = CType(guid_attr, Runtime.InteropServices.GuidAttribute).Value
 
                 '临时文件夹
-                instance._TempDownloadPath = IO.Path.Combine(
+                _instance._TempDirectoryPath = IO.Path.Combine(
                     IO.Path.GetTempPath,
-                    $"{{{instance.GUID}}}")
-                IO.Directory.CreateDirectory(instance._TempDownloadPath)
+                    $"{{{_instance.GUID.ToUpper}}}")
+                IO.Directory.CreateDirectory(_instance._TempDirectoryPath)
 
                 '程序集文件版本
                 Dim assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location
-                instance._ProductVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(assemblyLocation).ProductVersion
+                _instance._ProductVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(assemblyLocation).ProductVersion
 
             End If
 
-            Return instance
+            Return _instance
         End Get
     End Property
 #End Region
@@ -124,14 +125,14 @@ Public Class AppSettingHelper
 
         '反序列化
         Try
-            instance = JsonConvert.DeserializeObject(Of AppSettingHelper)(
+            _instance = JsonConvert.DeserializeObject(Of AppSettingHelper)(
                 System.IO.File.ReadAllText($".\Data\Setting.json",
                                            System.Text.Encoding.UTF8))
 
 #Disable Warning CA1031 ' Do not catch general exception types
         Catch ex As Exception
             '设置默认参数
-            instance = New AppSettingHelper
+            _instance = New AppSettingHelper
 #Enable Warning CA1031 ' Do not catch general exception types
         End Try
 
@@ -155,7 +156,7 @@ Public Class AppSettingHelper
                     False,
                     System.Text.Encoding.UTF8)
 
-                t.Write(JsonConvert.SerializeObject(instance))
+                t.Write(JsonConvert.SerializeObject(_instance))
             End Using
 
 #Disable Warning CA1031 ' Do not catch general exception types
@@ -179,7 +180,7 @@ Public Class AppSettingHelper
             False,
             System.Text.Encoding.UTF8)
 
-            t.Write(JsonConvert.SerializeObject(instance))
+            t.Write(JsonConvert.SerializeObject(_instance))
         End Using
 
     End Sub
@@ -197,7 +198,7 @@ Public Class AppSettingHelper
                                        System.Text.Encoding.UTF8))
 
         '需要导入的变量
-        instance.ExportConfigurationNodeInfoList = tmpInstance.ExportConfigurationNodeInfoList
+        _instance.ExportConfigurationNodeInfoList = tmpInstance.ExportConfigurationNodeInfoList
 
         SaveToLocaltion()
 
@@ -217,9 +218,22 @@ Public Class AppSettingHelper
     ''' 清理临时文件
     ''' </summary>
     Public Sub ClearTempFiles()
-        For Each item In IO.Directory.EnumerateFiles(Me.TempDownloadPath)
+
+        '删除文件
+        For Each item In IO.Directory.EnumerateFiles(Me.TempDirectoryPath)
             Try
                 IO.File.Delete(item)
+
+#Disable Warning CA1031 ' Do not catch general exception types
+            Catch ex As Exception
+#Enable Warning CA1031 ' Do not catch general exception types
+            End Try
+        Next
+
+        '删除文件夹
+        For Each item In IO.Directory.EnumerateDirectories(Me.TempDirectoryPath)
+            Try
+                IO.Directory.Delete(item, True)
 
 #Disable Warning CA1031 ' Do not catch general exception types
             Catch ex As Exception
@@ -237,7 +251,7 @@ Public Class AppSettingHelper
     Public Function GetTempFilesSizeByMB() As Decimal
         Dim sizeByMB As Decimal = 0
 
-        For Each item In Directory.EnumerateFiles(Me.TempDownloadPath)
+        For Each item In Directory.EnumerateFiles(Me.TempDirectoryPath)
             Dim tmpFileInfo = New FileInfo(item)
             sizeByMB += tmpFileInfo.Length
         Next
@@ -254,88 +268,19 @@ Public Class AppSettingHelper
     Public Shared SQLiteConnection As String = "data source= .\Data\LocalDatabase.db"
 
     ''' <summary>
-    ''' 源文件地址
-    ''' </summary>
-    Public SourceFilePath As String
-    ''' <summary>
-    ''' 临时文件地址,存放处理后的源文件
-    ''' </summary>
-    Public Shared TempfilePath As String = ".\Data\Tempfile.xlsx"
-
-    ''' <summary>
-    ''' 模板文件地址
-    ''' </summary>
-    Public Shared TemplateFilePath As String = ".\Data\Template.xlsx"
-
-    ''' <summary>
-    ''' 配置控件查找表
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public ConfigurationNodeControlTable As New Dictionary(Of String, ConfigurationNodeControl)
-
-    ''' <summary>
     ''' 导出配置项设置信息
     ''' </summary>
     Public ExportConfigurationNodeInfoList As New List(Of ExportConfigurationNodeInfo)
 
     ''' <summary>
-    ''' 待导出BOM列表
+    ''' 当前BOM模板文件地址
     ''' </summary>
-    Public ExportBOMList As New List(Of BOMConfigurationInfo)
+    Public CurrentBOMTemplateFilePath As String
 
     ''' <summary>
-    ''' 当前BOM最大阶层数
+    ''' 当前BOM模板
     ''' </summary>
     <Newtonsoft.Json.JsonIgnore>
-    Public BOMLevelCount As Integer
-    ''' <summary>
-    ''' 当前BOM阶层首层所在列ID
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public BOMlevelColumnID As Integer
-    ''' <summary>
-    ''' 当前BOM品号所在列ID
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public BOMpIDColumnID As Integer
-    ''' <summary>
-    ''' 当前BOM备注所在列ID
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public BOMRemarkColumnID As Integer
-
-    ''' <summary>
-    ''' BOM第一个物料行号
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public BOMMaterialRowMinID As Integer
-    ''' <summary>
-    ''' BOM最后一个物料行号
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public BOMMaterialRowMaxID As Integer
-
-    ''' <summary>
-    ''' 总价
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public TotalPrice As Decimal
-
-    ''' <summary>
-    ''' 显示的最小价格占比
-    ''' </summary>
-    Public MinimumTotalPricePercentage As Decimal = 1
-
-    ''' <summary>
-    ''' 物料单项总价表
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public MaterialTotalPriceTable As New Dictionary(Of String, Decimal)
-
-    ''' <summary>
-    ''' 显示隐藏配置项
-    ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
-    Public ShowHideConfigurationNodeItems As Boolean = False
+    Public CurrentBOMTemplateInfo As BOMTemplateInfo
 
 End Class

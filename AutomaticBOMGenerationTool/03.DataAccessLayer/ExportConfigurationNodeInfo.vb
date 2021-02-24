@@ -35,34 +35,28 @@ Public Class ExportConfigurationNodeInfo
     ''' <summary>
     ''' 选项值ID
     ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
     Public ValueID As String
     ''' <summary>
     ''' 选项值
     ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
     Public Value As String
     ''' <summary>
     ''' 是否是物料节点
     ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
     Public IsMaterial As Boolean
     ''' <summary>
     ''' 替换物料信息
     ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
     Public MaterialValue As MaterialInfo
 
     ''' <summary>
     ''' 是否在当前模板中
     ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
     Public Exist As Boolean
 
     ''' <summary>
     ''' 所在列号
     ''' </summary>
-    <Newtonsoft.Json.JsonIgnore>
     Public ColIndex As Integer
 
 End Class

@@ -92,7 +92,6 @@
                 PageControl1.Init(tmpCount, 25, tmpNowPageID)
 
                 UIFormHelper.ToastSuccess($"删除 {pIDStr} 成功", Me)
-                UIFormHelper.UIForm.UpdateMaterialPriceInfoCount()
 #End Region
 
         End Select
@@ -131,7 +130,6 @@
         PageControl1.Init(tmpCount, 25, tmpNowPageID)
 
         UIFormHelper.ToastSuccess($"批量删除成功", Me)
-        UIFormHelper.UIForm.UpdateMaterialPriceInfoCount()
 
     End Sub
 #End Region

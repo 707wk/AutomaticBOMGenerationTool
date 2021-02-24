@@ -13,6 +13,11 @@ Public Class BOMConfigurationInfo
     Public ConfigurationItems As List(Of ConfigurationNodeRowInfo)
 
     ''' <summary>
+    ''' 配置值查找表
+    ''' </summary>
+    Public ConfigurationInfoValueTable As Dictionary(Of String, String)
+
+    ''' <summary>
     ''' 单价
     ''' </summary>
     Public UnitPrice As Decimal
@@ -21,5 +26,24 @@ Public Class BOMConfigurationInfo
     ''' 文件名
     ''' </summary>
     Public FileName As String
+
+    ''' <summary>
+    ''' 丢失的配置项信息
+    ''' </summary>
+    Public MissingConfigurationNodeInfoList As New List(Of String)
+    ''' <summary>
+    ''' 丢失的值信息
+    ''' </summary>
+    Public MissingConfigurationNodeValueInfoList As New List(Of String)
+
+    ''' <summary>
+    ''' 是否有丢失信息
+    ''' </summary>
+    Public ReadOnly Property HaveMissingValue As Boolean
+        Get
+            Return MissingConfigurationNodeInfoList.Count > 0 OrElse
+                MissingConfigurationNodeValueInfoList.Count > 0
+        End Get
+    End Property
 
 End Class

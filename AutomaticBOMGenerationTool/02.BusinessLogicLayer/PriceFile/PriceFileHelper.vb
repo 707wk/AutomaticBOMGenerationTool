@@ -104,7 +104,11 @@ Public NotInheritable Class PriceFileHelper
     ''' </summary>
     Private Shared Function IsBOMCostingTemplateByLZType(filePath As String) As Boolean
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(filePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -132,7 +136,11 @@ Public NotInheritable Class PriceFileHelper
     ''' </summary>
     Private Shared Function IsBOMCostingTemplateByWKType(filePath As String) As Boolean
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(filePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -160,7 +168,11 @@ Public NotInheritable Class PriceFileHelper
     ''' </summary>
     Private Shared Function IsBOMTemplateType(filePath As String) As Boolean
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(filePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -188,7 +200,11 @@ Public NotInheritable Class PriceFileHelper
     ''' </summary>
     Private Shared Function IsBOMFromBOMTemplateType(filePath As String) As Boolean
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(filePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -216,7 +232,11 @@ Public NotInheritable Class PriceFileHelper
     ''' </summary>
     Private Shared Function IsImportMaterialPriceTableType(filePath As String) As Boolean
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(filePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First

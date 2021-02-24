@@ -5,10 +5,10 @@ Public Class AboutForm
         Label1.Text = My.Application.Info.Title
 
 #If DEBUG Then
-        Label2.Text = $"版本 {AppSettingHelper.GetInstance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit_Debug"
+        Label2.Text = $"版本 {AppSettingHelper.Instance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit_Debug"
 
 #Else
-        Label2.Text = $"版本 {AppSettingHelper.GetInstance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit_Release"
+        Label2.Text = $"版本 {AppSettingHelper.Instance.ProductVersion}_{If(Environment.Is64BitProcess, "64", "32")}Bit_Release"
 
 #End If
 

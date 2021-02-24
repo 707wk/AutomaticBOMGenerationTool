@@ -27,10 +27,9 @@ Public NotInheritable Class UIFormHelper
     ''' <summary>
     ''' 创建操作列
     ''' </summary>
-    Public Shared Function GetDataGridViewLinkColumn(
-                                                    headerText As String,
-                                                    foreColor As Color,
-                                                    Optional visible As Boolean = True) As DataGridViewLinkColumn
+    Public Shared Function GetDataGridViewLinkColumn(headerText As String,
+                                                     foreColor As Color,
+                                                     Optional visible As Boolean = True) As DataGridViewLinkColumn
 
         Dim tmpColumn = New DataGridViewLinkColumn
         With tmpColumn
@@ -47,6 +46,7 @@ Public NotInheritable Class UIFormHelper
         End With
 
         Return tmpColumn
+
     End Function
 #End Region
 
@@ -70,6 +70,7 @@ Public NotInheritable Class UIFormHelper
                                timeoutInterval,
                                eToastGlowColor.Blue,
                                eToastPosition.MiddleCenter)
+
     End Sub
 #End Region
 
@@ -88,6 +89,7 @@ Public NotInheritable Class UIFormHelper
                                timeoutInterval,
                                eToastGlowColor.Green,
                                eToastPosition.MiddleCenter)
+
     End Sub
 #End Region
 
@@ -106,6 +108,7 @@ Public NotInheritable Class UIFormHelper
                                timeoutInterval,
                                eToastGlowColor.Orange,
                                eToastPosition.MiddleCenter)
+
     End Sub
 #End Region
 
@@ -124,6 +127,7 @@ Public NotInheritable Class UIFormHelper
                                timeoutInterval,
                                eToastGlowColor.Red,
                                eToastPosition.MiddleCenter)
+
     End Sub
 #End Region
 

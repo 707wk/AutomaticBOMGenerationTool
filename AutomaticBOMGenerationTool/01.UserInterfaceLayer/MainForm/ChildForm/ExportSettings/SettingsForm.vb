@@ -17,7 +17,7 @@
 
         End With
 
-        For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+        For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
             CheckBoxDataGridView1.Rows.Add({
                                            False,
                                            item.Name,
@@ -73,9 +73,9 @@
             Exit Sub
         End If
 
-        AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList.Clear()
+        AppSettingHelper.Instance.ExportConfigurationNodeInfoList.Clear()
         For Each item As DataGridViewRow In CheckBoxDataGridView1.Rows
-            AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList.Add(New ExportConfigurationNodeInfo With
+            AppSettingHelper.Instance.ExportConfigurationNodeInfoList.Add(New ExportConfigurationNodeInfo With
                                                                              {
                                                                              .Name = item.Cells(1).Value,
                                                                              .ExportPrefix = item.Cells(2).Value,

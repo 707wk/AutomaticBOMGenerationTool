@@ -9,7 +9,11 @@ Public NotInheritable Class BOMFromBOMTemplateTypeHelper
     ''' </summary>
     Public Shared Sub GetMaterialPriceInfo(value As ImportPriceFileInfo)
 
-        Using readFS = New FileStream(value.SourceFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(value.SourceFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First

@@ -23,13 +23,12 @@ Public NotInheritable Class FileHelper
     End Enum
 
     <DllImport("shell32.dll", CharSet:=CharSet.Unicode)>
-    Private Shared Function ShellExecute(
-                                        hwnd As IntPtr,
-                                        lpOperation As String,
-                                        lpFile As String,
-                                        lpParameters As String,
-                                        lpDirectory As String,
-                                        nShowCmd As ShowCommands) As IntPtr
+    Private Shared Function ShellExecute(hwnd As IntPtr,
+                                         lpOperation As String,
+                                         lpFile As String,
+                                         lpParameters As String,
+                                         lpDirectory As String,
+                                         nShowCmd As ShowCommands) As IntPtr
     End Function
 
     ''' <summary>

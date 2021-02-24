@@ -14,7 +14,7 @@ Public Class ConfigurationNodeControl
         End Get
         Set(ByVal value As ConfigurationNodeInfo)
             _NodeInfo = value
-            ParentNodeIDHashSet = LocalDatabaseHelper.GetParentConfigurationNodeIDItems(NodeInfo.ID)
+            ParentNodeIDHashSet = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetParentConfigurationNodeIDItems(NodeInfo.ID)
         End Set
     End Property
 
@@ -64,7 +64,7 @@ Public Class ConfigurationNodeControl
     ''' </summary>
     Public Sub Init()
 
-        If LocalDatabaseHelper.GetLinkCount(NodeInfo.ID) > 0 Then
+        If AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetLinkCount(NodeInfo.ID) > 0 Then
             Exit Sub
         End If
 
@@ -72,7 +72,7 @@ Public Class ConfigurationNodeControl
 
         '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
-            Dim tmpList = LocalDatabaseHelper.GetMaterialInfoItems(NodeInfo.ID)
+            Dim tmpList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoItems(NodeInfo.ID)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -82,7 +82,7 @@ Public Class ConfigurationNodeControl
             Next
 
         Else
-            Dim tmpList = LocalDatabaseHelper.GetConfigurationNodeValueInfoItems(NodeInfo.ID)
+            Dim tmpList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoItems(NodeInfo.ID)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -108,12 +108,12 @@ Public Class ConfigurationNodeControl
             If FlowLayoutPanel1.Controls.Count > 1 Then
                 Me.Visible = True
             Else
-                Me.Visible = AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems
+                Me.Visible = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems
             End If
 
         Else
             Me.Label1.BackColor = UIFormHelper.ErrorColor
-            Me.Visible = AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems
+            Me.Visible = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems
         End If
 
         Me.AutoSize = True
@@ -138,12 +138,12 @@ Public Class ConfigurationNodeControl
             SelectedValue = tmp.Text
         Else
             '物料
-            SelectedValue = tmp.Cache.pName
+            SelectedValue = tmp.Cache.pID
         End If
 
-        Dim tmpList = LocalDatabaseHelper.GetLinkNodeIDListByNodeID(NodeInfo.ID)
+        Dim tmpList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetLinkNodeIDListByNodeID(NodeInfo.ID)
         For Each item In tmpList
-            Dim tmpControl As ConfigurationNodeControl = AppSettingHelper.GetInstance.ConfigurationNodeControlTable(item)
+            Dim tmpControl As ConfigurationNodeControl = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable(item)
             tmpControl.UpdateValueWithOtherConfiguration()
         Next
 
@@ -165,21 +165,21 @@ Public Class ConfigurationNodeControl
         SelectedValueID = Nothing
         SelectedValue = Nothing
 
-        Dim originDictionary = LocalDatabaseHelper.GetConfigurationNodeValueIDItems(NodeInfo.ID)
+        Dim originDictionary = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueIDItems(NodeInfo.ID)
 
-        Dim tmpParentNodeValueIDList = (From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+        Dim tmpParentNodeValueIDList = (From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
                                         Where ParentNodeIDHashSet.Contains(item.NodeInfo.ID)
                                         Select item.SelectedValueID).ToList
 
-        If LocalDatabaseHelper.IsHaveParentValueLink(tmpParentNodeValueIDList, NodeInfo.ID) Then
+        If AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.IsHaveParentValueLink(tmpParentNodeValueIDList, NodeInfo.ID) Then
             '有关联,取交集
             '遍历其他配置项当前值
-            For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+            For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
                 If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
                     Continue For
                 End If
 
-                Dim tmpHashSet = LocalDatabaseHelper.GetConfigurationNodeValueIDItems(item.SelectedValueID, NodeInfo.ID)
+                Dim tmpHashSet = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueIDItems(item.SelectedValueID, NodeInfo.ID)
 
                 '取交集
                 Dim tmpKeys = originDictionary.Keys.ToList
@@ -196,12 +196,12 @@ Public Class ConfigurationNodeControl
         Else
             '无关联,排除其他选项值
             '遍历其他配置项当前值
-            For Each item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+            For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
                 If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
                     Continue For
                 End If
 
-                Dim tmpDictionary = LocalDatabaseHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
+                Dim tmpDictionary = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
 
                 '排除
                 For Each key In tmpDictionary.Keys
@@ -232,7 +232,7 @@ Public Class ConfigurationNodeControl
 
         '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
-            Dim tmpList = LocalDatabaseHelper.GetMaterialInfoItems(NodeInfo.ID, originDictionary.Keys.ToList)
+            Dim tmpList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoItems(NodeInfo.ID, originDictionary.Keys.ToList)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -242,7 +242,7 @@ Public Class ConfigurationNodeControl
             Next
 
         Else
-            Dim tmpList = LocalDatabaseHelper.GetConfigurationNodeValueInfoItems(originDictionary.Keys.ToList)
+            Dim tmpList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoItems(originDictionary.Keys.ToList)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -269,12 +269,12 @@ Public Class ConfigurationNodeControl
             If FlowLayoutPanel1.Controls.Count > 1 Then
                 Me.Visible = True
             Else
-                Me.Visible = AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems
+                Me.Visible = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems
             End If
 
         Else
             Me.Label1.BackColor = UIFormHelper.ErrorColor
-            Me.Visible = AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems
+            Me.Visible = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems
         End If
 
         Me.AutoSize = True
@@ -311,7 +311,7 @@ Public Class ConfigurationNodeControl
     Public Sub UpdateVisible()
         Dim tmpVisible As Boolean
 
-        If AppSettingHelper.GetInstance.ShowHideConfigurationNodeItems Then
+        If AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems Then
             '强制显示
             Me.Visible = True
             tmpVisible = True

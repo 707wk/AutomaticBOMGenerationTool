@@ -5,25 +5,64 @@ Imports OfficeOpenXml
 ''' <summary>
 ''' BOM模板辅助模块
 ''' </summary>
-Public NotInheritable Class BOMTemplateHelper
+Public Class BOMTemplateHelper
 
-#Region "预处理源文件"
     ''' <summary>
-    ''' 预处理源文件
+    ''' 当前BOM最大阶层数
     ''' </summary>
-    Public Shared Sub PreproccessSourceFile()
-        Using readFS = New FileStream(AppSettingHelper.GetInstance.SourceFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+    Public CurrentBOMLevelCount As Integer
+    ''' <summary>
+    ''' 当前BOM阶层首层所在列ID
+    ''' </summary>
+    Public CurrentBOMlevelColumnID As Integer
+    ''' <summary>
+    ''' 当前BOM品号所在列ID
+    ''' </summary>
+    Public CurrentBOMpIDColumnID As Integer
+    ''' <summary>
+    ''' 当前BOM备注所在列ID
+    ''' </summary>
+    Public CurrentBOMRemarkColumnID As Integer
+
+    ''' <summary>
+    ''' BOM第一个物料行号
+    ''' </summary>
+    Public CurrentBOMMaterialRowMinID As Integer
+    ''' <summary>
+    ''' BOM最后一个物料行号
+    ''' </summary>
+    Public CurrentBOMMaterialRowMaxID As Integer
+
+    Private ReadOnly CacheBOMTemplateInfo As BOMTemplateInfo
+
+    Public Sub New(value As BOMTemplateInfo)
+
+        CacheBOMTemplateInfo = value
+
+    End Sub
+
+#Region "预处理原文件"
+    ''' <summary>
+    ''' 预处理原文件
+    ''' </summary>
+    Public Sub PreproccessSourceFile()
+
+        Using readFS = New FileStream(CacheBOMTemplateInfo.SourceFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 ReadBOMInfo(tmpExcelPackage)
 
-                Dim levelColumnID = AppSettingHelper.GetInstance.BOMlevelColumnID
-                Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
-                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim levelColumnID = CurrentBOMlevelColumnID
+                Dim LevelCount = CurrentBOMLevelCount
+                Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+                Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+                Dim pIDColumnID = CurrentBOMpIDColumnID
 
 #Region "检测阶层合法性"
                 Dim lastLevel = GetLevel(tmpExcelPackage, MaterialRowMinID)
@@ -102,7 +141,7 @@ Public NotInheritable Class BOMTemplateHelper
                 CheckIntegrityOfMaterialInfo(tmpExcelPackage)
 
                 '另存为
-                Using tmpSaveFileStream = New FileStream(AppSettingHelper.TempfilePath, FileMode.Create)
+                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateInfo.TempfilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
                 End Using
 
@@ -116,7 +155,8 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 基础物料信息完整性检测
     ''' </summary>
-    Private Shared Sub CheckIntegrityOfMaterialInfo(wb As ExcelPackage)
+    Private Sub CheckIntegrityOfMaterialInfo(wb As ExcelPackage)
+
         ReadBOMInfo(wb)
 
         SetBaseMaterialMark(wb)
@@ -125,10 +165,10 @@ Public NotInheritable Class BOMTemplateHelper
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
-        Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
+        Dim baseMaterialFlagColumnID = CurrentBOMRemarkColumnID + 1
 
         For rID = MaterialRowMinID To MaterialRowMaxID
 
@@ -167,16 +207,16 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 标记基础物料(基础物料为True,组合物料为False)
     ''' </summary>
-    Private Shared Sub SetBaseMaterialMark(wb As ExcelPackage)
+    Private Sub SetBaseMaterialMark(wb As ExcelPackage)
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
-        Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
+        Dim baseMaterialFlagColumnID = CurrentBOMRemarkColumnID + 1
         tmpWorkSheet.InsertColumn(baseMaterialFlagColumnID, 1)
         tmpWorkSheet.Cells(MaterialRowMinID - 1, baseMaterialFlagColumnID).Value = "基础物料标记"
 
@@ -219,18 +259,21 @@ Public NotInheritable Class BOMTemplateHelper
     ''' 获取需要替换的物料价格信息列表
     ''' </summary>
     Public Shared Function GetNeedsReplaceMaterialPriceInfoItems(filePath As String) As Dictionary(Of String, MaterialPriceInfo)
+
         Dim tmpList = New Dictionary(Of String, MaterialPriceInfo)
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(filePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                ReadBOMInfo(tmpExcelPackage)
-
-                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
+                Dim MaterialRowMinID = FindTextLocation(tmpExcelPackage, "阶层").Y + 2
+                Dim pIDColumnID = FindTextLocation(tmpExcelPackage, "品 号").X
 
                 For rID = MaterialRowMinID To MaterialRowMaxID
 
@@ -274,21 +317,22 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 替换物料价格并保存
     ''' </summary>
-    Public Shared Sub ReplaceMaterialPriceAndSave(
-                                                 filePath As String,
-                                                 saveFilePath As String,
-                                                 MaterialPriceItems As Dictionary(Of String, MaterialPriceInfo))
+    Public Shared Sub ReplaceMaterialPriceAndSave(filePath As String,
+                                                  saveFilePath As String,
+                                                  MaterialPriceItems As Dictionary(Of String, MaterialPriceInfo))
 
-        Using readFS = New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(filePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                ReadBOMInfo(tmpExcelPackage)
-
-                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
+                Dim MaterialRowMinID = FindTextLocation(tmpExcelPackage, "阶层").Y + 2
+                Dim pIDColumnID = FindTextLocation(tmpExcelPackage, "品 号").X
 
                 Dim DefaultBackgroundColor = UIFormHelper.SuccessColor 'Color.FromArgb(169, 208, 142)
 
@@ -324,10 +368,15 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 获取配置表中的替换物料品号
     ''' </summary>
-    Public Shared Function GetMaterialpIDListFromConfigurationTable() As HashSet(Of String)
+    Public Function GetMaterialpIDListFromConfigurationTable() As HashSet(Of String)
+
         Dim tmpHashSet = New HashSet(Of String)
 
-        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -368,6 +417,7 @@ Public NotInheritable Class BOMTemplateHelper
         End Using
 
         Return tmpHashSet
+
     End Function
 #End Region
 
@@ -375,21 +425,26 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 获取BOM中的替换物料品号
     ''' </summary>
-    Public Shared Function GetMaterialpIDListFromBOMTable() As HashSet(Of String)
+    Public Function GetMaterialpIDListFromBOMTable() As HashSet(Of String)
+
         Dim tmpHashSet = New HashSet(Of String)
 
-        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 ReadBOMInfo(tmpExcelPackage)
 
-                Dim levelColumnID = AppSettingHelper.GetInstance.BOMlevelColumnID
-                Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
-                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim levelColumnID = CurrentBOMlevelColumnID
+                Dim LevelCount = CurrentBOMLevelCount
+                Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+                Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+                Dim pIDColumnID = CurrentBOMpIDColumnID
 
                 For rID = MaterialRowMinID To MaterialRowMaxID
 
@@ -409,6 +464,7 @@ Public NotInheritable Class BOMTemplateHelper
         End Using
 
         Return tmpHashSet
+
     End Function
 #End Region
 
@@ -416,7 +472,7 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 检测替换物料完整性
     ''' </summary>
-    Public Shared Sub TestMaterialInfoCompleteness(pIDList As HashSet(Of String))
+    Public Sub TestMaterialInfoCompleteness(pIDList As HashSet(Of String))
 
         Dim BOMpIDList = GetMaterialpIDListFromBOMTable()
 
@@ -439,19 +495,24 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 获取替换物料信息
     ''' </summary>
-    Public Shared Function GetMaterialInfoList(values As HashSet(Of String)) As List(Of MaterialInfo)
+    Public Function GetMaterialInfoList(values As HashSet(Of String)) As List(Of MaterialInfo)
+
         Dim tmpList = New List(Of MaterialInfo)
 
-        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 ReadBOMInfo(tmpExcelPackage)
 
-                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+                Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+                Dim pIDColumnID = CurrentBOMpIDColumnID
 
 #Region "遍历物料信息"
                 For rID = MaterialRowMinID To MaterialRowMaxID
@@ -483,6 +544,7 @@ Public NotInheritable Class BOMTemplateHelper
         End Using
 
         Return tmpList
+
     End Function
 #End Region
 
@@ -490,9 +552,8 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 查找文本所在位置
     ''' </summary>
-    Public Shared Function FindTextLocation(
-                                           wb As ExcelPackage,
-                                           headText As String) As Point
+    Public Shared Function FindTextLocation(wb As ExcelPackage,
+                                            headText As String) As Point
 
         Dim findStr = StrConv(headText, VbStrConv.Narrow).ToUpper
 
@@ -533,7 +594,7 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 转换配置表
     ''' </summary>
-    Public Shared Sub TransformationConfigurationTable()
+    Public Sub TransformationConfigurationTable()
 
         ReplaceableMaterialParser()
 
@@ -545,9 +606,13 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 解析可替换物料
     ''' </summary>
-    Public Shared Sub ReplaceableMaterialParser()
+    Public Sub ReplaceableMaterialParser()
 
-        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -571,37 +636,37 @@ Public NotInheritable Class BOMTemplateHelper
                     If Not String.IsNullOrWhiteSpace(tmpStr) Then
                         '第一列内容不为空
                         tmpRootNode = New ConfigurationNodeInfo With {
-                            .ID = Wangk.Resource.IDHelper.NewID,
+                            .ID = Wangk.Hash.IDHelper.NewID,
                             .SortID = rootSortID,
                             .Name = tmpStr,
                             .GroupID = .ID,
                             .Priority = 0
                         }
                         '查重
-                        If LocalDatabaseHelper.GetConfigurationNodeInfoByName(tmpStr) IsNot Nothing Then
+                        If CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(tmpStr) IsNot Nothing Then
                             Throw New Exception($"第 {rID} 行 配置选项 {tmpStr} 名称重复")
                         End If
 
-                        LocalDatabaseHelper.SaveConfigurationNodeInfo(tmpRootNode)
+                        CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeInfo(tmpRootNode)
                         rootSortID += 1
 
-                        LocalDatabaseHelper.SaveConfigurationGroupInfo(New ConfigurationGroupInfo With {
-                                                                  .ID = tmpRootNode.ID,
-                                                                  .Name = tmpRootNode.Name,
-                                                                  .SortID = groupSortID
-                                                                  })
+                        CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationGroupInfo(New ConfigurationGroupInfo With {
+                                                                                  .ID = tmpRootNode.ID,
+                                                                                  .Name = tmpRootNode.Name,
+                                                                                  .SortID = groupSortID
+                                                                                  })
                         groupSortID += 1
 
                         '第二列内容
                         Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
 
                         tmpChildNode = New ConfigurationNodeValueInfo With {
-                            .ID = Wangk.Resource.IDHelper.NewID,
+                            .ID = Wangk.Hash.IDHelper.NewID,
                             .ConfigurationNodeID = tmpRootNode.ID,
                             .SortID = childSortID,
                             .Value = If(String.IsNullOrWhiteSpace(tmpChildNodeName), $"{tmpRootNode.Name}默认配置", tmpChildNodeName)
                         }
-                        LocalDatabaseHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
+                        CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
                         childSortID += 1
 
                     Else
@@ -615,12 +680,12 @@ Public NotInheritable Class BOMTemplateHelper
                             Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
 
                             tmpChildNode = New ConfigurationNodeValueInfo With {
-                                .ID = Wangk.Resource.IDHelper.NewID,
+                                .ID = Wangk.Hash.IDHelper.NewID,
                                 .ConfigurationNodeID = tmpRootNode.ID,
                                 .SortID = childSortID,
                                 .Value = tmpChildNodeName
                             }
-                            LocalDatabaseHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
+                            CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
                             childSortID += 1
 
                         Else
@@ -646,16 +711,17 @@ Public NotInheritable Class BOMTemplateHelper
                     End If
 
 #Region "解析细分选项"
-                    Dim tmpNode = LocalDatabaseHelper.GetConfigurationNodeInfoByName(tmpNodeStr)
+                    Dim tmpNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(tmpNodeStr)
                     If tmpNode Is Nothing Then
                         tmpNode = New ConfigurationNodeInfo With {
-                    .ID = Wangk.Resource.IDHelper.NewID,
-                    .SortID = rootSortID,
-                    .Name = tmpNodeStr,
-                    .IsMaterial = True,
-                    .GroupID = tmpRootNode.ID
-                }
-                        LocalDatabaseHelper.SaveConfigurationNodeInfo(tmpNode)
+                            .ID = Wangk.Hash.IDHelper.NewID,
+                            .SortID = rootSortID,
+                            .Name = tmpNodeStr,
+                            .IsMaterial = True,
+                            .GroupID = tmpRootNode.ID
+                        }
+
+                        CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeInfo(tmpNode)
                         rootSortID += 1
                     End If
 #End Region
@@ -672,11 +738,11 @@ Public NotInheritable Class BOMTemplateHelper
 
                         Dim tmppID = item.Trim()
 
-                        Dim tmpMaterialNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpNode.ID, tmppID)
+                        Dim tmpMaterialNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpNode.ID, tmppID)
                         '不存在则添加配置值信息
                         If tmpMaterialNode Is Nothing Then
 
-                            Dim tmpMaterialInfo = LocalDatabaseHelper.GetMaterialInfoBypID(tmppID)
+                            Dim tmpMaterialInfo = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoBypID(tmppID)
                             If tmpMaterialInfo Is Nothing Then
                                 Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 未找到品号 {tmppID} 对应物料信息")
                             End If
@@ -687,19 +753,20 @@ Public NotInheritable Class BOMTemplateHelper
                                 .SortID = childSortID,
                                 .Value = tmppID
                             }
-                            LocalDatabaseHelper.SaveConfigurationNodeValueInfo(tmpMaterialNode)
+                            CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpMaterialNode)
                             childSortID += 1
                         End If
 
                         '添加物料关联信息
                         Dim tmpLinkNode = New MaterialLinkInfo With {
-                        .ID = Wangk.Resource.IDHelper.NewID,
-                        .NodeID = tmpChildNode.ConfigurationNodeID,
-                        .NodeValueID = tmpChildNode.ID,
-                        .LinkNodeID = tmpNode.ID,
-                        .LinkNodeValueID = tmpMaterialNode.ID
-                    }
-                        LocalDatabaseHelper.SaveMaterialLinkInfo(tmpLinkNode)
+                            .ID = Wangk.Hash.IDHelper.NewID,
+                            .NodeID = tmpChildNode.ConfigurationNodeID,
+                            .NodeValueID = tmpChildNode.ID,
+                            .LinkNodeID = tmpNode.ID,
+                            .LinkNodeValueID = tmpMaterialNode.ID
+                        }
+
+                        CacheBOMTemplateInfo.BOMTDHelper.SaveMaterialLinkInfo(tmpLinkNode)
 
                     Next
 #End Region
@@ -708,6 +775,7 @@ Public NotInheritable Class BOMTemplateHelper
 
             End Using
         End Using
+
     End Sub
 #End Region
 
@@ -715,9 +783,13 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 解析固定搭配物料
     ''' </summary>
-    Public Shared Sub FixedMatchingMaterialParser()
+    Public Sub FixedMatchingMaterialParser()
 
-        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -758,17 +830,17 @@ Public NotInheritable Class BOMTemplateHelper
                             Dim nodeNameLength = tmpMaterialArray(0).IndexOf(")") - nodeNameStartIndex
                             Dim configurationNodeName = tmpMaterialArray(0).Substring(nodeNameStartIndex, nodeNameLength).Trim
                             Dim pIDStr = tmpMaterialArray(0).Substring(0, nodeNameStartIndex - 1).Trim
-                            Dim tmpConfigurationNodeInfo = LocalDatabaseHelper.GetConfigurationNodeInfoByName(configurationNodeName)
+                            Dim tmpConfigurationNodeInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
 
                             If tmpConfigurationNodeInfo Is Nothing Then
                                 Throw New Exception($"1第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
                             End If
 
-                            parentNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
+                            parentNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
 
                         Else
                             '品号唯一
-                            parentNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(0).Trim())
+                            parentNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(0).Trim())
 
                         End If
 
@@ -786,17 +858,17 @@ Public NotInheritable Class BOMTemplateHelper
                                 Dim nodeNameLength = tmpMaterialArray(i001).IndexOf(")") - nodeNameStartIndex
                                 Dim configurationNodeName = tmpMaterialArray(i001).Substring(nodeNameStartIndex, nodeNameLength).Trim
                                 Dim pIDStr = tmpMaterialArray(i001).Substring(0, nodeNameStartIndex - 1).Trim
-                                Dim tmpConfigurationNodeInfo = LocalDatabaseHelper.GetConfigurationNodeInfoByName(configurationNodeName)
+                                Dim tmpConfigurationNodeInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
 
                                 If tmpConfigurationNodeInfo Is Nothing Then
                                     Throw New Exception($"2第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
                                 End If
 
-                                linkNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
+                                linkNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
 
                             Else
                                 '品号唯一
-                                linkNode = LocalDatabaseHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(i001).Trim())
+                                linkNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(i001).Trim())
 
                             End If
 
@@ -804,13 +876,13 @@ Public NotInheritable Class BOMTemplateHelper
                                 Throw New Exception($"第 {rID} 行 替换物料 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
                             End If
 
-                            LocalDatabaseHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
-                                                                .ID = Wangk.Resource.IDHelper.NewID,
-                                                                .NodeID = parentNode.ConfigurationNodeID,
-                                                                .NodeValueID = parentNode.ID,
-                                                                .LinkNodeID = linkNode.ConfigurationNodeID,
-                                                                .LinkNodeValueID = linkNode.ID
-                                                                })
+                            CacheBOMTemplateInfo.BOMTDHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
+                                                                                .ID = Wangk.Hash.IDHelper.NewID,
+                                                                                .NodeID = parentNode.ConfigurationNodeID,
+                                                                                .NodeValueID = parentNode.ID,
+                                                                                .LinkNodeID = linkNode.ConfigurationNodeID,
+                                                                                .LinkNodeValueID = linkNode.ID
+                                                                                })
 
                         Next
 
@@ -821,6 +893,7 @@ Public NotInheritable Class BOMTemplateHelper
 
             End Using
         End Using
+
     End Sub
 #End Region
 
@@ -830,9 +903,13 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 制作提取模板
     ''' </summary>
-    Public Shared Sub CreateTemplate()
+    Public Sub CreateTemplate()
 
-        Using readFS = New FileStream(AppSettingHelper.TempfilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -843,12 +920,12 @@ Public NotInheritable Class BOMTemplateHelper
 
                 ReadBOMInfo(tmpExcelPackage)
 
-                Dim levelColumnID = AppSettingHelper.GetInstance.BOMlevelColumnID
-                Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
-                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim BOMRemarkColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID
-                Dim BOMpIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim levelColumnID = CurrentBOMlevelColumnID
+                Dim LevelCount = CurrentBOMLevelCount
+                Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+                Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+                Dim BOMRemarkColumnID = CurrentBOMRemarkColumnID
+                Dim BOMpIDColumnID = CurrentBOMpIDColumnID
 
 #Region "设置默认样式"
                 For rID = MaterialRowMinID To MaterialRowMaxID
@@ -899,7 +976,7 @@ Public NotInheritable Class BOMTemplateHelper
                 CalculateMaterialCount(tmpExcelPackage)
 
                 '另存为模板
-                Using tmpSaveFileStream = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Create)
+                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateInfo.TemplateFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
                 End Using
 
@@ -913,17 +990,18 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 清空组合料节点的价格
     ''' </summary>
-    Public Shared Sub ClearCompositeMaterialPrice(wb As ExcelPackage)
+    Public Sub ClearCompositeMaterialPrice(wb As ExcelPackage)
+
         ReadBOMInfo(wb)
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
-        Dim baseMaterialFlagColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
+        Dim baseMaterialFlagColumnID = CurrentBOMRemarkColumnID + 1
 
         For rID = MaterialRowMinID To MaterialRowMaxID
 
@@ -947,16 +1025,17 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 计算基础物料总数
     ''' </summary>
-    Public Shared Sub CalculateMaterialCount(wb As ExcelPackage)
+    Public Sub CalculateMaterialCount(wb As ExcelPackage)
+
         ReadBOMInfo(wb)
 
-        Dim levelColumnID = AppSettingHelper.GetInstance.BOMlevelColumnID
-        Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim levelColumnID = CurrentBOMlevelColumnID
+        Dim LevelCount = CurrentBOMLevelCount
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
         Dim pCountColumnID = pIDColumnID + 4
-        Dim tmpCountColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID + 1
+        Dim tmpCountColumnID = CurrentBOMRemarkColumnID + 1
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1011,22 +1090,27 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 获取替换物料在模板中的位置
     ''' </summary>
-    Public Shared Function GetMaterialRowIDInTemplate() As List(Of ConfigurationNodeRowInfo)
+    Public Function GetMaterialRowIDInTemplate() As List(Of ConfigurationNodeRowInfo)
+
         Dim tmpList = New List(Of ConfigurationNodeRowInfo)
 
-        Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(CacheBOMTemplateInfo.TemplateFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 ReadBOMInfo(tmpExcelPackage)
 
-                Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-                Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+                Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+                Dim pIDColumnID = CurrentBOMpIDColumnID
 
 #Region "新格式"
-                Dim MaterialItems = LocalDatabaseHelper.GetConfigurationNodeInfoItems()
+                Dim MaterialItems = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoItems()
 
                 For Each item In MaterialItems
                     '跳过非物料选项
@@ -1039,7 +1123,7 @@ Public NotInheritable Class BOMTemplateHelper
                         '有标记
                     Else
                         '无标记
-                        Dim tmppIDItems = LocalDatabaseHelper.GetMaterialpIDItems(item.ID)
+                        Dim tmppIDItems = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialpIDItems(item.ID)
 
                         tmpMarkLocations = GetNoMarkLocations(tmpExcelPackage, tmppIDItems)
 
@@ -1064,6 +1148,7 @@ Public NotInheritable Class BOMTemplateHelper
         End Using
 
         Return tmpList
+
     End Function
 #End Region
 
@@ -1071,18 +1156,18 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 获取标记的替换位置
     ''' </summary>
-    Private Shared Function GetMarkLocations(
-                                            wb As ExcelPackage,
-                                            nodeName As String) As List(Of Integer)
+    Private Function GetMarkLocations(wb As ExcelPackage,
+                                      nodeName As String) As List(Of Integer)
+
         Dim tmpList As New List(Of Integer)
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
 
         For rID = MaterialRowMinID To MaterialRowMaxID
 
@@ -1106,6 +1191,7 @@ Public NotInheritable Class BOMTemplateHelper
         Next
 
         Return tmpList
+
     End Function
 #End Region
 
@@ -1113,18 +1199,18 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 获取无标记的替换位置
     ''' </summary>
-    Private Shared Function GetNoMarkLocations(
-                                              wb As ExcelPackage,
-                                              pIDItems As HashSet(Of String)) As List(Of Integer)
+    Private Function GetNoMarkLocations(wb As ExcelPackage,
+                                        pIDItems As HashSet(Of String)) As List(Of Integer)
+
         Dim tmpList As New List(Of Integer)
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
 
         For rID = MaterialRowMinID To MaterialRowMaxID
 
@@ -1159,6 +1245,7 @@ Public NotInheritable Class BOMTemplateHelper
         Next
 
         Return tmpList
+
     End Function
 #End Region
 
@@ -1166,11 +1253,14 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 替换物料并输出
     ''' </summary>
-    Public Shared Sub ReplaceMaterialAndSave(
-                                            outputFilePath As String,
-                                            values As List(Of ConfigurationNodeRowInfo))
+    Public Sub ReplaceMaterialAndSave(outputFilePath As String,
+                                      values As List(Of ConfigurationNodeRowInfo))
 
-        Using readFS = New FileStream(AppSettingHelper.TemplateFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+        Using readFS = New FileStream(CacheBOMTemplateInfo.TemplateFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
             Using tmpExcelPackage As New ExcelPackage(readFS)
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
@@ -1179,7 +1269,7 @@ Public NotInheritable Class BOMTemplateHelper
 
                 ReplaceMaterial(tmpExcelPackage, values)
 
-                Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+                Dim pIDColumnID = CurrentBOMpIDColumnID
 
                 '删除物料标记列
                 Dim headerLocation = FindTextLocation(tmpExcelPackage, "替换料")
@@ -1195,7 +1285,7 @@ Public NotInheritable Class BOMTemplateHelper
 
                 '更新BOM名称
                 headerLocation = FindTextLocation(tmpExcelPackage, "显示屏规格")
-                Dim BOMName = JoinBOMName(tmpExcelPackage, AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList)
+                Dim BOMName = JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.ExportConfigurationNodeInfoList)
                 tmpWorkSheet.Cells(headerLocation.Y, headerLocation.X + 2).Value = BOMName
 
                 '自动调整行高
@@ -1216,7 +1306,7 @@ Public NotInheritable Class BOMTemplateHelper
                 Dim MaterialRowMinID = headerLocation.Y + 2
                 Dim MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
 
-                Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
+                Dim LevelCount = CurrentBOMLevelCount
 
 #Region "删除空行"
                 For rid = MaterialRowMaxID To MaterialRowMinID Step -1
@@ -1279,6 +1369,7 @@ Public NotInheritable Class BOMTemplateHelper
 
             End Using
         End Using
+
     End Sub
 #End Region
 
@@ -1286,12 +1377,11 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 替换物料
     ''' </summary>
-    Public Shared Sub ReplaceMaterial(
-                                     wb As ExcelPackage,
-                                     values As List(Of ConfigurationNodeRowInfo))
+    Public Sub ReplaceMaterial(wb As ExcelPackage,
+                               values As List(Of ConfigurationNodeRowInfo))
 
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
-        Dim BOMRemarkColumnID = AppSettingHelper.GetInstance.BOMRemarkColumnID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
+        Dim BOMRemarkColumnID = CurrentBOMRemarkColumnID
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1342,11 +1432,10 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 计算配置项单项总价
     ''' </summary>
-    Public Shared Sub CalculateConfigurationMaterialTotalPrice(
-                                                 wb As ExcelPackage,
-                                                 values As List(Of ConfigurationNodeRowInfo))
+    Public Sub CalculateConfigurationMaterialTotalPrice(wb As ExcelPackage,
+                                                        values As List(Of ConfigurationNodeRowInfo))
 
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
         Dim pUnitPriceColumnID = pIDColumnID + 5
         Dim tmpCountColumnID = FindTextLocation(wb, "备注").X + 1
 
@@ -1355,6 +1444,10 @@ Public NotInheritable Class BOMTemplateHelper
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
         For Each node In values
+
+            If Not node.IsMaterial Then
+                Continue For
+            End If
 
             Dim tmpUnitPrice As Decimal = 0
 
@@ -1369,19 +1462,20 @@ Public NotInheritable Class BOMTemplateHelper
                 Next
             End If
 
-            Dim tmpConfigurationNode = AppSettingHelper.GetInstance.ConfigurationNodeControlTable(node.ConfigurationNodeID).NodeInfo
+            Dim tmpConfigurationNode = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable(node.ConfigurationNodeID).NodeInfo
 
             '记录价格
             tmpConfigurationNode.TotalPrice = tmpUnitPrice
 
             '计算占比
-            If AppSettingHelper.GetInstance.TotalPrice = 0 Then
+            If AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice = 0 Then
                 tmpConfigurationNode.TotalPricePercentage = 0
             Else
-                tmpConfigurationNode.TotalPricePercentage = tmpConfigurationNode.TotalPrice * 100 / AppSettingHelper.GetInstance.TotalPrice
+                tmpConfigurationNode.TotalPricePercentage = tmpConfigurationNode.TotalPrice * 100 / AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice
             End If
 
         Next
+
     End Sub
 #End Region
 
@@ -1389,13 +1483,13 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 计算物料单项总价
     ''' </summary>
-    Public Shared Sub CalculateMaterialTotalPrice(wb As ExcelPackage)
+    Public Sub CalculateMaterialTotalPrice(wb As ExcelPackage)
 
-        AppSettingHelper.GetInstance.MaterialTotalPriceTable.Clear()
+        AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable.Clear()
 
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
         Dim pUnitPriceColumnID = pIDColumnID + 5
         Dim tmpCountColumnID = FindTextLocation(wb, "备注").X + 1
         Dim baseMaterialFlagColumnID = tmpCountColumnID + 1
@@ -1424,13 +1518,13 @@ Public NotInheritable Class BOMTemplateHelper
             Dim tmpPrice As Decimal = Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, pUnitPriceColumnID).Value}")) *
                     Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, tmpCountColumnID).Value}"))
 
-            If AppSettingHelper.GetInstance.MaterialTotalPriceTable.ContainsKey(pName) Then
+            If AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable.ContainsKey(pName) Then
                 '已存在
-                Dim oldPrice = AppSettingHelper.GetInstance.MaterialTotalPriceTable(pName)
-                AppSettingHelper.GetInstance.MaterialTotalPriceTable(pName) = oldPrice + tmpPrice
+                Dim oldPrice = AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable(pName)
+                AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable(pName) = oldPrice + tmpPrice
             Else
                 '不存在
-                AppSettingHelper.GetInstance.MaterialTotalPriceTable.Add(pName, tmpPrice)
+                AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable.Add(pName, tmpPrice)
             End If
 
         Next
@@ -1442,9 +1536,8 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 获取拼接的BOM名称
     ''' </summary>
-    Public Shared Function JoinBOMName(
-                                wb As ExcelPackage,
-                                values As List(Of ExportConfigurationNodeInfo)) As String
+    Public Shared Function JoinBOMName(wb As ExcelPackage,
+                                       values As List(Of ExportConfigurationNodeInfo)) As String
 
         Dim headerLocation = FindTextLocation(wb, "品  名")
 
@@ -1473,6 +1566,7 @@ Public NotInheritable Class BOMTemplateHelper
     ''' 获取拼接的配置项名称
     ''' </summary>
     Public Shared Function JoinConfigurationName(value As ExportConfigurationNodeInfo) As String
+
         '跳过未出现在BOM中的配置项
         If Not value.Exist Then
             Return ""
@@ -1525,6 +1619,7 @@ Public NotInheritable Class BOMTemplateHelper
         End If
 
         Return nameStr
+
     End Function
 #End Region
 
@@ -1532,13 +1627,14 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 计算单价
     ''' </summary>
-    Public Shared Sub CalculateUnitPrice(wb As ExcelPackage)
+    Public Sub CalculateUnitPrice(wb As ExcelPackage)
+
         ReadBOMInfo(wb)
 
-        Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
-        Dim MaterialRowMaxID = AppSettingHelper.GetInstance.BOMMaterialRowMaxID
-        Dim MaterialRowMinID = AppSettingHelper.GetInstance.BOMMaterialRowMinID
-        Dim pIDColumnID = AppSettingHelper.GetInstance.BOMpIDColumnID
+        Dim LevelCount = CurrentBOMLevelCount
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1596,16 +1692,15 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 获取阶层等级,未找到则返回0
     ''' </summary>
-    Public Shared Function GetLevel(
-                                   wb As ExcelPackage,
-                                   rowID As Integer) As Integer
+    Public Function GetLevel(wb As ExcelPackage,
+                             rowID As Integer) As Integer
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-        Dim levelColumnID = AppSettingHelper.GetInstance.BOMlevelColumnID
-        Dim LevelCount = AppSettingHelper.GetInstance.BOMLevelCount
+        Dim levelColumnID = CurrentBOMlevelColumnID
+        Dim LevelCount = CurrentBOMLevelCount
 
         For i001 = levelColumnID To levelColumnID + LevelCount - 1
             If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rowID, i001).Value}") Then
@@ -1624,22 +1719,23 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 读取BOM基本信息
     ''' </summary>
-    Public Shared Sub ReadBOMInfo(wb As ExcelPackage)
+    Public Sub ReadBOMInfo(wb As ExcelPackage)
+
         Dim tmpExcelPackage = wb
 
         Dim headerLocation = FindTextLocation(tmpExcelPackage, "阶层")
-        AppSettingHelper.GetInstance.BOMlevelColumnID = headerLocation.X
-        AppSettingHelper.GetInstance.BOMMaterialRowMinID = headerLocation.Y + 2
-        AppSettingHelper.GetInstance.BOMLevelCount = FindTextLocation(tmpExcelPackage, "替换料").X - headerLocation.X
+        CurrentBOMlevelColumnID = headerLocation.X
+        CurrentBOMMaterialRowMinID = headerLocation.Y + 2
+        CurrentBOMLevelCount = FindTextLocation(tmpExcelPackage, "替换料").X - headerLocation.X
 
         headerLocation = FindTextLocation(tmpExcelPackage, "版次")
-        AppSettingHelper.GetInstance.BOMMaterialRowMaxID = headerLocation.Y - 1
+        CurrentBOMMaterialRowMaxID = headerLocation.Y - 1
 
         headerLocation = FindTextLocation(tmpExcelPackage, "品 号")
-        AppSettingHelper.GetInstance.BOMpIDColumnID = headerLocation.X
+        CurrentBOMpIDColumnID = headerLocation.X
 
         headerLocation = FindTextLocation(tmpExcelPackage, "备注")
-        AppSettingHelper.GetInstance.BOMRemarkColumnID = headerLocation.X
+        CurrentBOMRemarkColumnID = headerLocation.X
 
     End Sub
 #End Region
@@ -1648,9 +1744,8 @@ Public NotInheritable Class BOMTemplateHelper
     ''' <summary>
     ''' 生成文件配置清单文件
     ''' </summary>
-    Public Shared Sub CreateConfigurationListFile(
-                                                 outputFilePath As String,
-                                                 BOMList As List(Of BOMConfigurationInfo))
+    Public Sub CreateConfigurationListFile(outputFilePath As String,
+                                           BOMList As List(Of BOMConfigurationInfo))
 
         Using tmpExcelPackage As New ExcelPackage()
             Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1660,7 +1755,7 @@ Public NotInheritable Class BOMTemplateHelper
             tmpWorkSheet.Cells(1, 1).Value = "文件名"
             tmpWorkSheet.Cells(1, 2).Value = "操作"
             Dim tmpID = 3
-            For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+            For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
                 If Not item.Exist Then
                     Continue For
                 End If
@@ -1669,13 +1764,13 @@ Public NotInheritable Class BOMTemplateHelper
             Next
             tmpWorkSheet.Cells(1, tmpID).Value = "总价"
 
-            Dim tmpKeys = From item In AppSettingHelper.GetInstance.ConfigurationNodeControlTable.Values
+            Dim tmpKeys = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
                           Where item.NodeInfo.IsMaterial = True
                           Order By item.NodeInfo.SortID
                           Select item.NodeInfo.ID
             '显示物料选项标题
             For i001 = 0 To tmpKeys.Count - 1
-                tmpWorkSheet.Cells(1, tmpID + i001 + 1).Value = AppSettingHelper.GetInstance.ConfigurationNodeControlTable(tmpKeys(i001)).NodeInfo.Name
+                tmpWorkSheet.Cells(1, tmpID + i001 + 1).Value = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable(tmpKeys(i001)).NodeInfo.Name
             Next
 
             For i001 = 0 To BOMList.Count - 1
@@ -1687,7 +1782,7 @@ Public NotInheritable Class BOMTemplateHelper
                 tmpWorkSheet.Cells(i001 + 1 + 1, 2).Style.Font.Color.SetColor(UIFormHelper.NormalColor)
 
                 '配置
-                For Each item In AppSettingHelper.GetInstance.ExportConfigurationNodeInfoList
+                For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
                     If Not item.Exist Then
                         Continue For
                     End If
@@ -1702,7 +1797,7 @@ Public NotInheritable Class BOMTemplateHelper
                     item.Value = findNode.SelectedValue
                     item.IsMaterial = findNode.IsMaterial
                     If item.IsMaterial Then
-                        item.MaterialValue = LocalDatabaseHelper.GetMaterialInfoByID(item.ValueID)
+                        item.MaterialValue = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
                     End If
 
                     tmpWorkSheet.Cells(i001 + 1 + 1, item.ColIndex + 3).Value = JoinConfigurationName(item)
@@ -1739,6 +1834,350 @@ Public NotInheritable Class BOMTemplateHelper
                 tmpExcelPackage.SaveAs(tmpSaveFileStream)
             End Using
         End Using
+
+    End Sub
+#End Region
+
+#Region "保存BOM配置到BOM模板内"
+    ''' <summary>
+    ''' 保存BOM配置到BOM模板内
+    ''' </summary>
+    Public Sub SaveBOMConfigurationInfoToBOMTemplate(sourceFilePath As String)
+
+        Using readFS = New FileStream(sourceFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                             Return tmpSheet.Name.Equals("BOMConfigurationInfo")
+                                                                         End Function)
+
+                If tmpWorkSheet Is Nothing Then
+
+                Else
+                    tmpWorkBook.Worksheets.Delete("BOMConfigurationInfo")
+                End If
+                tmpWorkSheet = tmpWorkBook.Worksheets.Add("BOMConfigurationInfo")
+                '调试时不隐藏
+                tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
+
+                Dim rID = 1
+                For i001 = 0 To CacheBOMTemplateInfo.ExportBOMList.Count - 1
+                    Dim BOMConfigurationInfoItem = CacheBOMTemplateInfo.ExportBOMList(i001)
+
+                    For Each item In BOMConfigurationInfoItem.ConfigurationItems
+
+                        tmpWorkSheet.Cells(rID, 1).Value = i001
+                        tmpWorkSheet.Cells(rID, 2).Value = item.ConfigurationNodeName
+                        tmpWorkSheet.Cells(rID, 3).Value = item.SelectedValue
+
+                        rID += 1
+                    Next
+
+                Next
+
+                '另存为
+                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateInfo.SourceFilePath, FileMode.Create)
+                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
+                End Using
+
+            End Using
+        End Using
+
+        IO.File.Copy(CacheBOMTemplateInfo.SourceFilePath, CacheBOMTemplateInfo.BackupFilePath, True)
+
+    End Sub
+#End Region
+
+#Region "保存BOM配置到新BOM模板内"
+    ''' <summary>
+    ''' 保存BOM配置到新BOM模板内
+    ''' </summary>
+    Public Sub SaveAsBOMConfigurationInfoToBOMTemplate(sourceFilePath As String,
+                                                       destFilePath As String)
+
+        Using readFS = New FileStream(sourceFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                             Return tmpSheet.Name.Equals("BOMConfigurationInfo")
+                                                                         End Function)
+
+                If tmpWorkSheet Is Nothing Then
+
+                Else
+                    tmpWorkBook.Worksheets.Delete("BOMConfigurationInfo")
+                End If
+                tmpWorkSheet = tmpWorkBook.Worksheets.Add("BOMConfigurationInfo")
+                '调试时不隐藏
+                tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
+
+                Dim rID = 1
+                For i001 = 0 To CacheBOMTemplateInfo.ExportBOMList.Count - 1
+                    Dim BOMConfigurationInfoItem = CacheBOMTemplateInfo.ExportBOMList(i001)
+
+                    For Each item In BOMConfigurationInfoItem.ConfigurationItems
+
+                        tmpWorkSheet.Cells(rID, 1).Value = i001
+                        tmpWorkSheet.Cells(rID, 2).Value = item.ConfigurationNodeName
+                        tmpWorkSheet.Cells(rID, 3).Value = item.SelectedValue
+
+                        rID += 1
+                    Next
+
+                Next
+
+                '另存为
+                Using tmpSaveFileStream = New FileStream(destFilePath, FileMode.Create)
+                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
+                End Using
+
+            End Using
+        End Using
+
+        IO.File.Copy(destFilePath, CacheBOMTemplateInfo.BackupFilePath, True)
+
+    End Sub
+#End Region
+
+#Region "读取BOM模板内的BOM配置"
+    ''' <summary>
+    ''' 读取BOM模板内的BOM配置
+    ''' </summary>
+    Public Sub ReadBOMConfigurationInfoFromBOMTemplate()
+
+        CacheBOMTemplateInfo.ExportBOMList = New List(Of BOMConfigurationInfo)
+
+        Using readFS = New FileStream(CacheBOMTemplateInfo.SourceFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                             Return tmpSheet.Name.Equals("BOMConfigurationInfo")
+                                                                         End Function)
+
+                If tmpWorkSheet Is Nothing Then
+                    '无配置表
+                    Exit Sub
+
+                ElseIf tmpWorkSheet.Dimension Is Nothing Then
+                    '有配置表但无数据
+                    Exit Sub
+
+                Else
+                    '有配置表有数据
+                End If
+
+                Dim BOMConfigurationID = -1
+                Dim CurrentBOMConfigurationInfo As BOMConfigurationInfo = Nothing
+
+                For rID = 1 To tmpWorkSheet.Dimension.End.Row
+
+                    If CurrentBOMConfigurationInfo Is Nothing OrElse
+                        BOMConfigurationID <> tmpWorkSheet.Cells(rID, 1).Value Then
+
+                        BOMConfigurationID += 1
+
+                        CurrentBOMConfigurationInfo = New BOMConfigurationInfo With {
+                            .ConfigurationInfoValueTable = New Dictionary(Of String, String)
+                        }
+
+                        CacheBOMTemplateInfo.ExportBOMList.Add(CurrentBOMConfigurationInfo)
+                    End If
+
+                    CurrentBOMConfigurationInfo.ConfigurationInfoValueTable.Add($"{tmpWorkSheet.Cells(rID, 2).Value}", $"{tmpWorkSheet.Cells(rID, 3).Value}")
+
+                Next
+
+            End Using
+        End Using
+
+    End Sub
+#End Region
+
+#Region "匹配待导出BOM列表选项信息"
+    ''' <summary>
+    ''' 匹配待导出BOM列表选项信息
+    ''' </summary>
+    Public Sub MatchingExportBOMListConfigurationNodeAndValue()
+
+        Dim tmpNodeList = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoItems()
+
+        For Each item In CacheBOMTemplateInfo.ExportBOMList
+            item.ConfigurationItems = New List(Of ConfigurationNodeRowInfo)
+
+            For Each nodeItem In tmpNodeList
+
+                Dim addConfigurationNodeRowInfo = New ConfigurationNodeRowInfo() With {
+                    .ConfigurationNodeID = nodeItem.ID,
+                    .ConfigurationNodeName = nodeItem.Name,
+                    .ConfigurationNodePriority = nodeItem.Priority,
+                    .IsMaterial = nodeItem.IsMaterial,
+                    .SelectedValue = Nothing,
+                    .SelectedValueID = Nothing
+                }
+
+                If item.ConfigurationInfoValueTable.ContainsKey(nodeItem.Name) Then
+                    '存在配置项
+
+                    Dim tmpSelectedValue As String = item.ConfigurationInfoValueTable(nodeItem.Name)
+
+                    If String.IsNullOrWhiteSpace(tmpSelectedValue) Then
+                        '空值不做处理
+                    Else
+                        '有值
+
+                        Dim tmpConfigurationNodeValueInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(nodeItem.ID, tmpSelectedValue)
+
+                        If tmpConfigurationNodeValueInfo IsNot Nothing Then
+                            '存在值
+
+                            addConfigurationNodeRowInfo.SelectedValue = tmpConfigurationNodeValueInfo.Value
+                            addConfigurationNodeRowInfo.SelectedValueID = tmpConfigurationNodeValueInfo.ID
+
+                        Else
+                            '不存在值
+                            item.MissingConfigurationNodeValueInfoList.Add(tmpSelectedValue)
+                        End If
+
+                    End If
+
+                Else
+                    '不存在配置项
+
+                    item.MissingConfigurationNodeInfoList.Add(nodeItem.Name)
+
+                End If
+
+                item.ConfigurationItems.Add(addConfigurationNodeRowInfo)
+
+            Next
+
+        Next
+
+    End Sub
+#End Region
+
+#Region "计算待导出BOM列表选项价格"
+    ''' <summary>
+    ''' 计算待导出BOM列表选项价格
+    ''' </summary>
+    Public Sub CalculateExportBOMListConfigurationPrice()
+
+        For Each exportBOMItem In CacheBOMTemplateInfo.ExportBOMList
+
+            '获取位置及物料信息
+            For Each item In exportBOMItem.ConfigurationItems
+
+                If Not item.IsMaterial Then
+                    Continue For
+                End If
+
+                item.MaterialRowIDList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialRowID(item.ConfigurationNodeID)
+                item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.SelectedValueID)
+
+            Next
+
+            '处理物料信息
+            Using readFS = New FileStream(AppSettingHelper.Instance.CurrentBOMTemplateInfo.TemplateFilePath,
+                                          FileMode.Open,
+                                          FileAccess.Read,
+                                          FileShare.ReadWrite)
+
+                Using tmpExcelPackage As New ExcelPackage(readFS)
+                    Dim tmpWorkBook = tmpExcelPackage.Workbook
+                    Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReadBOMInfo(tmpExcelPackage)
+
+                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReplaceMaterial(tmpExcelPackage, exportBOMItem.ConfigurationItems)
+
+                    Dim headerLocation = FindTextLocation(tmpExcelPackage, "单价")
+
+                    exportBOMItem.UnitPrice = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
+
+                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.CalculateExportBOMListConfigurationMaterialTotalPrice(tmpExcelPackage, exportBOMItem.ConfigurationItems)
+
+                    '获取导出项信息
+                    For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
+                        item.Exist = False
+
+                        Dim findNodes = From node In exportBOMItem.ConfigurationItems
+                                        Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
+                                        Select node
+                        If findNodes.Count = 0 Then Continue For
+
+                        Dim findNode = findNodes.First
+
+                        item.Exist = True
+                        item.ValueID = findNode.SelectedValueID
+                        item.Value = findNode.SelectedValue
+                        item.IsMaterial = findNode.IsMaterial
+                        If item.IsMaterial Then
+                            item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
+                        End If
+
+                    Next
+
+                    '获取BOM名称
+                    exportBOMItem.Name = JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.ExportConfigurationNodeInfoList)
+
+                End Using
+            End Using
+
+        Next
+
+    End Sub
+#End Region
+
+#Region "计算待导出BOM列表配置项单项总价"
+    ''' <summary>
+    ''' 计算待导出BOM列表配置项单项总价
+    ''' </summary>
+    Public Sub CalculateExportBOMListConfigurationMaterialTotalPrice(wb As ExcelPackage,
+                                                                     values As List(Of ConfigurationNodeRowInfo))
+
+        Dim pIDColumnID = CurrentBOMpIDColumnID
+        Dim pUnitPriceColumnID = pIDColumnID + 5
+        Dim tmpCountColumnID = FindTextLocation(wb, "备注").X + 1
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+
+        For Each node In values
+
+            If Not node.IsMaterial Then
+                Continue For
+            End If
+
+            Dim tmpUnitPrice As Decimal = 0
+
+            If String.IsNullOrWhiteSpace(node.SelectedValueID) Then
+                '无替换物料
+            Else
+                '有替换物料
+                For Each item In node.MaterialRowIDList
+                    tmpUnitPrice +=
+                        Convert.ToDecimal(Val($"{tmpWorkSheet.Cells(item, pUnitPriceColumnID).Value}")) *
+                        Convert.ToDecimal(Val($"0{tmpWorkSheet.Cells(item, tmpCountColumnID).Value}"))
+                Next
+            End If
+
+            '记录价格
+            node.TotalPrice = tmpUnitPrice
+
+        Next
 
     End Sub
 #End Region

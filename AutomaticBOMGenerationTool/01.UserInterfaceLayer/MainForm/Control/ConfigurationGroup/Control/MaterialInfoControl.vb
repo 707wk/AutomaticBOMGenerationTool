@@ -22,6 +22,7 @@
         Me.Size = New Size(160, 28)
         Me.TextAlign = ContentAlignment.MiddleLeft
         Me.Cursor = Cursors.Hand
+        Me.Margin = New Padding(2)
 
         Me.DoubleBuffered = True
 

@@ -3,7 +3,7 @@
 ''' </summary>
 Public Class ImportPriceFileInfo
     ''' <summary>
-    ''' 源文件地址
+    ''' 原文件地址
     ''' </summary>
     Public SourceFilePath As String
 
