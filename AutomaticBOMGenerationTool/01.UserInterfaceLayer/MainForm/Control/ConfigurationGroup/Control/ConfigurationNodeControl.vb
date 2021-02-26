@@ -174,7 +174,10 @@ Public Class ConfigurationNodeControl
         If AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.IsHaveParentValueLink(tmpParentNodeValueIDList, NodeInfo.ID) Then
             '有关联,取交集
             '遍历其他配置项当前值
-            For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
+            Dim tmpValues = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
+                            Order By item.NodeInfo.Priority
+                            Select item
+            For Each item In tmpValues 'AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
                 If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
                     Continue For
                 End If
@@ -196,7 +199,10 @@ Public Class ConfigurationNodeControl
         Else
             '无关联,排除其他选项值
             '遍历其他配置项当前值
-            For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
+            Dim tmpValues = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
+                            Order By item.NodeInfo.Priority
+                            Select item
+            For Each item In tmpValues 'AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
                 If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
                     Continue For
                 End If
@@ -251,7 +257,6 @@ Public Class ConfigurationNodeControl
                                               })
             Next
         End If
-
 
         If FlowLayoutPanel1.Controls.Count > 0 Then
             Me.Label1.BackColor = Color.FromArgb(70, 70, 74)

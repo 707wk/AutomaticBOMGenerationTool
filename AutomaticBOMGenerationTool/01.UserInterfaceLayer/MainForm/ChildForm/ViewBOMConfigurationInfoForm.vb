@@ -8,7 +8,11 @@ Public Class ViewBOMConfigurationInfoForm
             ListView1.Items.Clear()
 
             For Each item In value.ConfigurationItems
-                Dim addListViewItem = ListView1.Items.Add(New ListViewItem({item.ConfigurationNodeName, item.SelectedValue}))
+                Dim addListViewItem = ListView1.Items.Add(New ListViewItem({
+                                                                           item.ConfigurationNodeName,
+                                                                           item.SelectedValue
+                                                                           },
+                                                                           If(item.IsMaterial, 1, 0)))
 
                 If value.MissingConfigurationNodeInfoList.Contains(item.ConfigurationNodeName) Then
                     '是丢失的配置项
@@ -33,9 +37,11 @@ Public Class ViewBOMConfigurationInfoForm
         Me.Left = MousePosition.X
         Me.Top = MousePosition.Y - Me.Height
 
+        ListView1.SmallImageList = ImageList1
+
     End Sub
 
-    Private Sub ViewBOMConfigurationInfoForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+    Private Sub ViewBOMConfigurationInfoForm_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         UIFormHelper.UIForm.tmpViewBOMConfigurationInfoForm = Nothing
     End Sub
 

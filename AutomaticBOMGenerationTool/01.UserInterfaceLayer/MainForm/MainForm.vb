@@ -317,7 +317,11 @@ Public Class MainForm
         For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
             item.FlowLayoutPanel1.AutoSize = False
         Next
-        For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
+
+        Dim tmpValues = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
+                        Order By item.NodeInfo.Priority
+                        Select item
+        For Each item In tmpValues
             item.Init()
         Next
         '启用自动调整大小
@@ -874,6 +878,7 @@ Public Class MainForm
                 End If
 
                 tmpViewBOMConfigurationInfoForm.CacheBOMConfigurationInfo = BOMConfigurationInfoItem
+
 #End Region
             Case 5
 #Region "查看配置"

@@ -2035,9 +2035,10 @@ Public Class BOMTemplateHelper
 
                     If String.IsNullOrWhiteSpace(tmpSelectedValue) Then
                         '空值不做处理
+                        'item.ConfigurationInfoValueTable.Remove(nodeItem.Name)
+
                     Else
                         '有值
-
                         Dim tmpConfigurationNodeValueInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(nodeItem.ID, tmpSelectedValue)
 
                         If tmpConfigurationNodeValueInfo IsNot Nothing Then
@@ -2045,6 +2046,8 @@ Public Class BOMTemplateHelper
 
                             addConfigurationNodeRowInfo.SelectedValue = tmpConfigurationNodeValueInfo.Value
                             addConfigurationNodeRowInfo.SelectedValueID = tmpConfigurationNodeValueInfo.ID
+
+                            'item.ConfigurationInfoValueTable.Remove(nodeItem.Name)
 
                         Else
                             '不存在值
@@ -2063,6 +2066,12 @@ Public Class BOMTemplateHelper
                 item.ConfigurationItems.Add(addConfigurationNodeRowInfo)
 
             Next
+
+            'If item.ConfigurationInfoValueTable.Count > 0 Then
+            '    For Each configurationNodeName In item.ConfigurationInfoValueTable.Keys
+            '        item.MissingConfigurationNodeInfoList.Add(configurationNodeName)
+            '    Next
+            'End If
 
         Next
 

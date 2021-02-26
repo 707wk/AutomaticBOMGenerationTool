@@ -531,8 +531,11 @@ where ConfigurationNodeID=@ConfigurationNodeID"
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = "select MaterialLinkInfo.LinkNodeID
 from MaterialLinkInfo
+left join ConfigurationNodeInfo
+on MaterialLinkInfo.LinkNodeID=ConfigurationNodeInfo.ID
 where NodeID=@NodeID
-group by MaterialLinkInfo.LinkNodeID"
+group by MaterialLinkInfo.LinkNodeID
+order by ConfigurationNodeInfo.Priority"
             }
         cmd.Parameters.Add(New SQLiteParameter("@NodeID", DbType.String) With {.Value = nodeID})
 
