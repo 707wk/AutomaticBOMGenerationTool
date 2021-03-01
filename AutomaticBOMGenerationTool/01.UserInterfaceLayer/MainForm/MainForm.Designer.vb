@@ -51,6 +51,10 @@ Partial Class MainForm
         Me.ButtonItem13 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar3 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem6 = New DevComponents.DotNetBar.ButtonItem()
+        Me.RibbonBar5 = New DevComponents.DotNetBar.RibbonBar()
+        Me.ItemContainer1 = New DevComponents.DotNetBar.ItemContainer()
+        Me.CheckBoxItem1 = New DevComponents.DotNetBar.CheckBoxItem()
+        Me.CheckBoxItem2 = New DevComponents.DotNetBar.CheckBoxItem()
         Me.RibbonBar2 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem5 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem7 = New DevComponents.DotNetBar.ButtonItem()
@@ -164,7 +168,7 @@ Partial Class MainForm
         '
         Me.ShowHideItems.CheckOnClick = True
         Me.ShowHideItems.Name = "ShowHideItems"
-        Me.ShowHideItems.Size = New System.Drawing.Size(136, 22)
+        Me.ShowHideItems.Size = New System.Drawing.Size(180, 22)
         Me.ShowHideItems.Text = "显示隐藏项"
         '
         'ToolStripButton2
@@ -254,6 +258,7 @@ Partial Class MainForm
         Me.RibbonPanel1.ColorSchemeStyle = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonPanel1.Controls.Add(Me.RibbonBar4)
         Me.RibbonPanel1.Controls.Add(Me.RibbonBar3)
+        Me.RibbonPanel1.Controls.Add(Me.RibbonBar5)
         Me.RibbonPanel1.Controls.Add(Me.RibbonBar2)
         Me.RibbonPanel1.Controls.Add(Me.RibbonBar1)
         Me.RibbonPanel1.Dock = System.Windows.Forms.DockStyle.Fill
@@ -291,7 +296,7 @@ Partial Class MainForm
         Me.RibbonBar4.DragDropSupport = True
         Me.RibbonBar4.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem1, Me.FeedbackButton, Me.ButtonItem13})
         Me.RibbonBar4.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar4.Location = New System.Drawing.Point(939, 0)
+        Me.RibbonBar4.Location = New System.Drawing.Point(999, 0)
         Me.RibbonBar4.Name = "RibbonBar4"
         Me.RibbonBar4.Size = New System.Drawing.Size(224, 99)
         Me.RibbonBar4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
@@ -349,9 +354,9 @@ Partial Class MainForm
         Me.RibbonBar3.DragDropSupport = True
         Me.RibbonBar3.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem6})
         Me.RibbonBar3.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar3.Location = New System.Drawing.Point(731, 0)
+        Me.RibbonBar3.Location = New System.Drawing.Point(887, 0)
         Me.RibbonBar3.Name = "RibbonBar3"
-        Me.RibbonBar3.Size = New System.Drawing.Size(208, 99)
+        Me.RibbonBar3.Size = New System.Drawing.Size(112, 99)
         Me.RibbonBar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar3.TabIndex = 2
         Me.RibbonBar3.Text = "工具"
@@ -372,6 +377,65 @@ Partial Class MainForm
         Me.ButtonItem6.Name = "ButtonItem6"
         Me.ButtonItem6.SubItemsExpandWidth = 14
         Me.ButtonItem6.Text = "设置"
+        '
+        'RibbonBar5
+        '
+        Me.RibbonBar5.AutoOverflowEnabled = True
+        '
+        '
+        '
+        Me.RibbonBar5.BackgroundMouseOverStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
+        '
+        '
+        Me.RibbonBar5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        Me.RibbonBar5.ContainerControlProcessDialogKey = True
+        Me.RibbonBar5.Dock = System.Windows.Forms.DockStyle.Left
+        Me.RibbonBar5.DragDropSupport = True
+        Me.RibbonBar5.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ItemContainer1})
+        Me.RibbonBar5.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
+        Me.RibbonBar5.Location = New System.Drawing.Point(731, 0)
+        Me.RibbonBar5.Name = "RibbonBar5"
+        Me.RibbonBar5.Size = New System.Drawing.Size(156, 99)
+        Me.RibbonBar5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
+        Me.RibbonBar5.TabIndex = 5
+        Me.RibbonBar5.Text = "视图"
+        '
+        '
+        '
+        Me.RibbonBar5.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
+        '
+        '
+        Me.RibbonBar5.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
+        'ItemContainer1
+        '
+        '
+        '
+        '
+        Me.ItemContainer1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        Me.ItemContainer1.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical
+        Me.ItemContainer1.Name = "ItemContainer1"
+        Me.ItemContainer1.SubItems.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.CheckBoxItem1, Me.CheckBoxItem2})
+        '
+        '
+        '
+        Me.ItemContainer1.TitleMouseOverStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
+        '
+        '
+        Me.ItemContainer1.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
+        'CheckBoxItem1
+        '
+        Me.CheckBoxItem1.Name = "CheckBoxItem1"
+        Me.CheckBoxItem1.Text = "物料价格占比"
+        '
+        'CheckBoxItem2
+        '
+        Me.CheckBoxItem2.Name = "CheckBoxItem2"
+        Me.CheckBoxItem2.Text = "待导出BOM列表"
         '
         'RibbonBar2
         '
@@ -947,4 +1011,8 @@ Partial Class MainForm
     Friend WithEvents ButtonItem13 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents ToolStripStatusLabel2 As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabel3 As ToolStripStatusLabel
+    Friend WithEvents RibbonBar5 As DevComponents.DotNetBar.RibbonBar
+    Friend WithEvents ItemContainer1 As DevComponents.DotNetBar.ItemContainer
+    Friend WithEvents CheckBoxItem1 As DevComponents.DotNetBar.CheckBoxItem
+    Friend WithEvents CheckBoxItem2 As DevComponents.DotNetBar.CheckBoxItem
 End Class

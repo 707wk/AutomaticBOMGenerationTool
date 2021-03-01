@@ -283,4 +283,38 @@ Public Class AppSettingHelper
     <Newtonsoft.Json.JsonIgnore>
     Public CurrentBOMTemplateInfo As BOMTemplateInfo
 
+#Region "视图状态"
+    ''' <summary>
+    ''' 视图初始状态
+    ''' </summary>
+    Public ViewInitVisibleTable As New Dictionary(Of String, Boolean)
+
+    ''' <summary>
+    ''' 获取视图初始状态
+    ''' </summary>
+    Public Function ViewVisible(viewName As String) As Boolean
+
+        If ViewInitVisibleTable.ContainsKey(viewName) Then
+            Return ViewInitVisibleTable(viewName)
+        Else
+            ViewInitVisibleTable.Add(viewName, True)
+            Return True
+        End If
+
+    End Function
+
+    ''' <summary>
+    ''' 设置视图状态
+    ''' </summary>
+    Public Sub ViewVisible(viewName As String, visible As Boolean)
+
+        If ViewInitVisibleTable.ContainsKey(viewName) Then
+            ViewInitVisibleTable(viewName) = visible
+        Else
+            ViewInitVisibleTable.Add(viewName, visible)
+        End If
+
+    End Sub
+#End Region
+
 End Class

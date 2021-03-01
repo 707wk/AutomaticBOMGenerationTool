@@ -4,6 +4,7 @@ Imports System.Drawing.Drawing2D
 Imports System.IO
 Imports System.Text
 Imports System.Windows.Forms.DataVisualization.Charting
+Imports DevComponents.DotNetBar
 Imports OfficeOpenXml
 
 Public Class MainForm
@@ -92,6 +93,12 @@ Public Class MainForm
             .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
 
         End With
+
+        '初始化视图状态
+        CheckBoxItem1.Checked = AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer2.Panel2Collapsed")
+        SplitContainer2.Panel2Collapsed = Not AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer2.Panel2Collapsed")
+        CheckBoxItem2.Checked = AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed")
+        SplitContainer1.Panel2Collapsed = Not AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed")
 
     End Sub
 #End Region
@@ -844,11 +851,16 @@ Public Class MainForm
         '显示隐藏项
         AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems = ShowHideItems.Checked
 
+        Dim tmpStopwatch As New Stopwatch
+        tmpStopwatch.Start()
+
         For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
             item.UpdateVisible()
         Next
 
-        UIFormHelper.ToastSuccess("界面更新完成")
+        tmpStopwatch.Stop()
+
+        UIFormHelper.ToastSuccess($"界面更新完成,耗时 {tmpStopwatch.Elapsed:mm\:ss\.fff}")
 
     End Sub
 
@@ -873,8 +885,9 @@ Public Class MainForm
                 Dim BOMConfigurationInfoItem = ExportBOMList.Rows(e.RowIndex).Tag
 
                 If tmpViewBOMConfigurationInfoForm Is Nothing Then
-                    tmpViewBOMConfigurationInfoForm = New ViewBOMConfigurationInfoForm
-                    tmpViewBOMConfigurationInfoForm.Owner = Me
+                    tmpViewBOMConfigurationInfoForm = New ViewBOMConfigurationInfoForm With {
+                        .Owner = Me
+                    }
                 End If
 
                 tmpViewBOMConfigurationInfoForm.CacheBOMConfigurationInfo = BOMConfigurationInfoItem
@@ -1276,6 +1289,18 @@ Public Class MainForm
 
     Private Sub ToolStripStatusLabel2_Click(sender As Object, e As EventArgs) Handles ToolStripStatusLabel2.Click
         FileHelper.Open(AppSettingHelper.Instance.TempDirectoryPath)
+    End Sub
+
+    Private Sub CheckBoxItem1_CheckedChanged(sender As Object, e As CheckBoxChangeEventArgs) Handles CheckBoxItem1.CheckedChanged
+        SplitContainer2.Panel2Collapsed = Not CheckBoxItem1.Checked
+
+        AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer2.Panel2Collapsed", CheckBoxItem1.Checked)
+    End Sub
+
+    Private Sub CheckBoxItem2_CheckedChanged(sender As Object, e As CheckBoxChangeEventArgs) Handles CheckBoxItem2.CheckedChanged
+        SplitContainer1.Panel2Collapsed = Not CheckBoxItem2.Checked
+
+        AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed", CheckBoxItem2.Checked)
     End Sub
 
 End Class
