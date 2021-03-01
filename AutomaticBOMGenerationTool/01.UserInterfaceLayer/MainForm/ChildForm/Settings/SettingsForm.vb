@@ -30,6 +30,8 @@
                                            })
         Next
 
+        CheckBox1.Checked = AppSettingHelper.Instance.EnabledBOMTemplateDatabaseUnsafetyOption
+
     End Sub
 
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
@@ -86,6 +88,8 @@
                                                                              .MatchingValues = StrConv(item.Cells(7).Value, VbStrConv.Narrow)
                                                                              })
         Next
+
+        AppSettingHelper.Instance.EnabledBOMTemplateDatabaseUnsafetyOption = CheckBox1.Checked
 
         Me.Close()
 

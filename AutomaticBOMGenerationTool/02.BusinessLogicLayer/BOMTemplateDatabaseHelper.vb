@@ -22,7 +22,9 @@ Public Class BOMTemplateDatabaseHelper
                 }
                 _DatabaseConnection.Open()
 
-                'Init()
+                If AppSettingHelper.Instance.EnabledBOMTemplateDatabaseUnsafetyOption Then
+                    Init()
+                End If
 
             End If
 

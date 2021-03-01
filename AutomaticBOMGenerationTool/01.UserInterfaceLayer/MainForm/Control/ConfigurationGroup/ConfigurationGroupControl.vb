@@ -85,4 +85,12 @@
     End Sub
 #End Region
 
+    Private Sub CheckBox1_SizeChanged(sender As Object, e As EventArgs) Handles CheckBox1.SizeChanged
+
+        For Each item As ConfigurationNodeControl In FlowLayoutPanel1.Controls
+            item.Width = CheckBox1.Width - 26
+        Next
+
+    End Sub
+
 End Class

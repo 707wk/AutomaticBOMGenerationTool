@@ -123,10 +123,12 @@ Partial Class MainForm
         Me.ConfigurationGroupList.AutoScroll = True
         Me.ConfigurationGroupList.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.ConfigurationGroupList.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.ConfigurationGroupList.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.ConfigurationGroupList.Location = New System.Drawing.Point(3, 46)
         Me.ConfigurationGroupList.Name = "ConfigurationGroupList"
         Me.ConfigurationGroupList.Size = New System.Drawing.Size(729, 346)
         Me.ConfigurationGroupList.TabIndex = 3
+        Me.ConfigurationGroupList.WrapContents = False
         '
         'GroupBox1
         '
@@ -168,7 +170,7 @@ Partial Class MainForm
         '
         Me.ShowHideItems.CheckOnClick = True
         Me.ShowHideItems.Name = "ShowHideItems"
-        Me.ShowHideItems.Size = New System.Drawing.Size(180, 22)
+        Me.ShowHideItems.Size = New System.Drawing.Size(136, 22)
         Me.ShowHideItems.Text = "显示隐藏项"
         '
         'ToolStripButton2

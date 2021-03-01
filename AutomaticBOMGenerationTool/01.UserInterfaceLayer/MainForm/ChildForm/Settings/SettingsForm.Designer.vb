@@ -31,6 +31,10 @@ Partial Class SettingsForm
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
+        Me.TabPage2 = New System.Windows.Forms.TabPage()
+        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.CheckBox1 = New System.Windows.Forms.CheckBox()
         Me.CancelButton = New System.Windows.Forms.Button()
         Me.AddOrSaveButton = New System.Windows.Forms.Button()
         Me.ExportSettingsButton = New System.Windows.Forms.Button()
@@ -39,6 +43,8 @@ Partial Class SettingsForm
         Me.TabPage1.SuspendLayout()
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
+        Me.TabPage2.SuspendLayout()
+        Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
         'TabControl1
@@ -47,10 +53,13 @@ Partial Class SettingsForm
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.ItemSize = New System.Drawing.Size(160, 22)
         Me.TabControl1.Location = New System.Drawing.Point(12, 12)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(984, 444)
+        Me.TabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed
         Me.TabControl1.TabIndex = 0
         '
         'TabPage1
@@ -127,6 +136,52 @@ Partial Class SettingsForm
         Me.ToolStripButton2.Size = New System.Drawing.Size(92, 24)
         Me.ToolStripButton2.Text = "移除选中项"
         '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.TableLayoutPanel1)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage2.Size = New System.Drawing.Size(976, 414)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "其它"
+        Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'TableLayoutPanel1
+        '
+        Me.TableLayoutPanel1.ColumnCount = 2
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel1.Controls.Add(Me.Label1, 0, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.CheckBox1, 1, 0)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(6, 6)
+        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
+        Me.TableLayoutPanel1.RowCount = 1
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(614, 48)
+        Me.TableLayoutPanel1.TabIndex = 2
+        '
+        'Label1
+        '
+        Me.Label1.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(3, 15)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(63, 17)
+        Me.Label1.TabIndex = 1
+        Me.Label1.Text = "模板解析 :"
+        '
+        'CheckBox1
+        '
+        Me.CheckBox1.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.CheckBox1.AutoSize = True
+        Me.CheckBox1.Location = New System.Drawing.Point(72, 13)
+        Me.CheckBox1.Name = "CheckBox1"
+        Me.CheckBox1.Size = New System.Drawing.Size(342, 21)
+        Me.CheckBox1.TabIndex = 0
+        Me.CheckBox1.Text = "启用不安全选项 (能够缩短解析时间,但可能影响程序稳定性)"
+        Me.CheckBox1.UseVisualStyleBackColor = True
+        '
         'CancelButton
         '
         Me.CancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -174,7 +229,7 @@ Partial Class SettingsForm
         Me.ImportSettingsButton.Text = "导入设置..."
         Me.ImportSettingsButton.UseVisualStyleBackColor = True
         '
-        'ExportSettingsForm
+        'SettingsForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -187,7 +242,7 @@ Partial Class SettingsForm
         Me.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.MinimizeBox = False
-        Me.Name = "ExportSettingsForm"
+        Me.Name = "SettingsForm"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
@@ -198,6 +253,9 @@ Partial Class SettingsForm
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
+        Me.TabPage2.ResumeLayout(False)
+        Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.TableLayoutPanel1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -212,4 +270,8 @@ Partial Class SettingsForm
     Friend WithEvents ToolStripButton2 As ToolStripButton
     Friend WithEvents ExportSettingsButton As Button
     Friend WithEvents ImportSettingsButton As Button
+    Friend WithEvents TabPage2 As TabPage
+    Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
+    Friend WithEvents Label1 As Label
+    Friend WithEvents CheckBox1 As CheckBox
 End Class

@@ -286,6 +286,8 @@ Public Class MainForm
         ExportBOMList.Rows.Clear()
         ConfigurationGroupList.Controls.Clear()
 
+        ConfigurationGroupList.SuspendLayout()
+
         Dim tmpGroupList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetConfigurationGroupInfoItems()
         Dim tmpGroupDict = New Dictionary(Of String, ConfigurationGroupControl)
 
@@ -320,9 +322,8 @@ Public Class MainForm
 
         Next
 
-        '关闭自动调整大小
         For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.FlowLayoutPanel1.AutoSize = False
+            item.FlowLayoutPanel1.SuspendLayout()
         Next
 
         Dim tmpValues = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
@@ -331,15 +332,17 @@ Public Class MainForm
         For Each item In tmpValues
             item.Init()
         Next
-        '启用自动调整大小
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.FlowLayoutPanel1.AutoSize = True
-        Next
 
         '默认展开
         For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
             item.CheckBox1.Checked = True
         Next
+
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.FlowLayoutPanel1.ResumeLayout()
+        Next
+
+        ConfigurationGroupList.ResumeLayout()
 
         ShowUnitPrice()
 
@@ -854,8 +857,16 @@ Public Class MainForm
         Dim tmpStopwatch As New Stopwatch
         tmpStopwatch.Start()
 
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.FlowLayoutPanel1.SuspendLayout()
+        Next
+
         For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
             item.UpdateVisible()
+        Next
+
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.FlowLayoutPanel1.ResumeLayout()
         Next
 
         tmpStopwatch.Stop()
@@ -895,6 +906,8 @@ Public Class MainForm
 #End Region
             Case 5
 #Region "查看配置"
+                ConfigurationGroupList.SuspendLayout()
+
                 Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = ExportBOMList.Rows(e.RowIndex).Tag
 
                 Dim tmpList = From item In tmpBOMConfigurationInfo.ConfigurationItems
@@ -910,6 +923,8 @@ Public Class MainForm
                     tmpConfigurationNodeControl.SetValue(tmpSelectedValueID)
 
                 Next
+
+                ConfigurationGroupList.ResumeLayout()
 #End Region
 
             Case 6
@@ -1301,6 +1316,16 @@ Public Class MainForm
         SplitContainer1.Panel2Collapsed = Not CheckBoxItem2.Checked
 
         AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed", CheckBoxItem2.Checked)
+    End Sub
+
+    Private Sub ConfigurationGroupList_SizeChanged(sender As Object, e As EventArgs) Handles ConfigurationGroupList.SizeChanged
+
+        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+            item.CheckBox1.Width = ConfigurationGroupList.Width - 28
+        Next
+
+        ConfigurationGroupList.ResumeLayout()
+
     End Sub
 
 End Class

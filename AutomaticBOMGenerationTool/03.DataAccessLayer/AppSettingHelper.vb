@@ -317,4 +317,9 @@ Public Class AppSettingHelper
     End Sub
 #End Region
 
+    ''' <summary>
+    ''' 是否启用模板数据库不安全选项
+    ''' </summary>
+    Public EnabledBOMTemplateDatabaseUnsafetyOption As Boolean
+
 End Class

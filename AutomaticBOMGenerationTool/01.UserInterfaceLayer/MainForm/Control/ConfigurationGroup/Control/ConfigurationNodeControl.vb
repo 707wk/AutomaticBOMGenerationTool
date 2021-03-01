@@ -70,6 +70,8 @@ Public Class ConfigurationNodeControl
 
         IsUserChecked = False
 
+        FlowLayoutPanel1.SuspendLayout()
+
         '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
             Dim tmpList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoItems(NodeInfo.ID)
@@ -116,10 +118,7 @@ Public Class ConfigurationNodeControl
             Me.Visible = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems
         End If
 
-        Me.AutoSize = True
-        Dim tmpHeight = Me.Height
-        Me.AutoSize = False
-        Me.Height = tmpHeight
+        FlowLayoutPanel1.ResumeLayout()
 
         IsUserChecked = True
 
@@ -160,7 +159,7 @@ Public Class ConfigurationNodeControl
     Private Sub UpdateValueWithOtherConfiguration()
         IsUserChecked = False
 
-        Me.AutoSize = False
+        FlowLayoutPanel1.SuspendLayout()
 
         SelectedValueID = Nothing
         SelectedValue = Nothing
@@ -282,10 +281,7 @@ Public Class ConfigurationNodeControl
             Me.Visible = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems
         End If
 
-        Me.AutoSize = True
-        Dim tmpHeight = Me.Height
-        Me.AutoSize = False
-        Me.Height = tmpHeight
+        FlowLayoutPanel1.ResumeLayout()
 
         IsUserChecked = True
 
@@ -316,6 +312,8 @@ Public Class ConfigurationNodeControl
     Public Sub UpdateVisible()
         Dim tmpVisible As Boolean
 
+        FlowLayoutPanel1.SuspendLayout()
+
         If AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems Then
             '强制显示
             Me.Visible = True
@@ -340,10 +338,7 @@ Public Class ConfigurationNodeControl
             End If
         End If
 
-        Me.AutoSize = True
-        Dim tmpHeight = Me.Height
-        Me.AutoSize = False
-        Me.Height = tmpHeight
+        FlowLayoutPanel1.ResumeLayout()
 
         GroupControl.UpdateControlVisible(NodeInfo.Name, tmpVisible)
 

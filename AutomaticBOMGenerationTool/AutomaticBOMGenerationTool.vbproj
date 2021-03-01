@@ -141,16 +141,16 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ConfigurationNodeNameSelectedForm.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\ConfigurationNodeNameSelectedForm.Designer.vb">
       <DependentUpon>ConfigurationNodeNameSelectedForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ConfigurationNodeNameSelectedForm.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\ConfigurationNodeNameSelectedForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\SettingsForm.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\SettingsForm.Designer.vb">
       <DependentUpon>SettingsForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\SettingsForm.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\SettingsForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ImportMaterialPriceInfo\ManualUpdateMaterialPriceForm.Designer.vb">
@@ -268,10 +268,10 @@
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\ConfigurationNodeNameSelectedForm.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\ConfigurationNodeNameSelectedForm.resx">
       <DependentUpon>ConfigurationNodeNameSelectedForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportSettings\SettingsForm.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\SettingsForm.resx">
       <DependentUpon>SettingsForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ImportMaterialPriceInfo\ManualUpdateMaterialPriceForm.resx">
