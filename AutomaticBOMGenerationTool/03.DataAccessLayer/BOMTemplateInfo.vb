@@ -1,4 +1,5 @@
-﻿''' <summary>
+﻿Imports Newtonsoft.Json
+''' <summary>
 ''' BOM模板信息
 ''' </summary>
 Public Class BOMTemplateInfo
@@ -70,6 +71,11 @@ Public Class BOMTemplateInfo
     ''' 待导出BOM列表
     ''' </summary>
     Public ExportBOMList As List(Of BOMConfigurationInfo)
+
+    ''' <summary>
+    ''' 导出BOM名称设置信息
+    ''' </summary>
+    Public ExportConfigurationNodeItems As List(Of ExportConfigurationNodeInfo)
 
     Public Sub New(filePath As String)
 

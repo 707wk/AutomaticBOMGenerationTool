@@ -141,10 +141,16 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\ConfigurationNodeNameSelectedForm.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.Designer.vb">
+      <DependentUpon>ExportBOMNameSettingsForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.Designer.vb">
       <DependentUpon>ConfigurationNodeNameSelectedForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\ConfigurationNodeNameSelectedForm.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\SettingsForm.Designer.vb">
@@ -268,7 +274,10 @@
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\ConfigurationNodeNameSelectedForm.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.resx">
+      <DependentUpon>ExportBOMNameSettingsForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.resx">
       <DependentUpon>ConfigurationNodeNameSelectedForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\SettingsForm.resx">
@@ -350,6 +359,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\setting_20px.png" />
     <None Include="res\temp_16px.png" />
     <None Include="res\logo.png" />
     <None Include="res\about.png" />

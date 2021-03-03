@@ -201,8 +201,8 @@ Public Class MainForm
                                     be.Write("计算配置节点优先级", 100 / stepCount * 10)
                                     AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.CalculateConfigurationNodePriority()
 
-                                    be.Write("读取待导出BOM列表", 100 / stepCount * 11)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReadBOMConfigurationInfoFromBOMTemplate()
+                                    be.Write("读取BOM内设置", 100 / stepCount * 11)
+                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReadConfigurationInfoFromBOMTemplate()
 
                                     be.Write("匹配待导出BOM列表选项信息", 100 / stepCount * 12)
                                     AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.MatchingExportBOMListConfigurationNodeAndValue()
@@ -514,7 +514,7 @@ Public Class MainForm
                                                                     ).ToList
 
                                 be.Write("获取导出项信息", 100 / stepCount * 2)
-                                For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
+                                For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
                                     item.Exist = False
 
                                     Dim findNodes = From node In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
@@ -544,7 +544,7 @@ Public Class MainForm
                                         Dim tmpWorkBook = tmpExcelPackage.Workbook
                                         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                                        tmpResult.Name = BOMTemplateHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.ExportConfigurationNodeInfoList)
+                                        tmpResult.Name = BOMTemplateHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems)
 
                                     End Using
                                 End Using
@@ -613,7 +613,7 @@ Public Class MainForm
                                                                            ).ToList
 
                                 be.Write("获取导出项信息", 100 / stepCount * 2)
-                                For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
+                                For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
                                     item.Exist = False
 
                                     Dim findNodes = From node In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
@@ -681,7 +681,7 @@ Public Class MainForm
 
                                 be.Write("获取导出项")
                                 Dim ColIndex = 0
-                                For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
+                                For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
                                     item.Exist = False
                                     item.ColIndex = 0
 
@@ -713,7 +713,7 @@ Public Class MainForm
 
                                     be.Write($"导出第 {i001 + 1} 个", CInt(100 / tmpBOMList.Count * i001))
 
-                                    For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
+                                    For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
                                         If Not item.Exist Then
                                             Continue For
                                         End If
@@ -820,13 +820,13 @@ Public Class MainForm
             ButtonItem12.Enabled = True
             ButtonItem3.Enabled = True
             ButtonItem4.Enabled = True
-            ButtonItem6.Enabled = True
+            ToolStripButton1.Enabled = True
         Else
             ButtonItem11.Enabled = False
             ButtonItem12.Enabled = False
             ButtonItem3.Enabled = False
             ButtonItem4.Enabled = False
-            ButtonItem6.Enabled = False
+            ToolStripButton1.Enabled = False
         End If
 
     End Sub
@@ -1176,7 +1176,7 @@ Public Class MainForm
         Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(AppSettingHelper.Instance.CurrentBOMTemplateInfo.BackupFilePath)
         Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath)
 
-        Dim sourceFilePath As String = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BackupFilePath
+        Dim isOldFileVersion = True
 
         If fileHashCodeOld.Equals(fileHashCodeNew) OrElse
             String.IsNullOrWhiteSpace(fileHashCodeNew) Then
@@ -1193,7 +1193,7 @@ Public Class MainForm
             Select Case tmpResult
 
                 Case MsgBoxResult.Yes
-                    sourceFilePath = AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath
+                    isOldFileVersion = False
 
                 Case MsgBoxResult.No
 
@@ -1211,7 +1211,11 @@ Public Class MainForm
         Do
             Try
 
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.SaveBOMConfigurationInfoToBOMTemplate(sourceFilePath)
+                AppSettingHelper.
+                    Instance.
+                    CurrentBOMTemplateInfo.
+                    BOMTHelper.
+                    SaveConfigurationInfoToBOMTemplate(isOldFileVersion)
 
 #Disable Warning CA1031 ' Do not catch general exception types
             Catch ex As Exception
@@ -1241,6 +1245,37 @@ Public Class MainForm
 
     Private Sub ButtonItem12_Click(sender As Object, e As EventArgs) Handles ButtonItem12.Click
 
+        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(AppSettingHelper.Instance.CurrentBOMTemplateInfo.BackupFilePath)
+        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath)
+
+        Dim isOldFileVersion = True
+
+        If fileHashCodeOld.Equals(fileHashCodeNew) OrElse
+            String.IsNullOrWhiteSpace(fileHashCodeNew) Then
+            '文件哈希值相同或原文件不存在
+
+        Else
+            '文件哈希值不同
+
+            Dim tmpResult = MsgBox("检测到原文件已修改,
+如果想以修改后的文件版本为基准来保存,点击 ""是"",
+如果想以程序解析时读取的文件版本为基准来保存,点击 ""否"",
+取消保存点击 ""取消""", MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Question, "保存文件")
+
+            Select Case tmpResult
+
+                Case MsgBoxResult.Yes
+                    isOldFileVersion = False
+
+                Case MsgBoxResult.No
+
+                Case MsgBoxResult.Cancel
+                    Exit Sub
+
+            End Select
+
+        End If
+
         Dim outputFilePath As String
 
         Using tmpDialog As New SaveFileDialog With {
@@ -1255,8 +1290,6 @@ Public Class MainForm
 
         End Using
 
-        Dim sourceFilePath As String = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BackupFilePath
-
         AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList.Clear()
         AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList.AddRange(From item As DataGridViewRow In ExportBOMList.Rows
                                                                                 Select CType(item.Tag, BOMConfigurationInfo))
@@ -1264,7 +1297,11 @@ Public Class MainForm
         Do
             Try
 
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.SaveAsBOMConfigurationInfoToBOMTemplate(sourceFilePath, outputFilePath)
+                AppSettingHelper.
+                    Instance.
+                    CurrentBOMTemplateInfo.
+                    BOMTHelper.
+                    SaveAsConfigurationInfoToBOMTemplate(isOldFileVersion, outputFilePath)
 
                 AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath = outputFilePath
                 AppSettingHelper.Instance.CurrentBOMTemplateFilePath = outputFilePath
@@ -1325,6 +1362,76 @@ Public Class MainForm
         Next
 
         ConfigurationGroupList.ResumeLayout()
+
+    End Sub
+
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+
+        Using tmpDialog As New ExportBOMNameSettingsForm
+            If tmpDialog.ShowDialog() <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+        End Using
+
+        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
+            .Text = "更新BOM名称"
+        }
+
+            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+
+                                Using readFS = New FileStream(AppSettingHelper.Instance.CurrentBOMTemplateInfo.TemplateFilePath,
+                                                              FileMode.Open,
+                                                              FileAccess.Read,
+                                                              FileShare.ReadWrite)
+
+                                    Using tmpExcelPackage As New ExcelPackage(readFS)
+
+                                        For Each rowItem As DataGridViewRow In ExportBOMList.Rows
+                                            be.Write(ExportBOMList.Rows.IndexOf(rowItem) * 100 \ ExportBOMList.Rows.Count)
+
+                                            Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = rowItem.Tag
+
+                                            For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
+                                                item.Exist = False
+
+                                                Dim findNodes = From node In tmpBOMConfigurationInfo.ConfigurationItems
+                                                                Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
+                                                                Select node
+                                                If findNodes.Count = 0 Then Continue For
+
+                                                Dim findNode = findNodes.First
+
+                                                item.Exist = True
+                                                item.ValueID = findNode.SelectedValueID
+                                                item.Value = findNode.SelectedValue
+                                                item.IsMaterial = findNode.IsMaterial
+                                                If item.IsMaterial Then
+                                                    item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
+                                                End If
+
+                                            Next
+
+                                            tmpBOMConfigurationInfo.Name = BOMTemplateHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems)
+
+                                        Next
+
+                                    End Using
+                                End Using
+
+                            End Sub)
+
+            If tmpDialog.Error IsNot Nothing Then
+                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "更新BOM名称出错")
+                Exit Sub
+            End If
+
+        End Using
+
+        For Each rowItem As DataGridViewRow In ExportBOMList.Rows
+            Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = rowItem.Tag
+            rowItem.Cells(1).Value = tmpBOMConfigurationInfo.Name
+        Next
 
     End Sub
 

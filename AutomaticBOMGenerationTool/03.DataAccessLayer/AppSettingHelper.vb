@@ -118,15 +118,15 @@ Public Class AppSettingHelper
     ''' 从本地读取配置
     ''' </summary>
     Private Shared Sub LoadFromLocaltion()
-        'Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+        Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 
-        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
-        System.IO.Directory.CreateDirectory($".\Data")
+        System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
+        'System.IO.Directory.CreateDirectory($".\Data")
 
         '反序列化
         Try
             _instance = JsonConvert.DeserializeObject(Of AppSettingHelper)(
-                System.IO.File.ReadAllText($".\Data\Setting.json",
+                System.IO.File.ReadAllText($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data\Setting.json",
                                            System.Text.Encoding.UTF8))
 
 #Disable Warning CA1031 ' Do not catch general exception types
@@ -144,15 +144,15 @@ Public Class AppSettingHelper
     ''' 保存配置到本地
     ''' </summary>
     Public Shared Sub SaveToLocaltion()
-        'Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+        Dim Path As String = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 
-        'System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
-        System.IO.Directory.CreateDirectory($".\Data")
+        System.IO.Directory.CreateDirectory($"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data")
+        'System.IO.Directory.CreateDirectory($".\Data")
 
         '序列化
         Try
             Using t As System.IO.StreamWriter = New System.IO.StreamWriter(
-                    $".\Data\Setting.json",
+                    $"{Path}\Hunan Yestech\{My.Application.Info.ProductName}\Data\Setting.json",
                     False,
                     System.Text.Encoding.UTF8)
 
@@ -198,7 +198,6 @@ Public Class AppSettingHelper
                                        System.Text.Encoding.UTF8))
 
         '需要导入的变量
-        _instance.ExportConfigurationNodeInfoList = tmpInstance.ExportConfigurationNodeInfoList
 
         SaveToLocaltion()
 
@@ -266,11 +265,6 @@ Public Class AppSettingHelper
     ''' 本地数据库地址
     ''' </summary>
     Public Shared SQLiteConnection As String = "data source= .\Data\LocalDatabase.db"
-
-    ''' <summary>
-    ''' 导出配置项设置信息
-    ''' </summary>
-    Public ExportConfigurationNodeInfoList As New List(Of ExportConfigurationNodeInfo)
 
     ''' <summary>
     ''' 当前BOM模板文件地址

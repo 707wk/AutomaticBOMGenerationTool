@@ -35,6 +35,15 @@ Public Class BOMTemplateHelper
 
     Private ReadOnly CacheBOMTemplateInfo As BOMTemplateInfo
 
+    ''' <summary>
+    ''' 待导出BOM列表表名
+    ''' </summary>
+    Public Const BOMConfigurationInfoSheetName As String = "BOMConfigurationInfo"
+    ''' <summary>
+    ''' 导出BOM名称设置表名
+    ''' </summary>
+    Public Const ExportConfigurationInfoSheetName As String = "ExportConfigurationInfo"
+
     Public Sub New(value As BOMTemplateInfo)
 
         CacheBOMTemplateInfo = value
@@ -1286,7 +1295,7 @@ Public Class BOMTemplateHelper
 
                 '更新BOM名称
                 headerLocation = FindTextLocation(tmpExcelPackage, "显示屏规格")
-                Dim BOMName = JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.ExportConfigurationNodeInfoList)
+                Dim BOMName = JoinBOMName(tmpExcelPackage, CacheBOMTemplateInfo.ExportConfigurationNodeItems)
                 tmpWorkSheet.Cells(headerLocation.Y, headerLocation.X + 2).Value = BOMName
 
                 '自动调整行高
@@ -1756,7 +1765,7 @@ Public Class BOMTemplateHelper
             tmpWorkSheet.Cells(1, 1).Value = "文件名"
             tmpWorkSheet.Cells(1, 2).Value = "操作"
             Dim tmpID = 3
-            For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
+            For Each item In CacheBOMTemplateInfo.ExportConfigurationNodeItems
                 If Not item.Exist Then
                     Continue For
                 End If
@@ -1783,7 +1792,7 @@ Public Class BOMTemplateHelper
                 tmpWorkSheet.Cells(i001 + 1 + 1, 2).Style.Font.Color.SetColor(UIFormHelper.NormalColor)
 
                 '配置
-                For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
+                For Each item In CacheBOMTemplateInfo.ExportConfigurationNodeItems
                     If Not item.Exist Then
                         Continue For
                     End If
@@ -1843,107 +1852,37 @@ Public Class BOMTemplateHelper
     ''' <summary>
     ''' 保存BOM配置到BOM模板内
     ''' </summary>
-    Public Sub SaveBOMConfigurationInfoToBOMTemplate(sourceFilePath As String)
+    Private Sub SaveBOMConfigurationInfoToBOMTemplate(wb As ExcelPackage)
 
-        Using readFS = New FileStream(sourceFilePath,
-                                      FileMode.Open,
-                                      FileAccess.Read,
-                                      FileShare.ReadWrite)
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                     Return tmpSheet.Name.Equals(BOMConfigurationInfoSheetName)
+                                                                 End Function)
 
-            Using tmpExcelPackage As New ExcelPackage(readFS)
-                Dim tmpWorkBook = tmpExcelPackage.Workbook
-                Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
-                                                                             Return tmpSheet.Name.Equals("BOMConfigurationInfo")
-                                                                         End Function)
+        If tmpWorkSheet Is Nothing Then
 
-                If tmpWorkSheet Is Nothing Then
+        Else
+            tmpWorkBook.Worksheets.Delete(BOMConfigurationInfoSheetName)
+        End If
+        tmpWorkSheet = tmpWorkBook.Worksheets.Add(BOMConfigurationInfoSheetName)
+        '调试时不隐藏
+        tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
 
-                Else
-                    tmpWorkBook.Worksheets.Delete("BOMConfigurationInfo")
-                End If
-                tmpWorkSheet = tmpWorkBook.Worksheets.Add("BOMConfigurationInfo")
-                '调试时不隐藏
-                tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
+        Dim rID = 1
+        For i001 = 0 To CacheBOMTemplateInfo.ExportBOMList.Count - 1
+            Dim BOMConfigurationInfoItem = CacheBOMTemplateInfo.ExportBOMList(i001)
 
-                Dim rID = 1
-                For i001 = 0 To CacheBOMTemplateInfo.ExportBOMList.Count - 1
-                    Dim BOMConfigurationInfoItem = CacheBOMTemplateInfo.ExportBOMList(i001)
+            For Each item In BOMConfigurationInfoItem.ConfigurationItems
 
-                    For Each item In BOMConfigurationInfoItem.ConfigurationItems
+                tmpWorkSheet.Cells(rID, 1).Value = i001
+                tmpWorkSheet.Cells(rID, 2).Value = item.ConfigurationNodeName
+                tmpWorkSheet.Cells(rID, 3).Value = item.SelectedValue
 
-                        tmpWorkSheet.Cells(rID, 1).Value = i001
-                        tmpWorkSheet.Cells(rID, 2).Value = item.ConfigurationNodeName
-                        tmpWorkSheet.Cells(rID, 3).Value = item.SelectedValue
+                rID += 1
+            Next
 
-                        rID += 1
-                    Next
-
-                Next
-
-                '另存为
-                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateInfo.SourceFilePath, FileMode.Create)
-                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
-                End Using
-
-            End Using
-        End Using
-
-        IO.File.Copy(CacheBOMTemplateInfo.SourceFilePath, CacheBOMTemplateInfo.BackupFilePath, True)
-
-    End Sub
-#End Region
-
-#Region "保存BOM配置到新BOM模板内"
-    ''' <summary>
-    ''' 保存BOM配置到新BOM模板内
-    ''' </summary>
-    Public Sub SaveAsBOMConfigurationInfoToBOMTemplate(sourceFilePath As String,
-                                                       destFilePath As String)
-
-        Using readFS = New FileStream(sourceFilePath,
-                                      FileMode.Open,
-                                      FileAccess.Read,
-                                      FileShare.ReadWrite)
-
-            Using tmpExcelPackage As New ExcelPackage(readFS)
-                Dim tmpWorkBook = tmpExcelPackage.Workbook
-                Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
-                                                                             Return tmpSheet.Name.Equals("BOMConfigurationInfo")
-                                                                         End Function)
-
-                If tmpWorkSheet Is Nothing Then
-
-                Else
-                    tmpWorkBook.Worksheets.Delete("BOMConfigurationInfo")
-                End If
-                tmpWorkSheet = tmpWorkBook.Worksheets.Add("BOMConfigurationInfo")
-                '调试时不隐藏
-                tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
-
-                Dim rID = 1
-                For i001 = 0 To CacheBOMTemplateInfo.ExportBOMList.Count - 1
-                    Dim BOMConfigurationInfoItem = CacheBOMTemplateInfo.ExportBOMList(i001)
-
-                    For Each item In BOMConfigurationInfoItem.ConfigurationItems
-
-                        tmpWorkSheet.Cells(rID, 1).Value = i001
-                        tmpWorkSheet.Cells(rID, 2).Value = item.ConfigurationNodeName
-                        tmpWorkSheet.Cells(rID, 3).Value = item.SelectedValue
-
-                        rID += 1
-                    Next
-
-                Next
-
-                '另存为
-                Using tmpSaveFileStream = New FileStream(destFilePath, FileMode.Create)
-                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
-                End Using
-
-            End Using
-        End Using
-
-        IO.File.Copy(destFilePath, CacheBOMTemplateInfo.BackupFilePath, True)
+        Next
 
     End Sub
 #End Region
@@ -1952,56 +1891,48 @@ Public Class BOMTemplateHelper
     ''' <summary>
     ''' 读取BOM模板内的BOM配置
     ''' </summary>
-    Public Sub ReadBOMConfigurationInfoFromBOMTemplate()
+    Private Sub ReadBOMConfigurationInfoFromBOMTemplate(wb As ExcelPackage)
 
         CacheBOMTemplateInfo.ExportBOMList = New List(Of BOMConfigurationInfo)
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.SourceFilePath,
-                                      FileMode.Open,
-                                      FileAccess.Read,
-                                      FileShare.ReadWrite)
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                     Return tmpSheet.Name.Equals(BOMConfigurationInfoSheetName)
+                                                                 End Function)
 
-            Using tmpExcelPackage As New ExcelPackage(readFS)
-                Dim tmpWorkBook = tmpExcelPackage.Workbook
-                Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
-                                                                             Return tmpSheet.Name.Equals("BOMConfigurationInfo")
-                                                                         End Function)
+        If tmpWorkSheet Is Nothing Then
+            '无配置表
+            Exit Sub
 
-                If tmpWorkSheet Is Nothing Then
-                    '无配置表
-                    Exit Sub
+        ElseIf tmpWorkSheet.Dimension Is Nothing Then
+            '有配置表但无数据
+            Exit Sub
 
-                ElseIf tmpWorkSheet.Dimension Is Nothing Then
-                    '有配置表但无数据
-                    Exit Sub
+        Else
+            '有配置表有数据
+        End If
 
-                Else
-                    '有配置表有数据
-                End If
+        Dim BOMConfigurationID = -1
+        Dim CurrentBOMConfigurationInfo As BOMConfigurationInfo = Nothing
 
-                Dim BOMConfigurationID = -1
-                Dim CurrentBOMConfigurationInfo As BOMConfigurationInfo = Nothing
+        For rID = 1 To tmpWorkSheet.Dimension.End.Row
 
-                For rID = 1 To tmpWorkSheet.Dimension.End.Row
+            If CurrentBOMConfigurationInfo Is Nothing OrElse
+                BOMConfigurationID <> tmpWorkSheet.Cells(rID, 1).Value Then
 
-                    If CurrentBOMConfigurationInfo Is Nothing OrElse
-                        BOMConfigurationID <> tmpWorkSheet.Cells(rID, 1).Value Then
+                BOMConfigurationID += 1
 
-                        BOMConfigurationID += 1
+                CurrentBOMConfigurationInfo = New BOMConfigurationInfo With {
+                    .ConfigurationInfoValueTable = New Dictionary(Of String, String)
+                }
 
-                        CurrentBOMConfigurationInfo = New BOMConfigurationInfo With {
-                            .ConfigurationInfoValueTable = New Dictionary(Of String, String)
-                        }
+                CacheBOMTemplateInfo.ExportBOMList.Add(CurrentBOMConfigurationInfo)
+            End If
 
-                        CacheBOMTemplateInfo.ExportBOMList.Add(CurrentBOMConfigurationInfo)
-                    End If
+            CurrentBOMConfigurationInfo.ConfigurationInfoValueTable.Add($"{tmpWorkSheet.Cells(rID, 2).Value}", $"{tmpWorkSheet.Cells(rID, 3).Value}")
 
-                    CurrentBOMConfigurationInfo.ConfigurationInfoValueTable.Add($"{tmpWorkSheet.Cells(rID, 2).Value}", $"{tmpWorkSheet.Cells(rID, 3).Value}")
-
-                Next
-
-            End Using
-        End Using
+        Next
 
     End Sub
 #End Region
@@ -2119,7 +2050,7 @@ Public Class BOMTemplateHelper
                     AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.CalculateExportBOMListConfigurationMaterialTotalPrice(tmpExcelPackage, exportBOMItem.ConfigurationItems)
 
                     '获取导出项信息
-                    For Each item In AppSettingHelper.Instance.ExportConfigurationNodeInfoList
+                    For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
                         item.Exist = False
 
                         Dim findNodes = From node In exportBOMItem.ConfigurationItems
@@ -2140,7 +2071,7 @@ Public Class BOMTemplateHelper
                     Next
 
                     '获取BOM名称
-                    exportBOMItem.Name = JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.ExportConfigurationNodeInfoList)
+                    exportBOMItem.Name = JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems)
 
                 End Using
             End Using
@@ -2188,6 +2119,177 @@ Public Class BOMTemplateHelper
             node.TotalPrice = tmpUnitPrice
 
         Next
+
+    End Sub
+#End Region
+
+#Region "读取BOM模板内的导出BOM名称设置"
+    ''' <summary>
+    ''' 读取BOM模板内的导出BOM名称设置
+    ''' </summary>
+    Private Sub ReadExportConfigurationNodeItemsFromBOMTemplate(wb As ExcelPackage)
+
+        CacheBOMTemplateInfo.ExportConfigurationNodeItems = New List(Of ExportConfigurationNodeInfo)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                     Return tmpSheet.Name.Equals(ExportConfigurationInfoSheetName)
+                                                                 End Function)
+
+        If tmpWorkSheet Is Nothing Then
+            '无配置表
+            Exit Sub
+
+        ElseIf tmpWorkSheet.Dimension Is Nothing Then
+            '有配置表但无数据
+            Exit Sub
+
+        Else
+            '有配置表有数据
+        End If
+
+        For rID = 1 To tmpWorkSheet.Dimension.End.Row
+            Dim addExportConfigurationNodeInfo = New ExportConfigurationNodeInfo With {
+                .Name = tmpWorkSheet.Cells(rID, 1).Value,
+                .ExportPrefix = tmpWorkSheet.Cells(rID, 2).Value,
+                .IsExportConfigurationNodeValue = tmpWorkSheet.Cells(rID, 3).Value,
+                .IsExportpName = tmpWorkSheet.Cells(rID, 4).Value,
+                .IsExportpConfigFirstTerm = tmpWorkSheet.Cells(rID, 5).Value,
+                .IsExportMatchingValue = tmpWorkSheet.Cells(rID, 6).Value,
+                .MatchingValues = tmpWorkSheet.Cells(rID, 7).Value
+            }
+
+            CacheBOMTemplateInfo.ExportConfigurationNodeItems.Add(addExportConfigurationNodeInfo)
+        Next
+
+    End Sub
+#End Region
+
+#Region "保存导出BOM名称设置到BOM模板内"
+    ''' <summary>
+    ''' 保存导出BOM名称设置到BOM模板内
+    ''' </summary>
+    Private Sub SaveExportConfigurationNodeItemsToBOMTemplate(wb As ExcelPackage)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                     Return tmpSheet.Name.Equals(ExportConfigurationInfoSheetName)
+                                                                 End Function)
+
+        If tmpWorkSheet Is Nothing Then
+
+        Else
+            tmpWorkBook.Worksheets.Delete(ExportConfigurationInfoSheetName)
+        End If
+        tmpWorkSheet = tmpWorkBook.Worksheets.Add(ExportConfigurationInfoSheetName)
+        '调试时不隐藏
+        tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
+
+        For rID = 0 To CacheBOMTemplateInfo.ExportConfigurationNodeItems.Count - 1
+
+            Dim tmpExportConfigurationNodeInfo = CacheBOMTemplateInfo.ExportConfigurationNodeItems(rID)
+
+            With tmpExportConfigurationNodeInfo
+                tmpWorkSheet.Cells(rID + 1, 1).Value = .Name
+                tmpWorkSheet.Cells(rID + 1, 2).Value = .ExportPrefix
+                tmpWorkSheet.Cells(rID + 1, 3).Value = .IsExportConfigurationNodeValue
+                tmpWorkSheet.Cells(rID + 1, 4).Value = .IsExportpName
+                tmpWorkSheet.Cells(rID + 1, 5).Value = .IsExportpConfigFirstTerm
+                tmpWorkSheet.Cells(rID + 1, 6).Value = .IsExportMatchingValue
+                tmpWorkSheet.Cells(rID + 1, 7).Value = .MatchingValues
+            End With
+
+        Next
+
+    End Sub
+#End Region
+
+#Region "读取设置信息"
+    ''' <summary>
+    ''' 读取设置信息
+    ''' </summary>
+    Public Sub ReadConfigurationInfoFromBOMTemplate()
+
+        Using readFS = New FileStream(CacheBOMTemplateInfo.SourceFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+
+                ReadBOMConfigurationInfoFromBOMTemplate(tmpExcelPackage)
+
+                ReadExportConfigurationNodeItemsFromBOMTemplate(tmpExcelPackage)
+
+            End Using
+        End Using
+
+    End Sub
+#End Region
+
+#Region "保存设置信息"
+    ''' <summary>
+    ''' 保存设置信息
+    ''' </summary>
+    Public Sub SaveConfigurationInfoToBOMTemplate(isOldFileVersion As Boolean)
+
+        Dim sourceFilePath = If(isOldFileVersion, CacheBOMTemplateInfo.BackupFilePath, CacheBOMTemplateInfo.SourceFilePath)
+
+        Using readFS = New FileStream(sourceFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+
+                SaveBOMConfigurationInfoToBOMTemplate(tmpExcelPackage)
+
+                SaveExportConfigurationNodeItemsToBOMTemplate(tmpExcelPackage)
+
+                '另存为
+                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateInfo.SourceFilePath, FileMode.Create)
+                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
+                End Using
+
+            End Using
+        End Using
+
+        IO.File.Copy(CacheBOMTemplateInfo.SourceFilePath, CacheBOMTemplateInfo.BackupFilePath, True)
+
+    End Sub
+#End Region
+
+#Region "设置信息另存为"
+    ''' <summary>
+    ''' 设置信息另存为
+    ''' </summary>
+    Public Sub SaveAsConfigurationInfoToBOMTemplate(isOldFileVersion As Boolean,
+                                                    destFilePath As String)
+
+        Dim sourceFilePath = If(isOldFileVersion, CacheBOMTemplateInfo.BackupFilePath, CacheBOMTemplateInfo.SourceFilePath)
+
+        Using readFS = New FileStream(sourceFilePath,
+                                      FileMode.Open,
+                                      FileAccess.Read,
+                                      FileShare.ReadWrite)
+
+            Using tmpExcelPackage As New ExcelPackage(readFS)
+
+                SaveBOMConfigurationInfoToBOMTemplate(tmpExcelPackage)
+
+                SaveExportConfigurationNodeItemsToBOMTemplate(tmpExcelPackage)
+
+                '另存为
+                Using tmpSaveFileStream = New FileStream(destFilePath, FileMode.Create)
+                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
+                End Using
+
+            End Using
+        End Using
+
+        IO.File.Copy(destFilePath, CacheBOMTemplateInfo.BackupFilePath, True)
 
     End Sub
 #End Region
