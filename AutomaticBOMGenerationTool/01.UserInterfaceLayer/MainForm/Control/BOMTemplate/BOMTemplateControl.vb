@@ -323,11 +323,71 @@ Public Class BOMTemplateControl
                           Order By item.Value Descending
 
         For Each item In tmpNodeItem
-            CheckBoxDataGridView1.Rows.Add({False,
-                                           item.Key,
-                                           $"￥{item.Value:n2}",
-                                           $"{item.Value * 100 / CacheBOMTemplateInfo.TotalPrice:n1}%"})
+            Dim addRowID = CheckBoxDataGridView1.Rows.Add({False,
+                                                          item.Key,
+                                                          $"￥{item.Value:n2}",
+                                                          $"{item.Value * 100 / CacheBOMTemplateInfo.TotalPrice:n1}%"})
+
+            CheckBoxDataGridView1.Rows(addRowID).Tag = item.Value
+
         Next
+
+    End Sub
+#End Region
+
+    Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ToolStripButton5.Click
+        ShowTotalList()
+    End Sub
+
+#Region "合并选中物料项"
+    Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
+
+        Dim selectedCount As Integer = 0
+        For Each item As DataGridViewRow In CheckBoxDataGridView1.Rows
+            If item.Cells(0).EditedFormattedValue Then
+                selectedCount += 1
+            End If
+        Next
+
+        If selectedCount <= 1 Then
+            Exit Sub
+        End If
+
+        Dim combineStr As String = Nothing
+        Dim combinePrice As Decimal
+
+        For rowID = CheckBoxDataGridView1.Rows.Count - 1 To 0 Step -1
+            If CheckBoxDataGridView1.Rows(rowID).Cells(0).EditedFormattedValue Then
+
+                If String.IsNullOrWhiteSpace(combineStr) Then
+                    combineStr = $"{CheckBoxDataGridView1.Rows(rowID).Cells(1).Value}"
+                Else
+                    combineStr = $"{CheckBoxDataGridView1.Rows(rowID).Cells(1).Value},{combineStr}"
+                End If
+
+
+                combinePrice += CheckBoxDataGridView1.Rows(rowID).Tag
+
+                CheckBoxDataGridView1.Rows.RemoveAt(rowID)
+            End If
+        Next
+
+        Dim insertID = 0
+        For rowID = 0 To CheckBoxDataGridView1.Rows.Count - 1
+            If CheckBoxDataGridView1.Rows(rowID).Tag > combinePrice Then
+
+            Else
+                insertID = rowID
+                Exit For
+            End If
+        Next
+
+        CheckBoxDataGridView1.Rows.Insert(insertID,
+                                          {False,
+                                          combineStr,
+                                          $"￥{combinePrice:n2}",
+                                          $"{combinePrice * 100 / CacheBOMTemplateInfo.TotalPrice:n1}%"})
+        CheckBoxDataGridView1.Rows(insertID).Tag = combinePrice
 
     End Sub
 #End Region
@@ -658,7 +718,6 @@ Public Class BOMTemplateControl
         End If
     End Sub
 #End Region
-
 
 #Region "展开/折叠配置项"
     Private Sub ToolStripSplitButton1_ButtonClick(sender As Object, e As EventArgs) Handles ToolStripSplitButton1.ButtonClick

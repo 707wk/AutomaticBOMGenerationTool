@@ -368,6 +368,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\refresh_20px.png" />
+    <None Include="res\combine_20px.png" />
     <None Include="res\test_16px.png" />
     <None Include="res\xlsx_20px.png" />
     <None Include="res\setting_20px.png" />

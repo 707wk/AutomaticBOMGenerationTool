@@ -6,10 +6,34 @@ Public Class ConfigurationNodeInfo
 
     Public SortID As Integer
 
+
+    Private _name As String
     ''' <summary>
     ''' 名称
     ''' </summary>
-    Public Name As String
+    Public Property Name As String
+        Get
+            Return _name
+        End Get
+        Set(value As String)
+
+            '转换为大写
+            Dim convStr = value.ToUpper
+            '转换为窄字符标点
+            convStr = StrConv(convStr, VbStrConv.Narrow)
+
+            If convStr.Contains("(") OrElse
+                convStr.Contains(")") OrElse
+                convStr.Contains(",") OrElse
+                convStr.Contains("AND") Then
+
+                Throw New Exception($"配置节点名称 {value} 包含 ( ) , and 关键字")
+
+            End If
+
+            _name = value
+        End Set
+    End Property
 
     ''' <summary>
     ''' 是否是物料节点

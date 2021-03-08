@@ -35,12 +35,7 @@ Partial Class BOMTemplateControl
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.ConfigurationGroupList = New System.Windows.Forms.FlowLayoutPanel()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripSplitButton1 = New System.Windows.Forms.ToolStripSplitButton()
-        Me.ShowHideItems = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
-        Me.AddCurrentToExportBOMListButton = New System.Windows.Forms.ToolStripButton()
-        Me.ExportCurrentButton = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
@@ -48,7 +43,6 @@ Partial Class BOMTemplateControl
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.Chart1 = New System.Windows.Forms.DataVisualization.Charting.Chart()
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripLabel3 = New System.Windows.Forms.ToolStripLabel()
         Me.MinimumTotalPricePercentage = New System.Windows.Forms.ToolStripComboBox()
         Me.ToolStripLabel2 = New System.Windows.Forms.ToolStripLabel()
@@ -57,6 +51,15 @@ Partial Class BOMTemplateControl
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ExportBOMList = New Wangk.Resource.CheckBoxDataGridView()
         Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStrip4 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStripSplitButton1 = New System.Windows.Forms.ToolStripSplitButton()
+        Me.ShowHideItems = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
+        Me.AddCurrentToExportBOMListButton = New System.Windows.Forms.ToolStripButton()
+        Me.ExportCurrentButton = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton5 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ExportAllBOMButton = New System.Windows.Forms.ToolStripButton()
         Me.DeleteButton = New System.Windows.Forms.ToolStripButton()
@@ -80,6 +83,7 @@ Partial Class BOMTemplateControl
         Me.GroupBox2.SuspendLayout()
         CType(Me.ExportBOMList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip2.SuspendLayout()
+        Me.ToolStrip4.SuspendLayout()
         Me.SuspendLayout()
         '
         'SplitContainer1
@@ -156,55 +160,10 @@ Partial Class BOMTemplateControl
         Me.ToolStrip1.TabIndex = 4
         Me.ToolStrip1.Text = "ToolStrip1"
         '
-        'ToolStripSplitButton1
-        '
-        Me.ToolStripSplitButton1.DropDownButtonWidth = 18
-        Me.ToolStripSplitButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowHideItems})
-        Me.ToolStripSplitButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.expand_16px
-        Me.ToolStripSplitButton1.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.ToolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripSplitButton1.Name = "ToolStripSplitButton1"
-        Me.ToolStripSplitButton1.Size = New System.Drawing.Size(95, 24)
-        Me.ToolStripSplitButton1.Text = "全部展开"
-        '
-        'ShowHideItems
-        '
-        Me.ShowHideItems.CheckOnClick = True
-        Me.ShowHideItems.Name = "ShowHideItems"
-        Me.ShowHideItems.Size = New System.Drawing.Size(136, 22)
-        Me.ShowHideItems.Text = "显示隐藏项"
-        '
-        'ToolStripButton2
-        '
-        Me.ToolStripButton2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.fold_16px
-        Me.ToolStripButton2.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(76, 24)
-        Me.ToolStripButton2.Text = "全部折叠"
-        '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
         Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 27)
-        '
-        'AddCurrentToExportBOMListButton
-        '
-        Me.AddCurrentToExportBOMListButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.add_20px
-        Me.AddCurrentToExportBOMListButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.AddCurrentToExportBOMListButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.AddCurrentToExportBOMListButton.Name = "AddCurrentToExportBOMListButton"
-        Me.AddCurrentToExportBOMListButton.Size = New System.Drawing.Size(158, 24)
-        Me.AddCurrentToExportBOMListButton.Text = "添加到待导出BOM列表"
-        '
-        'ExportCurrentButton
-        '
-        Me.ExportCurrentButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportFile_20px
-        Me.ExportCurrentButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.ExportCurrentButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ExportCurrentButton.Name = "ExportCurrentButton"
-        Me.ExportCurrentButton.Size = New System.Drawing.Size(113, 24)
-        Me.ExportCurrentButton.Text = "导出当前配置..."
         '
         'ToolStripSeparator1
         '
@@ -293,15 +252,6 @@ Partial Class BOMTemplateControl
         Me.ToolStrip3.TabIndex = 2
         Me.ToolStrip3.Text = "ToolStrip3"
         '
-        'ToolStripButton3
-        '
-        Me.ToolStripButton3.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.copy_20px
-        Me.ToolStripButton3.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton3.Name = "ToolStripButton3"
-        Me.ToolStripButton3.Size = New System.Drawing.Size(128, 24)
-        Me.ToolStripButton3.Text = "复制图片到剪贴板"
-        '
         'ToolStripLabel3
         '
         Me.ToolStripLabel3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
@@ -329,6 +279,7 @@ Partial Class BOMTemplateControl
         '
         Me.TabPage2.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.TabPage2.Controls.Add(Me.CheckBoxDataGridView1)
+        Me.TabPage2.Controls.Add(Me.ToolStrip4)
         Me.TabPage2.Location = New System.Drawing.Point(4, 26)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
@@ -355,7 +306,7 @@ Partial Class BOMTemplateControl
         Me.CheckBoxDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.CheckBoxDataGridView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.CheckBoxDataGridView1.GridColor = System.Drawing.Color.FromArgb(CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer))
-        Me.CheckBoxDataGridView1.Location = New System.Drawing.Point(3, 3)
+        Me.CheckBoxDataGridView1.Location = New System.Drawing.Point(3, 30)
         Me.CheckBoxDataGridView1.Name = "CheckBoxDataGridView1"
         Me.CheckBoxDataGridView1.ReadOnly = True
         DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
@@ -367,7 +318,7 @@ Partial Class BOMTemplateControl
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 451)
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 424)
         Me.CheckBoxDataGridView1.TabIndex = 0
         '
         'GroupBox2
@@ -428,6 +379,89 @@ Partial Class BOMTemplateControl
         Me.ToolStrip2.TabIndex = 1
         Me.ToolStrip2.Text = "ToolStrip2"
         '
+        'ToolStrip4
+        '
+        Me.ToolStrip4.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.ToolStrip4.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.ToolStrip4.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton5, Me.ToolStripButton4})
+        Me.ToolStrip4.Location = New System.Drawing.Point(3, 3)
+        Me.ToolStrip4.Name = "ToolStrip4"
+        Me.ToolStrip4.Size = New System.Drawing.Size(625, 27)
+        Me.ToolStrip4.TabIndex = 1
+        Me.ToolStrip4.Text = "ToolStrip4"
+        '
+        'ToolStripSplitButton1
+        '
+        Me.ToolStripSplitButton1.DropDownButtonWidth = 18
+        Me.ToolStripSplitButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowHideItems})
+        Me.ToolStripSplitButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.expand_16px
+        Me.ToolStripSplitButton1.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton1.Name = "ToolStripSplitButton1"
+        Me.ToolStripSplitButton1.Size = New System.Drawing.Size(95, 24)
+        Me.ToolStripSplitButton1.Text = "全部展开"
+        '
+        'ShowHideItems
+        '
+        Me.ShowHideItems.CheckOnClick = True
+        Me.ShowHideItems.Name = "ShowHideItems"
+        Me.ShowHideItems.Size = New System.Drawing.Size(136, 22)
+        Me.ShowHideItems.Text = "显示隐藏项"
+        '
+        'ToolStripButton2
+        '
+        Me.ToolStripButton2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.fold_16px
+        Me.ToolStripButton2.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton2.Name = "ToolStripButton2"
+        Me.ToolStripButton2.Size = New System.Drawing.Size(76, 24)
+        Me.ToolStripButton2.Text = "全部折叠"
+        '
+        'AddCurrentToExportBOMListButton
+        '
+        Me.AddCurrentToExportBOMListButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.add_20px
+        Me.AddCurrentToExportBOMListButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.AddCurrentToExportBOMListButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.AddCurrentToExportBOMListButton.Name = "AddCurrentToExportBOMListButton"
+        Me.AddCurrentToExportBOMListButton.Size = New System.Drawing.Size(158, 24)
+        Me.AddCurrentToExportBOMListButton.Text = "添加到待导出BOM列表"
+        '
+        'ExportCurrentButton
+        '
+        Me.ExportCurrentButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportFile_20px
+        Me.ExportCurrentButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ExportCurrentButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ExportCurrentButton.Name = "ExportCurrentButton"
+        Me.ExportCurrentButton.Size = New System.Drawing.Size(113, 24)
+        Me.ExportCurrentButton.Text = "导出当前配置..."
+        '
+        'ToolStripButton3
+        '
+        Me.ToolStripButton3.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.copy_20px
+        Me.ToolStripButton3.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton3.Name = "ToolStripButton3"
+        Me.ToolStripButton3.Size = New System.Drawing.Size(128, 24)
+        Me.ToolStripButton3.Text = "复制图片到剪贴板"
+        '
+        'ToolStripButton5
+        '
+        Me.ToolStripButton5.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.refresh_20px
+        Me.ToolStripButton5.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton5.Name = "ToolStripButton5"
+        Me.ToolStripButton5.Size = New System.Drawing.Size(80, 24)
+        Me.ToolStripButton5.Text = "重置列表"
+        '
+        'ToolStripButton4
+        '
+        Me.ToolStripButton4.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.combine_20px
+        Me.ToolStripButton4.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton4.Name = "ToolStripButton4"
+        Me.ToolStripButton4.Size = New System.Drawing.Size(116, 24)
+        Me.ToolStripButton4.Text = "合并选中物料项"
+        '
         'ToolStripButton1
         '
         Me.ToolStripButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.setting_20px
@@ -485,12 +519,15 @@ Partial Class BOMTemplateControl
         Me.ToolStrip3.ResumeLayout(False)
         Me.ToolStrip3.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
+        Me.TabPage2.PerformLayout()
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.ExportBOMList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip2.ResumeLayout(False)
         Me.ToolStrip2.PerformLayout()
+        Me.ToolStrip4.ResumeLayout(False)
+        Me.ToolStrip4.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -525,4 +562,7 @@ Partial Class BOMTemplateControl
     Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents ExportAllBOMButton As ToolStripButton
     Friend WithEvents DeleteButton As ToolStripButton
+    Friend WithEvents ToolStrip4 As ToolStrip
+    Friend WithEvents ToolStripButton4 As ToolStripButton
+    Friend WithEvents ToolStripButton5 As ToolStripButton
 End Class

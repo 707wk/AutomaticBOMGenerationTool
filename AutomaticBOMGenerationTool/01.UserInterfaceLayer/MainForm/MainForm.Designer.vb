@@ -29,6 +29,7 @@ Partial Class MainForm
         Me.RibbonBar6 = New DevComponents.DotNetBar.RibbonBar()
         Me.ItemContainer2 = New DevComponents.DotNetBar.ItemContainer()
         Me.ButtonItem14 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem15 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar4 = New DevComponents.DotNetBar.RibbonBar()
         Me.ButtonItem1 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem13 = New DevComponents.DotNetBar.ButtonItem()
@@ -57,7 +58,7 @@ Partial Class MainForm
         Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel3 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.SuperTabControl1 = New DevComponents.DotNetBar.SuperTabControl()
-        Me.ButtonItem15 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.RibbonControl1.SuspendLayout()
         Me.RibbonPanel1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -185,6 +186,14 @@ Partial Class MainForm
         Me.ButtonItem14.Name = "ButtonItem14"
         Me.ButtonItem14.SubItemsExpandWidth = 14
         Me.ButtonItem14.Text = "已打开文件列表"
+        '
+        'ButtonItem15
+        '
+        Me.ButtonItem15.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem15.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.temp_16px
+        Me.ButtonItem15.Name = "ButtonItem15"
+        Me.ButtonItem15.SubItemsExpandWidth = 14
+        Me.ButtonItem15.Text = "临时文件夹"
         '
         'RibbonBar4
         '
@@ -552,14 +561,6 @@ Partial Class MainForm
         Me.SuperTabControl1.TabIndex = 11
         Me.SuperTabControl1.Text = "SuperTabControl1"
         '
-        'ButtonItem15
-        '
-        Me.ButtonItem15.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem15.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.temp_16px
-        Me.ButtonItem15.Name = "ButtonItem15"
-        Me.ButtonItem15.SubItemsExpandWidth = 14
-        Me.ButtonItem15.Text = "临时文件夹"
-        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
@@ -620,4 +621,5 @@ Partial Class MainForm
     Friend WithEvents ItemContainer2 As DevComponents.DotNetBar.ItemContainer
     Friend WithEvents ButtonItem14 As DevComponents.DotNetBar.ButtonItem
     Friend WithEvents ButtonItem15 As DevComponents.DotNetBar.ButtonItem
+    Friend WithEvents ToolTip1 As ToolTip
 End Class

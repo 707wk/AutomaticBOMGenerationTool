@@ -29,6 +29,14 @@ Public Class MainForm
         CheckBoxItem1.Checked = AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer2.Panel2Collapsed")
         CheckBoxItem2.Checked = AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed")
 
+        With ToolTip1
+            .IsBalloon = True
+            .UseAnimation = False
+            .UseFading = False
+            .InitialDelay = 1
+            .ReshowDelay = 1
+        End With
+
     End Sub
 #End Region
 
@@ -257,6 +265,8 @@ Public Class MainForm
             tmpBOMTemplateControl.ShowBOMTemplateData()
 
         End If
+
+        CurrentBOMTemplateInfo = addBOMTemplateInfo
 
         Dim UITimeSpan = tmpStopwatch.Elapsed
 

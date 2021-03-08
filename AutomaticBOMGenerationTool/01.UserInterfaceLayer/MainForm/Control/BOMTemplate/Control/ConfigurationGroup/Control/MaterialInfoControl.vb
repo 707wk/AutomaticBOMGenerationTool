@@ -11,7 +11,13 @@
         Set(ByVal value As MaterialInfo)
             _Cache = value
 
-            Me.Size = New Size(290, 72)
+            Me.Size = New Size(290, 54)
+
+            UIFormHelper.UIForm.ToolTip1.SetToolTip(Me, $"品名 : {Cache.pName}
+品号 : {Cache.pID}
+规格 : {Cache.pConfig}
+单价 : ￥{Cache.pUnitPrice} / {Cache.pUnit}")
+
         End Set
     End Property
 
@@ -68,7 +74,8 @@
 
             e.Graphics.DrawString($"品号 : {_Cache.pID}", OldFont, ContextFontSolidBrush, 1, tmpFontSize.Height * 1 + 1)
 
-            e.Graphics.DrawString($"规格 : {_Cache.pConfig}", OldFont, ContextFontSolidBrush, New Rectangle(1, tmpFontSize.Height * 2 + 1, Me.Width - 2, Me.Height - tmpFontSize.Height * 2 - 2))
+            'e.Graphics.DrawString($"规格 : {_Cache.pConfig}", OldFont, ContextFontSolidBrush, New Rectangle(1, tmpFontSize.Height * 2 + 1, Me.Width - 2, Me.Height - tmpFontSize.Height * 2 - 2))
+            e.Graphics.DrawString($"规格 : {_Cache.pConfig}", OldFont, ContextFontSolidBrush, 1, tmpFontSize.Height * 2 + 1)
 
         End If
 
@@ -76,6 +83,10 @@
             e.Graphics.DrawRectangle(BorderPen, 1, 1, Me.Width - 2, Me.Height - 2)
         End If
 
+    End Sub
+
+    Private Sub MaterialInfoControl_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
+        UIFormHelper.UIForm.ToolTip1.SetToolTip(Me, Nothing)
     End Sub
 
 End Class
