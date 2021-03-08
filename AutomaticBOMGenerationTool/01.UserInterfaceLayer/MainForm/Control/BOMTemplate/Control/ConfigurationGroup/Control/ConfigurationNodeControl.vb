@@ -116,8 +116,12 @@ Public Class ConfigurationNodeControl
             End If
 
         Else
+
             Me.Label1.BackColor = UIFormHelper.ErrorColor
             Me.Visible = CacheBOMTemplateInfo.ShowHideConfigurationNodeItems
+
+            UpdateChildNodeValue()
+
         End If
 
         FlowLayoutPanel1.ResumeLayout()
@@ -142,11 +146,7 @@ Public Class ConfigurationNodeControl
             SelectedValue = tmp.Cache.pID
         End If
 
-        Dim tmpList = CacheBOMTemplateInfo.BOMTDHelper.GetLinkNodeIDListByNodeID(NodeInfo.ID)
-        For Each item In tmpList
-            Dim tmpControl As ConfigurationNodeControl = CacheBOMTemplateInfo.ConfigurationNodeControlTable(item)
-            tmpControl.UpdateValueWithOtherConfiguration()
-        Next
+        UpdateChildNodeValue()
 
         If IsUserChecked Then
             CacheBOMTemplateInfo.BOMTControl.ShowUnitPrice()
@@ -172,61 +172,75 @@ Public Class ConfigurationNodeControl
                                         Where ParentNodeIDHashSet.Contains(item.NodeInfo.ID)
                                         Select item.SelectedValueID).ToList
 
-        If CacheBOMTemplateInfo.BOMTDHelper.IsHaveParentValueLink(tmpParentNodeValueIDList, NodeInfo.ID) Then
-            '有关联,取交集
-            '遍历其他配置项当前值
-            Dim tmpValues = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                            Order By item.NodeInfo.Priority
-                            Select item
-            For Each item In tmpValues 'AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
-                    Continue For
-                End If
+        Dim haveEmptyStr As Boolean = False
+        For Each item In tmpParentNodeValueIDList
+            If String.IsNullOrWhiteSpace(item) Then
+                haveEmptyStr = True
+            End If
+        Next
 
-                Dim tmpHashSet = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueIDItems(item.SelectedValueID, NodeInfo.ID)
-
-                '取交集
-                Dim tmpKeys = originDictionary.Keys.ToList
-                For Each key In tmpKeys
-                    If tmpHashSet.Contains(key) Then
-
-                    Else
-                        originDictionary.Remove(key)
-                    End If
-                Next
-
-            Next
-
+        If haveEmptyStr Then
+            '父节点有空值则子节点都为空
+            originDictionary.Clear()
         Else
-            '无关联,排除其他选项值
-            '遍历其他配置项当前值
-            Dim tmpValues = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                            Order By item.NodeInfo.Priority
-                            Select item
-            For Each item In tmpValues 'AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
-                    Continue For
-                End If
 
-                Dim tmpDictionary = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
+            If CacheBOMTemplateInfo.BOMTDHelper.IsHaveParentValueLink(tmpParentNodeValueIDList, NodeInfo.ID) Then
+                '有关联,取交集
+                '遍历其他配置项当前值
+                Dim tmpValues = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
+                                Order By item.NodeInfo.Priority
+                                Select item
+                For Each item In tmpValues
+                    If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
+                        Continue For
+                    End If
 
-                '排除
-                For Each key In tmpDictionary.Keys
-                    If originDictionary.ContainsKey(key) Then
+                    Dim tmpHashSet = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueIDItems(item.SelectedValueID, NodeInfo.ID)
 
-                        Dim count = originDictionary(key)
-                        count -= tmpDictionary(key)
-                        originDictionary(key) = count
-                        If count <= 0 Then
+                    '取交集
+                    Dim tmpKeys = originDictionary.Keys.ToList
+                    For Each key In tmpKeys
+                        If tmpHashSet.Contains(key) Then
+
+                        Else
                             originDictionary.Remove(key)
                         End If
-
-                    Else
-
-                    End If
+                    Next
 
                 Next
-            Next
+
+            Else
+                '无关联,排除其他选项值
+                '遍历其他配置项当前值
+                Dim tmpValues = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
+                                Order By item.NodeInfo.Priority
+                                Select item
+                For Each item In tmpValues
+                    If Not ParentNodeIDHashSet.Contains(item.NodeInfo.ID) Then
+                        Continue For
+                    End If
+
+                    Dim tmpDictionary = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
+
+                    '排除
+                    For Each key In tmpDictionary.Keys
+                        If originDictionary.ContainsKey(key) Then
+
+                            Dim count = originDictionary(key)
+                            count -= tmpDictionary(key)
+                            originDictionary(key) = count
+                            If count <= 0 Then
+                                originDictionary.Remove(key)
+                            End If
+
+                        Else
+
+                        End If
+
+                    Next
+                Next
+
+            End If
 
         End If
 
@@ -279,13 +293,32 @@ Public Class ConfigurationNodeControl
             End If
 
         Else
+
             Me.Label1.BackColor = UIFormHelper.ErrorColor
             Me.Visible = CacheBOMTemplateInfo.ShowHideConfigurationNodeItems
+
+            UpdateChildNodeValue()
+
         End If
 
         FlowLayoutPanel1.ResumeLayout()
 
         IsUserChecked = True
+
+    End Sub
+#End Region
+
+#Region "更新子节点选项"
+    ''' <summary>
+    ''' 更新子节点选项
+    ''' </summary>
+    Private Sub UpdateChildNodeValue()
+
+        Dim tmpList = CacheBOMTemplateInfo.BOMTDHelper.GetLinkNodeIDListByNodeID(NodeInfo.ID)
+        For Each item In tmpList
+            Dim tmpControl As ConfigurationNodeControl = CacheBOMTemplateInfo.ConfigurationNodeControlTable(item)
+            tmpControl.UpdateValueWithOtherConfiguration()
+        Next
 
     End Sub
 #End Region

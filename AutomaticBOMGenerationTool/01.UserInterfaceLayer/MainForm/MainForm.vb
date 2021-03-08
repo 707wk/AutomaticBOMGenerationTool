@@ -261,6 +261,7 @@ Public Class MainForm
             Dim item As SuperTabItem = SuperTabControl1.SelectedTab
             Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
             addBOMTemplateInfo.BOMTControl = tmpBOMTemplateControl
+            addBOMTemplateInfo.ShowHideConfigurationNodeItems = tmpBOMTemplateControl.ShowHideItems.Checked
             tmpBOMTemplateControl.CacheBOMTemplateInfo = addBOMTemplateInfo
             tmpBOMTemplateControl.ShowBOMTemplateData()
 

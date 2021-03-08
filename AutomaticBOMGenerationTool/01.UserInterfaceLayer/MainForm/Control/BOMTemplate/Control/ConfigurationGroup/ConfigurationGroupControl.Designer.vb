@@ -50,7 +50,7 @@ Partial Class ConfigurationGroupControl
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(23, 30)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1202, 50)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1202, 10)
         Me.FlowLayoutPanel1.TabIndex = 1
         Me.FlowLayoutPanel1.WrapContents = False
         '
@@ -66,7 +66,7 @@ Partial Class ConfigurationGroupControl
         Me.ForeColor = System.Drawing.Color.White
         Me.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
         Me.Name = "ConfigurationGroupControl"
-        Me.Size = New System.Drawing.Size(1230, 83)
+        Me.Size = New System.Drawing.Size(1230, 40)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

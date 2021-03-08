@@ -577,7 +577,6 @@ order by ConfigurationNodeInfo.Priority"
 from  MaterialLinkInfo
 inner join ConfigurationNodeInfo
 on MaterialLinkInfo.NodeID=ConfigurationNodeInfo.ID
-and ConfigurationNodeInfo.IsMaterial=false
 where MaterialLinkInfo.LinkNodeID=@ConfigurationNodeID
 group by MaterialLinkInfo.LinkNodeValueID"
             }
@@ -637,9 +636,6 @@ group by NodeID"
         Dim cmd As New SQLiteCommand(DatabaseConnection) With {
                 .CommandText = $"select count(NodeValueID)
 from MaterialLinkInfo
---inner join ConfigurationNodeInfo
---on MaterialLinkInfo.NodeID=ConfigurationNodeInfo.ID
---and ConfigurationNodeInfo.IsMaterial=true
 where NodeValueID in ({String.Join(",", tmpIDArray)}) 
 and LinkNodeID=@LinkNodeID
 group by NodeValueID"

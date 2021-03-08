@@ -34,7 +34,7 @@ Partial Class ConfigurationNodeControl
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 23)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1195, 18)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(1195, 10)
         Me.FlowLayoutPanel1.TabIndex = 1
         '
         'Label1
@@ -61,7 +61,7 @@ Partial Class ConfigurationNodeControl
         Me.ForeColor = System.Drawing.Color.White
         Me.Margin = New System.Windows.Forms.Padding(3, 0, 0, 2)
         Me.Name = "ConfigurationNodeControl"
-        Me.Size = New System.Drawing.Size(1198, 41)
+        Me.Size = New System.Drawing.Size(1198, 33)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
