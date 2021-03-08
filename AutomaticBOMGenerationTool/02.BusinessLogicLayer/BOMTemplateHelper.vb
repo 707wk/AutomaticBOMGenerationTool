@@ -1472,16 +1472,16 @@ Public Class BOMTemplateHelper
                 Next
             End If
 
-            Dim tmpConfigurationNode = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable(node.ConfigurationNodeID).NodeInfo
+            Dim tmpConfigurationNode = CacheBOMTemplateInfo.ConfigurationNodeControlTable(node.ConfigurationNodeID).NodeInfo
 
             '记录价格
             tmpConfigurationNode.TotalPrice = tmpUnitPrice
 
             '计算占比
-            If AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice = 0 Then
+            If CacheBOMTemplateInfo.TotalPrice = 0 Then
                 tmpConfigurationNode.TotalPricePercentage = 0
             Else
-                tmpConfigurationNode.TotalPricePercentage = tmpConfigurationNode.TotalPrice * 100 / AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice
+                tmpConfigurationNode.TotalPricePercentage = tmpConfigurationNode.TotalPrice * 100 / CacheBOMTemplateInfo.TotalPrice
             End If
 
         Next
@@ -1495,7 +1495,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub CalculateMaterialTotalPrice(wb As ExcelPackage)
 
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable.Clear()
+        CacheBOMTemplateInfo.MaterialTotalPriceTable.Clear()
 
         Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
         Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
@@ -1528,13 +1528,13 @@ Public Class BOMTemplateHelper
             Dim tmpPrice As Decimal = Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, pUnitPriceColumnID).Value}")) *
                     Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, tmpCountColumnID).Value}"))
 
-            If AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable.ContainsKey(pName) Then
+            If CacheBOMTemplateInfo.MaterialTotalPriceTable.ContainsKey(pName) Then
                 '已存在
-                Dim oldPrice = AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable(pName)
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable(pName) = oldPrice + tmpPrice
+                Dim oldPrice = CacheBOMTemplateInfo.MaterialTotalPriceTable(pName)
+                CacheBOMTemplateInfo.MaterialTotalPriceTable(pName) = oldPrice + tmpPrice
             Else
                 '不存在
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable.Add(pName, tmpPrice)
+                CacheBOMTemplateInfo.MaterialTotalPriceTable.Add(pName, tmpPrice)
             End If
 
         Next
@@ -1774,13 +1774,13 @@ Public Class BOMTemplateHelper
             Next
             tmpWorkSheet.Cells(1, tmpID).Value = "总价"
 
-            Dim tmpKeys = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
+            Dim tmpKeys = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
                           Where item.NodeInfo.IsMaterial = True
                           Order By item.NodeInfo.SortID
                           Select item.NodeInfo.ID
             '显示物料选项标题
             For i001 = 0 To tmpKeys.Count - 1
-                tmpWorkSheet.Cells(1, tmpID + i001 + 1).Value = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable(tmpKeys(i001)).NodeInfo.Name
+                tmpWorkSheet.Cells(1, tmpID + i001 + 1).Value = CacheBOMTemplateInfo.ConfigurationNodeControlTable(tmpKeys(i001)).NodeInfo.Name
             Next
 
             For i001 = 0 To BOMList.Count - 1
@@ -2024,13 +2024,13 @@ Public Class BOMTemplateHelper
                     Continue For
                 End If
 
-                item.MaterialRowIDList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialRowID(item.ConfigurationNodeID)
-                item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.SelectedValueID)
+                item.MaterialRowIDList = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialRowID(item.ConfigurationNodeID)
+                item.MaterialValue = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.SelectedValueID)
 
             Next
 
             '处理物料信息
-            Using readFS = New FileStream(AppSettingHelper.Instance.CurrentBOMTemplateInfo.TemplateFilePath,
+            Using readFS = New FileStream(CacheBOMTemplateInfo.TemplateFilePath,
                                           FileMode.Open,
                                           FileAccess.Read,
                                           FileShare.ReadWrite)
@@ -2039,18 +2039,18 @@ Public Class BOMTemplateHelper
                     Dim tmpWorkBook = tmpExcelPackage.Workbook
                     Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReadBOMInfo(tmpExcelPackage)
+                    CacheBOMTemplateInfo.BOMTHelper.ReadBOMInfo(tmpExcelPackage)
 
-                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReplaceMaterial(tmpExcelPackage, exportBOMItem.ConfigurationItems)
+                    CacheBOMTemplateInfo.BOMTHelper.ReplaceMaterial(tmpExcelPackage, exportBOMItem.ConfigurationItems)
 
                     Dim headerLocation = FindTextLocation(tmpExcelPackage, "单价")
 
                     exportBOMItem.UnitPrice = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
 
-                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.CalculateExportBOMListConfigurationMaterialTotalPrice(tmpExcelPackage, exportBOMItem.ConfigurationItems)
+                    CacheBOMTemplateInfo.BOMTHelper.CalculateExportBOMListConfigurationMaterialTotalPrice(tmpExcelPackage, exportBOMItem.ConfigurationItems)
 
                     '获取导出项信息
-                    For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
+                    For Each item In CacheBOMTemplateInfo.ExportConfigurationNodeItems
                         item.Exist = False
 
                         Dim findNodes = From node In exportBOMItem.ConfigurationItems
@@ -2065,13 +2065,13 @@ Public Class BOMTemplateHelper
                         item.Value = findNode.SelectedValue
                         item.IsMaterial = findNode.IsMaterial
                         If item.IsMaterial Then
-                            item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
+                            item.MaterialValue = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
                         End If
 
                     Next
 
                     '获取BOM名称
-                    exportBOMItem.Name = JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems)
+                    exportBOMItem.Name = JoinBOMName(tmpExcelPackage, CacheBOMTemplateInfo.ExportConfigurationNodeItems)
 
                 End Using
             End Using

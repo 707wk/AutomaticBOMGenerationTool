@@ -17,6 +17,11 @@ Public Class AboutForm
         Dim tmpDirectoryInfo = New DirectoryInfo(".\DLL")
         For Each item In tmpDirectoryInfo.GetFiles("*.dll")
             Dim tmpFileVersionInfo = FileVersionInfo.GetVersionInfo(item.FullName)
+
+            If tmpFileVersionInfo.ProductName.ToLower.Contains("Microsoft".ToLower) Then
+                Continue For
+            End If
+
             TextBox1.AppendText($"{tmpFileVersionInfo.ProductName} - {tmpFileVersionInfo.FileVersion}{vbCrLf}")
         Next
 

@@ -2,6 +2,9 @@
 Imports OfficeOpenXml
 
 Public Class ExportBOMNameSettingsForm
+
+    Public CacheBOMTemplateInfo As BOMTemplateInfo
+
     Private Sub ExportBOMNameSettingsForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Left = MousePosition.X
         Me.Top = MousePosition.Y - Me.Height
@@ -23,7 +26,7 @@ Public Class ExportBOMNameSettingsForm
 
         End With
 
-        For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
+        For Each item In CacheBOMTemplateInfo.ExportConfigurationNodeItems
             CheckBoxDataGridView1.Rows.Add({
                                            False,
                                            item.Name,
@@ -83,21 +86,18 @@ Public Class ExportBOMNameSettingsForm
             Exit Sub
         End If
 
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems.Clear()
+        CacheBOMTemplateInfo.ExportConfigurationNodeItems.Clear()
         For Each item As DataGridViewRow In CheckBoxDataGridView1.Rows
-            AppSettingHelper.
-                Instance.
-                CurrentBOMTemplateInfo.
-                ExportConfigurationNodeItems.Add(New ExportConfigurationNodeInfo With
-                {
-                .Name = item.Cells(1).Value,
-                .ExportPrefix = item.Cells(2).Value,
-                .IsExportConfigurationNodeValue = item.Cells(3).Value,
-                .IsExportpName = item.Cells(4).Value,
-                .IsExportpConfigFirstTerm = item.Cells(5).Value,
-                .IsExportMatchingValue = item.Cells(6).Value,
-                .MatchingValues = StrConv(item.Cells(7).Value, VbStrConv.Narrow)
-                                                    })
+            CacheBOMTemplateInfo.ExportConfigurationNodeItems.Add(New ExportConfigurationNodeInfo With
+                                                                  {
+                                                                  .Name = item.Cells(1).Value,
+                                                                  .ExportPrefix = item.Cells(2).Value,
+                                                                  .IsExportConfigurationNodeValue = item.Cells(3).Value,
+                                                                  .IsExportpName = item.Cells(4).Value,
+                                                                  .IsExportpConfigFirstTerm = item.Cells(5).Value,
+                                                                  .IsExportMatchingValue = item.Cells(6).Value,
+                                                                  .MatchingValues = StrConv(item.Cells(7).Value, VbStrConv.Narrow)
+                                                                  })
         Next
 
         Me.DialogResult = DialogResult.OK
@@ -167,7 +167,7 @@ Public Class ExportBOMNameSettingsForm
                             Throw New Exception("未导入有效数据")
                         End If
 
-                        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems = tmpExportConfigurationNodeItems
+                        CacheBOMTemplateInfo.ExportConfigurationNodeItems = tmpExportConfigurationNodeItems
 
                     End Using
                 End Using

@@ -69,6 +69,7 @@
             e.Graphics.DrawString($"品号 : {_Cache.pID}", OldFont, ContextFontSolidBrush, 1, tmpFontSize.Height * 1 + 1)
 
             e.Graphics.DrawString($"规格 : {_Cache.pConfig}", OldFont, ContextFontSolidBrush, New Rectangle(1, tmpFontSize.Height * 2 + 1, Me.Width - 2, Me.Height - tmpFontSize.Height * 2 - 2))
+
         End If
 
         If Me.Checked Then

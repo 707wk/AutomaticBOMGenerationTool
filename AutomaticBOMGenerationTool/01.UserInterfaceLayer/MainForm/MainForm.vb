@@ -1,104 +1,33 @@
-﻿Imports System.Data.Common
-Imports System.Data.SQLite
-Imports System.Drawing.Drawing2D
-Imports System.IO
-Imports System.Text
-Imports System.Windows.Forms.DataVisualization.Charting
+﻿Imports System.IO
 Imports DevComponents.DotNetBar
 Imports OfficeOpenXml
 
 Public Class MainForm
+
+    Public tmpViewBOMConfigurationInfoForm As ViewBOMConfigurationInfoForm
+
+    Private IsCreateNewTab As Boolean
 
 #Region "样式初始化"
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         Me.Text = $"{My.Application.Info.Title} V{AppSettingHelper.Instance.ProductVersion}"
 
+        Me.KeyPreview = True
+
         '设置使用方式为个人使用
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial
 
         UIFormHelper.UIForm = Me
 
-        '待导出列表
-        With ExportBOMList
-            .EditMode = DataGridViewEditMode.EditOnEnter
-            .AllowDrop = True
-            .ReadOnly = True
-            .ColumnHeadersDefaultCellStyle.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
-            .RowHeadersWidth = 80
-
-            .DefaultCellStyle.WrapMode = DataGridViewTriState.True
-            .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
-            .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
-            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .Width = 900})
-
-            Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "总价", .Width = 120}
-            tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns.Add(tmpDataGridViewTextBoxColumn)
-
-            tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "错误信息", .Width = 320}
-            tmpDataGridViewTextBoxColumn.DefaultCellStyle.ForeColor = UIFormHelper.ErrorColor
-            .Columns.Add(tmpDataGridViewTextBoxColumn)
-
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.NormalColor))
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.ErrorColor))
-
-
-            .EnableHeadersVisualStyles = False
-            .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
-            .RowHeadersDefaultCellStyle.ForeColor = Color.White
-            .RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single
-            .DefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48)
-            .GridColor = Color.FromArgb(45, 45, 48)
-            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
-
-        End With
-
-        '占比选择项
-        For i001 = 0 To 10
-            MinimumTotalPricePercentage.Items.Add(i001 * 0.1D)
-        Next
-        For i001 = 1 To 10
-            MinimumTotalPricePercentage.Items.Add(i001 * 1D)
-        Next
-
-        '价格占比列表
-        With CheckBoxDataGridView1
-            .ReadOnly = True
-            .ColumnHeadersDefaultCellStyle.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
-            .RowHeadersWidth = 80
-
-            .DefaultCellStyle.WrapMode = DataGridViewTriState.True
-            .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
-            .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
-            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
-
-            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "物料项", .Width = 300})
-            Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "价格", .Width = 100}
-            tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns.Add(tmpDataGridViewTextBoxColumn)
-            tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "比例", .Width = 60}
-            tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-            .Columns.Add(tmpDataGridViewTextBoxColumn)
-
-            .EnableHeadersVisualStyles = False
-            .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
-            .RowHeadersDefaultCellStyle.ForeColor = Color.White
-            .RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single
-            .DefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48)
-            .GridColor = Color.FromArgb(45, 45, 48)
-            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
-
-        End With
+        '标签页样式
+        SuperTabControl1.TabStyle = eSuperTabStyle.Office2010BackstageBlue
+        SuperTabControl1.TabStripColor.Background.Colors = {Me.BackColor}
+        SuperTabControl1.CloseButtonOnTabsVisible = True
 
         '初始化视图状态
         CheckBoxItem1.Checked = AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer2.Panel2Collapsed")
-        SplitContainer2.Panel2Collapsed = Not AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer2.Panel2Collapsed")
         CheckBoxItem2.Checked = AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed")
-        SplitContainer1.Panel2Collapsed = Not AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed")
 
     End Sub
 #End Region
@@ -109,14 +38,23 @@ Public Class MainForm
             MsgBox("程序版本过低,请尽快使用最新版程序", MsgBoxStyle.Information)
         End If
 
-        FlowLayoutPanel1_ControlRemoved(Nothing, Nothing)
-        ExportBOMList_RowsRemoved(Nothing, Nothing)
         ToolStripStatusLabel1_TextChanged(Nothing, Nothing)
 
-        If IO.File.Exists(AppSettingHelper.Instance.CurrentBOMTemplateFilePath) Then
-            ToolStripStatusLabel1.Text = AppSettingHelper.Instance.CurrentBOMTemplateFilePath
-            Button2_Click(Nothing, Nothing)
-        End If
+        'If IO.File.Exists(AppSettingHelper.Instance.CurrentBOMTemplateFilePath) Then
+
+        '    IsCreateNewTab = True
+
+        '    ToolStripStatusLabel1.Text = AppSettingHelper.Instance.CurrentBOMTemplateFilePath
+
+        '    ParseBOMTemplate()
+
+        'End If
+
+        'For Each item As SuperTabItem In SuperTabControl1.Tabs
+        '    Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
+        '    tmpBOMTemplateControl.SplitContainer2.Panel2Collapsed = Not CheckBoxItem1.Checked
+        '    tmpBOMTemplateControl.SplitContainer1.Panel2Collapsed = Not CheckBoxItem2.Checked
+        'Next
 
     End Sub
 
@@ -135,31 +73,60 @@ Public Class MainForm
                 Exit Sub
             End If
 
-            AppSettingHelper.Instance.CurrentBOMTemplateFilePath = tmpDialog.FileName
-            ToolStripStatusLabel1.Text = tmpDialog.FileName
-            Button2_Click(Nothing, Nothing)
+            IsCreateNewTab = True
+
+            If AppSettingHelper.Instance.OpenFileList.Contains(tmpDialog.FileName) Then
+                '已打开
+                Dim findTabs = From item As SuperTabItem In SuperTabControl1.Tabs
+                               Where item.Tooltip.Contains(tmpDialog.FileName)
+                               Select item
+
+                SuperTabControl1.SelectedTab = findTabs(0)
+
+                UIFormHelper.ToastWarning($"{IO.Path.GetFileName(tmpDialog.FileName)} 已打开")
+
+                Exit Sub
+
+            Else
+                '未打开
+                AppSettingHelper.Instance.OpenFileList.Add(tmpDialog.FileName)
+
+                ToolStripStatusLabel1.Text = tmpDialog.FileName
+
+                ParseBOMTemplate(tmpDialog.FileName)
+
+            End If
 
         End Using
     End Sub
 #End Region
 
     Private Sub ButtonItem3_Click(sender As Object, e As EventArgs) Handles ButtonItem3.Click
-        FileHelper.Open(AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath)
+        FileHelper.Open(CurrentBOMTemplateInfo.SourceFilePath)
     End Sub
 
-#Region "解析模板"
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles ButtonItem4.Click
 
-        ConfigurationGroupList.Controls.Clear()
-        ExportBOMList.Rows.Clear()
+        IsCreateNewTab = False
+
+        ParseBOMTemplate(CurrentBOMTemplateInfo.SourceFilePath)
+
+    End Sub
+
+#Region "解析BOM模板"
+    ''' <summary>
+    ''' 解析BOM模板
+    ''' </summary>
+    Private Sub ParseBOMTemplate(filePath As String)
 
         Dim tmpStopwatch = New Stopwatch
+
+        Dim addBOMTemplateInfo As BOMTemplateInfo = Nothing
 
         Do
             tmpStopwatch.Restart()
 
-            AppSettingHelper.Instance.CurrentBOMTemplateInfo = Nothing
-            AppSettingHelper.Instance.CurrentBOMTemplateInfo = New BOMTemplateInfo(AppSettingHelper.Instance.CurrentBOMTemplateFilePath)
+            addBOMTemplateInfo = New BOMTemplateInfo(filePath)
 
             Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
                         .Text = "解析数据"
@@ -169,46 +136,46 @@ Public Class MainForm
                                     Dim stepCount = 14
 
                                     be.Write("清空数据库", 100 / stepCount * 0)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.Clear()
+                                    addBOMTemplateInfo.BOMTDHelper.Clear()
 
                                     be.Write("预处理原文件", 100 / stepCount * 1)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.PreproccessSourceFile()
+                                    addBOMTemplateInfo.BOMTHelper.PreproccessSourceFile()
 
                                     be.Write("获取替换物料品号", 100 / stepCount * 2)
-                                    Dim configurationTablepIDList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.GetMaterialpIDListFromConfigurationTable()
+                                    Dim configurationTablepIDList = addBOMTemplateInfo.BOMTHelper.GetMaterialpIDListFromConfigurationTable()
 
                                     be.Write("检测替换物料完整性", 100 / stepCount * 3)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
+                                    addBOMTemplateInfo.BOMTHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
 
                                     be.Write("获取替换物料信息", 100 / stepCount * 4)
-                                    Dim tmpList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.GetMaterialInfoList(configurationTablepIDList)
+                                    Dim tmpList = addBOMTemplateInfo.BOMTHelper.GetMaterialInfoList(configurationTablepIDList)
 
                                     be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 5)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.SaveMaterialInfo(tmpList)
+                                    addBOMTemplateInfo.BOMTDHelper.SaveMaterialInfo(tmpList)
 
                                     be.Write("解析配置节点信息", 100 / stepCount * 6)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.TransformationConfigurationTable()
+                                    addBOMTemplateInfo.BOMTHelper.TransformationConfigurationTable()
 
                                     be.Write("制作提取模板", 100 / stepCount * 7)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.CreateTemplate()
+                                    addBOMTemplateInfo.BOMTHelper.CreateTemplate()
 
                                     be.Write("获取替换物料在模板中的位置", 100 / stepCount * 8)
-                                    Dim tmpRowIDList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.GetMaterialRowIDInTemplate()
+                                    Dim tmpRowIDList = addBOMTemplateInfo.BOMTHelper.GetMaterialRowIDInTemplate()
 
                                     be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 9)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.SaveMaterialRowID(tmpRowIDList)
+                                    addBOMTemplateInfo.BOMTDHelper.SaveMaterialRowID(tmpRowIDList)
 
                                     be.Write("计算配置节点优先级", 100 / stepCount * 10)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.CalculateConfigurationNodePriority()
+                                    addBOMTemplateInfo.BOMTDHelper.CalculateConfigurationNodePriority()
 
                                     be.Write("读取BOM内设置", 100 / stepCount * 11)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReadConfigurationInfoFromBOMTemplate()
+                                    addBOMTemplateInfo.BOMTHelper.ReadConfigurationInfoFromBOMTemplate()
 
                                     be.Write("匹配待导出BOM列表选项信息", 100 / stepCount * 12)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.MatchingExportBOMListConfigurationNodeAndValue()
+                                    addBOMTemplateInfo.BOMTHelper.MatchingExportBOMListConfigurationNodeAndValue()
 
                                     be.Write("计算待导出BOM列表物料价格", 100 / stepCount * 13)
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.CalculateExportBOMListConfigurationPrice()
+                                    addBOMTemplateInfo.BOMTHelper.CalculateExportBOMListConfigurationPrice()
 
                                     ''测试耗时
                                     'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 处理完成", 100 / stepCount * 10)
@@ -220,18 +187,27 @@ Public Class MainForm
 
                 If tmpDialog.Error IsNot Nothing Then
 
-                    If MsgBox($"文件 {AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath}
+                    If MsgBox($"文件 {addBOMTemplateInfo.SourceFilePath}
 {tmpDialog.Error.Message}",
                               MsgBoxStyle.RetryCancel Or MsgBoxStyle.Exclamation,
                               "解析出错") <> MsgBoxResult.Cancel Then
 
-                        AppSettingHelper.Instance.CurrentBOMTemplateInfo = Nothing
+                        addBOMTemplateInfo = Nothing
                         Continue Do
                     Else
 
-                        ToolStripStatusLabel1.Text = "文件解析出错"
-                        AppSettingHelper.Instance.CurrentBOMTemplateFilePath = Nothing
-                        AppSettingHelper.Instance.CurrentBOMTemplateInfo = Nothing
+                        SuperTabControl1_SelectedTabChanged(Nothing, Nothing)
+
+                        addBOMTemplateInfo = Nothing
+
+                        If IsCreateNewTab Then
+                            AppSettingHelper.Instance.OpenFileList.Remove(filePath)
+
+                        Else
+                            SuperTabControl1.SelectedTab.Close()
+
+                        End If
+
                         Exit Sub
                     End If
 
@@ -248,236 +224,43 @@ Public Class MainForm
 
         tmpStopwatch.Restart()
 
-        ShowConfigurationNodeControl()
+        If IsCreateNewTab Then
 
-        ShowExportBOMListData()
+            Dim title = IO.Path.GetFileNameWithoutExtension(filePath)
+            Dim addSuperTabItem As SuperTabItem = SuperTabControl1.CreateTab(title)
+            addSuperTabItem.FixedTabSize = New Size(320, 28)
+            addSuperTabItem.Image = My.Resources.xlsx_20px
+            addSuperTabItem.Tooltip = filePath
+            addSuperTabItem.CloseButtonVisible = True
+            addSuperTabItem.PredefinedColor = eTabItemColor.OfficeMobile2014Blue
+            addSuperTabItem.TabColor.Default.Normal.Background.Colors = {Color.FromArgb(56, 56, 60)}
+            addSuperTabItem.TabColor.Default.Normal.Text = Color.White
 
-        Dim selectedID = MinimumTotalPricePercentage.Items.IndexOf(0.5D)
-        MinimumTotalPricePercentage.SelectedIndex = If(selectedID > -1, selectedID, 0)
+            Dim addControl As New BOMTemplateControl With {
+                .CacheBOMTemplateInfo = addBOMTemplateInfo,
+                .Dock = DockStyle.Fill
+            }
+            addBOMTemplateInfo.BOMTControl = addControl
+
+            addSuperTabItem.AttachedControl.Controls.Add(addControl)
+
+            SuperTabControl1.SelectedTabIndex = SuperTabControl1.Tabs.Count - 1
+
+            addControl.ShowBOMTemplateData()
+
+        Else
+
+            Dim item As SuperTabItem = SuperTabControl1.SelectedTab
+            Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
+            addBOMTemplateInfo.BOMTControl = tmpBOMTemplateControl
+            tmpBOMTemplateControl.CacheBOMTemplateInfo = addBOMTemplateInfo
+            tmpBOMTemplateControl.ShowBOMTemplateData()
+
+        End If
 
         Dim UITimeSpan = tmpStopwatch.Elapsed
 
         UIFormHelper.ToastSuccess($"处理完成,解析耗时 {dateTimeSpan:mm\:ss\.fff},UI生成耗时 {UITimeSpan:mm\:ss\.fff}")
-
-    End Sub
-#End Region
-
-    Private Sub ShowExportBOMListData()
-        For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList
-            ExportBOMList.Rows.Add({False,
-                                   item.Name,
-                                   $"￥{item.UnitPrice:n4}",
-                                   If(item.HaveMissingValue, $"缺失配置项: {String.Join(",", item.MissingConfigurationNodeInfoList)}
-缺失选项值: {String.Join(",", item.MissingConfigurationNodeValueInfoList)}", ""),
-                                   "[查看选项信息]",
-                                   If(item.HaveMissingValue, Nothing, "[查看配置]"),
-                                   "[移除]"})
-            ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = item
-        Next
-    End Sub
-
-#Region "创建配置项选择控件"
-    ''' <summary>
-    ''' 创建配置项选择控件
-    ''' </summary>
-    Private Sub ShowConfigurationNodeControl()
-
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Clear()
-        ExportBOMList.Rows.Clear()
-        ConfigurationGroupList.Controls.Clear()
-
-        ConfigurationGroupList.SuspendLayout()
-
-        Dim tmpGroupList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetConfigurationGroupInfoItems()
-        Dim tmpGroupDict = New Dictionary(Of String, ConfigurationGroupControl)
-
-        Dim tmpNodeList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoItems()
-
-        For Each item In tmpGroupList
-            Dim addConfigurationGroupControl = New ConfigurationGroupControl With {
-                .CacheGroupInfo = item
-            }
-
-            ConfigurationGroupList.Controls.Add(addConfigurationGroupControl)
-            ConfigurationGroupList.Controls.SetChildIndex(addConfigurationGroupControl, ConfigurationGroupList.Controls.Count - 1)
-
-            tmpGroupDict.Add(item.ID, addConfigurationGroupControl)
-        Next
-
-        For Each item In tmpNodeList
-
-            Dim tmpConfigurationGroupControl = tmpGroupDict(item.GroupID)
-
-            Dim addConfigurationNodeControl = New ConfigurationNodeControl With {
-                .GroupControl = tmpConfigurationGroupControl,
-                .NodeInfo = item,
-                .ParentSortID = tmpConfigurationGroupControl.CacheGroupInfo.SortID + 1,
-                .SortID = tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Count + 1
-            }
-
-            tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.Add(addConfigurationNodeControl)
-            tmpConfigurationGroupControl.FlowLayoutPanel1.Controls.SetChildIndex(addConfigurationNodeControl, addConfigurationNodeControl.SortID - 1)
-
-            AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Add(item.ID, addConfigurationNodeControl)
-
-        Next
-
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.FlowLayoutPanel1.SuspendLayout()
-        Next
-
-        Dim tmpValues = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                        Order By item.NodeInfo.Priority
-                        Select item
-        For Each item In tmpValues
-            item.Init()
-        Next
-
-        '默认展开
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.CheckBox1.Checked = True
-        Next
-
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.FlowLayoutPanel1.ResumeLayout()
-        Next
-
-        ConfigurationGroupList.ResumeLayout()
-
-        ShowUnitPrice()
-
-    End Sub
-#End Region
-
-#Region "显示单价"
-    ''' <summary>
-    ''' 显示单价
-    ''' </summary>
-    Friend Sub ShowUnitPrice()
-
-        '获取配置项信息
-        Dim tmpConfigurationNodeRowInfoList = (From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                                               Where item.NodeInfo.IsMaterial = True
-                                               Select New ConfigurationNodeRowInfo() With {
-                                                   .IsMaterial = True,
-                                                   .ConfigurationNodeID = item.NodeInfo.ID,
-                                                   .SelectedValueID = item.SelectedValueID
-                                                   }
-                                                   ).ToList
-
-        '获取位置及物料信息
-        For Each item In tmpConfigurationNodeRowInfoList
-
-            item.MaterialRowIDList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialRowID(item.ConfigurationNodeID)
-            item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.SelectedValueID)
-
-        Next
-
-        '处理物料信息
-        Using readFS = New FileStream(AppSettingHelper.Instance.CurrentBOMTemplateInfo.TemplateFilePath,
-                                      FileMode.Open,
-                                      FileAccess.Read,
-                                      FileShare.ReadWrite)
-
-            Using tmpExcelPackage As New ExcelPackage(readFS)
-                Dim tmpWorkBook = tmpExcelPackage.Workbook
-                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReadBOMInfo(tmpExcelPackage)
-
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
-
-                Dim headerLocation = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "单价")
-
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
-                ToolStripLabel1.Text = $"当前总价: ￥{AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice:n4}"
-
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.CalculateConfigurationMaterialTotalPrice(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
-
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.CalculateMaterialTotalPrice(tmpExcelPackage)
-
-            End Using
-        End Using
-
-        For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-            item.UpdateTotalPrice()
-        Next
-
-        For Each nodeitem In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-            nodeitem.GroupControl.UpdatePrice(nodeitem.NodeInfo.ID, nodeitem.NodeInfo.TotalPrice, nodeitem.NodeInfo.TotalPricePercentage)
-        Next
-
-        ShowTotalPrice()
-
-        ShowTotalList()
-
-        UIFormHelper.ToastSuccess($"{Now:HH:mm:ss} 价格更新完成", timeoutInterval:=1000)
-
-    End Sub
-#End Region
-
-#Region "显示单项价格占比饼图"
-    ''' <summary>
-    ''' 显示单项价格占比饼图
-    ''' </summary>
-    Private Sub ShowTotalPrice()
-
-        Dim tmpOtherTotalPrice = AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice
-
-        Chart1.Series(0).Points.Clear()
-
-        If AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice = 0 Then
-            Exit Sub
-        End If
-
-        Dim tmpNodeItem = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable
-                          Where item.Value * 100 / AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice >= AppSettingHelper.Instance.CurrentBOMTemplateInfo.MinimumTotalPricePercentage
-                          Select item
-                          Order By item.Value Descending
-
-        For Each item In tmpNodeItem
-            Chart1.Series(0).Points.Add(New DataPoint() With {
-                                        .YValues = {item.Value},
-                                        .AxisLabel = $"{item.Key}
-({item.Value * 100 / AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice:n1}%,￥{item.Value:n2})"
-                                        })
-
-            tmpOtherTotalPrice -= item.Value
-        Next
-
-        If AppSettingHelper.Instance.CurrentBOMTemplateInfo.MinimumTotalPricePercentage > 0 Then
-            Chart1.Series(0).Points.Add(New DataPoint() With {
-                                                    .YValues = {tmpOtherTotalPrice},
-                                                    .AxisLabel = $"其他物料
-(￥{tmpOtherTotalPrice:n2})"
-                                                    })
-        End If
-
-    End Sub
-#End Region
-
-#Region "显示单项价格占比列表"
-    ''' <summary>
-    ''' 显示单项价格占比列表
-    ''' </summary>
-    Private Sub ShowTotalList()
-
-        CheckBoxDataGridView1.Rows.Clear()
-
-        If AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice = 0 Then
-            Exit Sub
-        End If
-
-        Dim tmpNodeItem = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.MaterialTotalPriceTable
-                          Select item
-                          Order By item.Value Descending
-
-        For Each item In tmpNodeItem
-            CheckBoxDataGridView1.Rows.Add({False,
-                                           item.Key,
-                                           $"￥{item.Value:n2}",
-                                           $"{item.Value * 100 / AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice:n1}%"})
-        Next
 
     End Sub
 #End Region
@@ -487,332 +270,7 @@ Public Class MainForm
         tmpDialog.ShowDialog()
     End Sub
 
-#Region "添加当前配置到待导出BOM列表"
-    Private Sub AddCurrentToExportBOMListButton_Click(sender As Object, e As EventArgs) Handles AddCurrentToExportBOMListButton.Click
-        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-            .Text = "导出数据"
-        }
-
-            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                Dim stepCount = 4
-
-                                be.Write("检测物料完整性(跳过)", 100 / stepCount * 0)
-
-                                Dim tmpResult = New BOMConfigurationInfo
-
-                                be.Write("获取配置项信息", 100 / stepCount * 1)
-                                tmpResult.ConfigurationItems = (From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                                                                Select New ConfigurationNodeRowInfo() With {
-                                                                    .ConfigurationNodeID = item.NodeInfo.ID,
-                                                                    .ConfigurationNodeName = item.NodeInfo.Name,
-                                                                    .SelectedValueID = item.SelectedValueID,
-                                                                    .SelectedValue = item.SelectedValue,
-                                                                    .IsMaterial = item.NodeInfo.IsMaterial,
-                                                                    .TotalPrice = item.NodeInfo.TotalPrice,
-                                                                    .ConfigurationNodePriority = item.NodeInfo.Priority
-                                                                    }
-                                                                    ).ToList
-
-                                be.Write("获取导出项信息", 100 / stepCount * 2)
-                                For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
-                                    item.Exist = False
-
-                                    Dim findNodes = From node In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
-                                                    Select node
-                                    If findNodes.Count = 0 Then Continue For
-
-                                    Dim findNode = findNodes.First
-
-                                    item.Exist = True
-                                    item.ValueID = findNode.SelectedValueID
-                                    item.Value = findNode.SelectedValue
-                                    item.IsMaterial = findNode.NodeInfo.IsMaterial
-                                    If item.IsMaterial Then
-                                        item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
-                                    End If
-
-                                Next
-
-                                be.Write("计算BOM名称", 100 / stepCount * 3)
-                                Using readFS = New FileStream(AppSettingHelper.Instance.CurrentBOMTemplateInfo.TemplateFilePath,
-                                                              FileMode.Open,
-                                                              FileAccess.Read,
-                                                              FileShare.ReadWrite)
-
-                                    Using tmpExcelPackage As New ExcelPackage(readFS)
-                                        Dim tmpWorkBook = tmpExcelPackage.Workbook
-                                        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-                                        tmpResult.Name = BOMTemplateHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems)
-
-                                    End Using
-                                End Using
-
-                                be.Result = tmpResult
-
-                            End Sub)
-
-            If tmpDialog.Error IsNot Nothing Then
-                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "导出出错")
-                Exit Sub
-            End If
-
-            Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = tmpDialog.Result
-            '保存单价
-            tmpBOMConfigurationInfo.UnitPrice = AppSettingHelper.Instance.CurrentBOMTemplateInfo.TotalPrice
-
-            ExportBOMList.Rows.Add({False,
-                                   tmpBOMConfigurationInfo.Name,
-                                   $"￥{tmpBOMConfigurationInfo.UnitPrice:n4}",
-                                   "",
-                                   "[查看选项信息]",
-                                   "[查看配置]",
-                                   "[移除]"})
-            ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpBOMConfigurationInfo
-
-        End Using
-    End Sub
-
-#End Region
-
-#Region "导出当前配置"
-    Private Sub ExportCurrentButton_Click(sender As Object, e As EventArgs) Handles ExportCurrentButton.Click
-        Dim outputFilePath As String
-
-        Using tmpDialog As New SaveFileDialog With {
-            .Filter = "BOM文件|*.xlsx",
-            .FileName = Now.ToString("yyyyMMddHHmmssfff")
-        }
-            If tmpDialog.ShowDialog() <> DialogResult.OK Then
-                Exit Sub
-            End If
-
-            outputFilePath = tmpDialog.FileName
-
-        End Using
-
-        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-            .Text = "导出数据"
-        }
-
-            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-                                Dim stepCount = 6
-
-                                be.Write("检测物料完整性(跳过)", 100 / stepCount * 0)
-
-                                be.Write("获取配置项信息", 100 / stepCount * 1)
-                                Dim tmpConfigurationNodeRowInfoList = (From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                                                                       Select New ConfigurationNodeRowInfo() With {
-                                                                           .ConfigurationNodeID = item.NodeInfo.ID,
-                                                                           .ConfigurationNodeName = item.NodeInfo.Name,
-                                                                           .SelectedValueID = item.SelectedValueID,
-                                                                           .SelectedValue = item.SelectedValue,
-                                                                           .IsMaterial = item.NodeInfo.IsMaterial
-                                                                           }
-                                                                           ).ToList
-
-                                be.Write("获取导出项信息", 100 / stepCount * 2)
-                                For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
-                                    item.Exist = False
-
-                                    Dim findNodes = From node In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
-                                                    Select node
-                                    If findNodes.Count = 0 Then Continue For
-
-                                    Dim findNode = findNodes.First
-
-                                    item.Exist = True
-                                    item.ValueID = findNode.SelectedValueID
-                                    item.Value = findNode.SelectedValue
-                                    item.IsMaterial = findNode.NodeInfo.IsMaterial
-                                    If item.IsMaterial Then
-                                        item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
-                                    End If
-
-                                Next
-
-                                be.Write("获取位置及物料信息", 100 / stepCount * 3)
-                                For Each item In tmpConfigurationNodeRowInfoList
-                                    If Not item.IsMaterial Then
-                                        Continue For
-                                    End If
-
-                                    item.MaterialRowIDList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialRowID(item.ConfigurationNodeID)
-                                    item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.SelectedValueID)
-
-                                Next
-
-                                be.Write("处理物料信息", 100 / stepCount * 4)
-                                AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReplaceMaterialAndSave(outputFilePath, tmpConfigurationNodeRowInfoList)
-
-                                be.Write("打开保存文件夹", 100 / stepCount * 5)
-                                FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
-
-                            End Sub)
-
-            If tmpDialog.Error IsNot Nothing Then
-                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "导出出错")
-                Exit Sub
-            End If
-
-        End Using
-
-    End Sub
-#End Region
-
-#Region "导出待导出BOM列表"
-    Private Sub ExportAllBOMButton_Click(sender As Object, e As EventArgs) Handles ExportAllBOMButton.Click
-        Dim saveFolderPath As String
-
-        Using tmpDialog As New FolderBrowserDialog
-            If tmpDialog.ShowDialog <> DialogResult.OK Then
-                Exit Sub
-            End If
-            saveFolderPath = tmpDialog.SelectedPath
-        End Using
-
-        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-            .Text = "导出数据"
-        }
-
-            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
-
-                                be.Write("获取导出项")
-                                Dim ColIndex = 0
-                                For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
-                                    item.Exist = False
-                                    item.ColIndex = 0
-
-                                    Dim findNodes = From node In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-                                                    Where node.NodeInfo.Name.ToUpper.Equals(item.Name.ToUpper)
-                                                    Select node
-                                    If findNodes.Count = 0 Then Continue For
-
-                                    Dim findNode = findNodes.First
-
-                                    item.Exist = True
-                                    item.ColIndex = ColIndex
-                                    ColIndex += 1
-                                Next
-
-                                Dim tmpBOMList = CType(be.Args, List(Of BOMConfigurationInfo))
-
-                                '设置文件名
-                                For i001 = 0 To tmpBOMList.Count - 1
-                                    tmpBOMList(i001).FileName = $"配置{i001 + 1}.xlsx"
-                                Next
-
-                                be.Write("生成配置清单")
-                                AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.CreateConfigurationListFile(Path.Combine(saveFolderPath, $"_文件配置清单.xlsx"), tmpBOMList)
-
-                                be.Write("导出中")
-                                For i001 = 0 To tmpBOMList.Count - 1
-                                    Dim tmpBOMConfigurationInfo = tmpBOMList(i001)
-
-                                    be.Write($"导出第 {i001 + 1} 个", CInt(100 / tmpBOMList.Count * i001))
-
-                                    For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
-                                        If Not item.Exist Then
-                                            Continue For
-                                        End If
-
-                                        Dim findNode = (From node In tmpBOMConfigurationInfo.ConfigurationItems
-                                                        Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
-                                                        Select node).First()
-
-                                        If findNode Is Nothing Then Continue For
-
-                                        item.ValueID = findNode.SelectedValueID
-                                        item.Value = findNode.SelectedValue
-                                        item.IsMaterial = findNode.IsMaterial
-                                        If item.IsMaterial Then
-                                            item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
-                                        End If
-
-                                    Next
-
-                                    For Each item In tmpBOMConfigurationInfo.ConfigurationItems
-                                        If Not item.IsMaterial Then
-                                            Continue For
-                                        End If
-
-                                        item.MaterialRowIDList = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialRowID(item.ConfigurationNodeID)
-                                        item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.SelectedValueID)
-
-                                    Next
-
-                                    AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTHelper.ReplaceMaterialAndSave(Path.Combine(saveFolderPath, tmpBOMConfigurationInfo.FileName), tmpBOMConfigurationInfo.ConfigurationItems)
-
-                                Next
-
-                            End Sub, (From item In ExportBOMList.Rows
-                                      Select CType(item.tag, BOMConfigurationInfo)).ToList)
-
-            If tmpDialog.Error IsNot Nothing Then
-                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "导出出错")
-                Exit Sub
-            End If
-
-            FileHelper.Open(saveFolderPath)
-
-        End Using
-
-    End Sub
-#End Region
-
-#Region "从待导出BOM列表移除"
-    Private Sub DeleteButton_Click(sender As Object, e As EventArgs) Handles DeleteButton.Click
-        Dim selectedCount As Integer = 0
-        For Each item As DataGridViewRow In ExportBOMList.Rows
-            If item.Cells(0).EditedFormattedValue Then
-                selectedCount += 1
-            End If
-        Next
-
-        If selectedCount = 0 Then
-            Exit Sub
-        End If
-
-        If MsgBox("确定移除选中项?", MsgBoxStyle.YesNo Or MsgBoxStyle.Question, "移除") <> MsgBoxResult.Yes Then
-            Exit Sub
-        End If
-
-        '删除
-        For rowID = ExportBOMList.Rows.Count - 1 To 0 Step -1
-            If ExportBOMList.Rows(rowID).Cells(0).EditedFormattedValue Then
-                ExportBOMList.Rows.RemoveAt(rowID)
-            End If
-        Next
-    End Sub
-#End Region
-
 #Region "控件状态管理"
-    Private Sub FlowLayoutPanel1_ControlAdded(sender As Object, e As ControlEventArgs) Handles ConfigurationGroupList.ControlAdded
-        AddCurrentToExportBOMListButton.Enabled = True
-        ExportCurrentButton.Enabled = True
-    End Sub
-
-    Private Sub FlowLayoutPanel1_ControlRemoved(sender As Object, e As ControlEventArgs) Handles ConfigurationGroupList.ControlRemoved
-        If ConfigurationGroupList.Controls.Count = 0 Then
-            AddCurrentToExportBOMListButton.Enabled = False
-            ExportCurrentButton.Enabled = False
-        End If
-    End Sub
-
-    Private Sub ExportBOMList_RowsAdded(sender As Object, e As DataGridViewRowsAddedEventArgs) Handles ExportBOMList.RowsAdded
-        ExportAllBOMButton.Enabled = True
-        DeleteButton.Enabled = True
-    End Sub
-
-    Private Sub ExportBOMList_RowsRemoved(sender As Object, e As DataGridViewRowsRemovedEventArgs) Handles ExportBOMList.RowsRemoved
-        If ExportBOMList.Rows.Count = 0 Then
-            ExportAllBOMButton.Enabled = False
-            DeleteButton.Enabled = False
-        End If
-    End Sub
-
     Private Sub ToolStripStatusLabel1_TextChanged(sender As Object, e As EventArgs) Handles ToolStripStatusLabel1.TextChanged
 
         If ToolStripStatusLabel1.Text.Contains(":") Then
@@ -820,150 +278,15 @@ Public Class MainForm
             ButtonItem12.Enabled = True
             ButtonItem3.Enabled = True
             ButtonItem4.Enabled = True
-            ToolStripButton1.Enabled = True
         Else
             ButtonItem11.Enabled = False
             ButtonItem12.Enabled = False
             ButtonItem3.Enabled = False
             ButtonItem4.Enabled = False
-            ToolStripButton1.Enabled = False
         End If
 
     End Sub
 #End Region
-
-#Region "显示编写规则"
-    Private Sub ButtonItem1_Click(sender As Object, e As EventArgs) Handles ButtonItem1.Click
-        Using tmpDialog As New ShowTxtContentForm With {
-                .Text = ButtonItem1.Text,
-                .filePath = ".\Data\ConfigurationRule.txt"
-            }
-            tmpDialog.ShowDialog()
-        End Using
-    End Sub
-#End Region
-
-#Region "展开/折叠配置项"
-    Private Sub ToolStripSplitButton1_ButtonClick(sender As Object, e As EventArgs) Handles ToolStripSplitButton1.ButtonClick
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.CheckBox1.Checked = True
-        Next
-    End Sub
-
-    Private Sub ShowHideItems_CheckedChanged(sender As Object, e As EventArgs) Handles ShowHideItems.CheckedChanged
-        '显示隐藏项
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ShowHideConfigurationNodeItems = ShowHideItems.Checked
-
-        Dim tmpStopwatch As New Stopwatch
-        tmpStopwatch.Start()
-
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.FlowLayoutPanel1.SuspendLayout()
-        Next
-
-        For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
-            item.UpdateVisible()
-        Next
-
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.FlowLayoutPanel1.ResumeLayout()
-        Next
-
-        tmpStopwatch.Stop()
-
-        UIFormHelper.ToastSuccess($"界面更新完成,耗时 {tmpStopwatch.Elapsed:mm\:ss\.fff}")
-
-    End Sub
-
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.CheckBox1.Checked = False
-        Next
-    End Sub
-#End Region
-
-    Public tmpViewBOMConfigurationInfoForm As ViewBOMConfigurationInfoForm
-
-    Private Sub ExportBOMList_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles ExportBOMList.CellContentClick
-        If e.RowIndex < 0 Then
-            Exit Sub
-        End If
-
-        Select Case e.ColumnIndex
-
-            Case 4
-#Region "查看选项信息"
-                Dim BOMConfigurationInfoItem = ExportBOMList.Rows(e.RowIndex).Tag
-
-                If tmpViewBOMConfigurationInfoForm Is Nothing Then
-                    tmpViewBOMConfigurationInfoForm = New ViewBOMConfigurationInfoForm With {
-                        .Owner = Me
-                    }
-                End If
-
-                tmpViewBOMConfigurationInfoForm.CacheBOMConfigurationInfo = BOMConfigurationInfoItem
-
-#End Region
-            Case 5
-#Region "查看配置"
-                ConfigurationGroupList.SuspendLayout()
-
-                Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = ExportBOMList.Rows(e.RowIndex).Tag
-
-                Dim tmpList = From item In tmpBOMConfigurationInfo.ConfigurationItems
-                              Order By item.ConfigurationNodePriority
-                              Select {item.ConfigurationNodeID, item.SelectedValueID}
-
-                For Each item In tmpList
-                    Dim tmpConfigurationNodeID = $"{item(0)}"
-                    Dim tmpSelectedValueID = $"{item(1)}"
-
-                    Dim tmpConfigurationNodeControl = AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable(tmpConfigurationNodeID)
-
-                    tmpConfigurationNodeControl.SetValue(tmpSelectedValueID)
-
-                Next
-
-                ConfigurationGroupList.ResumeLayout()
-#End Region
-
-            Case 6
-#Region "移除"
-                If MsgBox($"确定移除 {ExportBOMList.Rows(e.RowIndex).Cells(1).Value} ?", MsgBoxStyle.YesNo Or MsgBoxStyle.Question, "移除") <> MsgBoxResult.Yes Then
-                    Exit Sub
-                End If
-
-                '删除
-                ExportBOMList.Rows.RemoveAt(e.RowIndex)
-#End Region
-
-        End Select
-    End Sub
-
-    Private Sub FeedbackButton_Click(sender As Object, e As EventArgs) Handles FeedbackButton.Click
-        Process.Start("https://support.qq.com/products/285331")
-    End Sub
-
-    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
-        Dim tmpBitmap = New Bitmap(Chart1.Width, Chart1.Height)
-        Chart1.DrawToBitmap(tmpBitmap, New Rectangle(0, 0, Chart1.Width, Chart1.Height))
-
-        Clipboard.SetImage(tmpBitmap)
-
-        UIFormHelper.ToastSuccess("复制成功")
-
-    End Sub
-
-    Private Sub MinimumTotalPricePercentage_SelectedIndexChanged(sender As Object, e As EventArgs) Handles MinimumTotalPricePercentage.SelectedIndexChanged
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.MinimumTotalPricePercentage = MinimumTotalPricePercentage.SelectedItem
-
-        ShowTotalPrice()
-
-        If AppSettingHelper.Instance.CurrentBOMTemplateInfo.MinimumTotalPricePercentage = 0D Then
-            UIFormHelper.ToastWarning("显示项过多会导致部分标签无法显示")
-        End If
-
-    End Sub
 
 #Region "导入物料价格"
     Private Sub ButtonItem5_Click(sender As Object, e As EventArgs) Handles ButtonItem5.Click
@@ -1171,10 +494,11 @@ Public Class MainForm
 
 #End Region
 
+#Region "文件保存修改"
     Private Sub ButtonItem11_Click(sender As Object, e As EventArgs) Handles ButtonItem11.Click
 
-        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(AppSettingHelper.Instance.CurrentBOMTemplateInfo.BackupFilePath)
-        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath)
+        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateInfo.BackupFilePath)
+        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateInfo.SourceFilePath)
 
         Dim isOldFileVersion = True
 
@@ -1204,16 +528,14 @@ Public Class MainForm
 
         End If
 
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList.Clear()
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList.AddRange(From item As DataGridViewRow In ExportBOMList.Rows
-                                                                                Select CType(item.Tag, BOMConfigurationInfo))
+        CurrentBOMTemplateInfo.ExportBOMList.Clear()
+        CurrentBOMTemplateInfo.ExportBOMList.AddRange(From item As DataGridViewRow In CurrentBOMTemplateInfo.BOMTControl.ExportBOMList.Rows
+                                                      Select CType(item.Tag, BOMConfigurationInfo))
 
         Do
             Try
 
-                AppSettingHelper.
-                    Instance.
-                    CurrentBOMTemplateInfo.
+                CurrentBOMTemplateInfo.
                     BOMTHelper.
                     SaveConfigurationInfoToBOMTemplate(isOldFileVersion)
 
@@ -1237,16 +559,18 @@ Public Class MainForm
 
         Loop
 
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList.Clear()
+        CurrentBOMTemplateInfo.ExportBOMList.Clear()
 
         UIFormHelper.ToastSuccess("保存成功")
 
     End Sub
+#End Region
 
+#Region "文件另存为修改"
     Private Sub ButtonItem12_Click(sender As Object, e As EventArgs) Handles ButtonItem12.Click
 
-        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(AppSettingHelper.Instance.CurrentBOMTemplateInfo.BackupFilePath)
-        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath)
+        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateInfo.BackupFilePath)
+        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateInfo.SourceFilePath)
 
         Dim isOldFileVersion = True
 
@@ -1280,7 +604,7 @@ Public Class MainForm
 
         Using tmpDialog As New SaveFileDialog With {
             .Filter = "BOM模板文件|*.xlsx",
-            .FileName = IO.Path.GetFileName(AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath)
+            .FileName = IO.Path.GetFileName(CurrentBOMTemplateInfo.SourceFilePath)
         }
             If tmpDialog.ShowDialog() <> DialogResult.OK Then
                 Exit Sub
@@ -1290,21 +614,19 @@ Public Class MainForm
 
         End Using
 
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList.Clear()
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList.AddRange(From item As DataGridViewRow In ExportBOMList.Rows
-                                                                                Select CType(item.Tag, BOMConfigurationInfo))
+        CurrentBOMTemplateInfo.ExportBOMList.Clear()
+        CurrentBOMTemplateInfo.ExportBOMList.AddRange(From item As DataGridViewRow In CurrentBOMTemplateInfo.BOMTControl.ExportBOMList.Rows
+                                                      Select CType(item.Tag, BOMConfigurationInfo))
 
         Do
             Try
 
-                AppSettingHelper.
-                    Instance.
-                    CurrentBOMTemplateInfo.
+                CurrentBOMTemplateInfo.
                     BOMTHelper.
                     SaveAsConfigurationInfoToBOMTemplate(isOldFileVersion, outputFilePath)
 
-                AppSettingHelper.Instance.CurrentBOMTemplateInfo.SourceFilePath = outputFilePath
-                AppSettingHelper.Instance.CurrentBOMTemplateFilePath = outputFilePath
+                CurrentBOMTemplateInfo.SourceFilePath = outputFilePath
+
                 ToolStripStatusLabel1.Text = outputFilePath
 
 #Disable Warning CA1031 ' Do not catch general exception types
@@ -1327,11 +649,12 @@ Public Class MainForm
 
         Loop
 
-        AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportBOMList.Clear()
+        CurrentBOMTemplateInfo.ExportBOMList.Clear()
 
         UIFormHelper.ToastSuccess("保存成功")
 
     End Sub
+#End Region
 
     Private Sub ButtonItem13_Click(sender As Object, e As EventArgs) Handles ButtonItem13.Click
         Using tmpDialog As New AboutForm
@@ -1339,100 +662,99 @@ Public Class MainForm
         End Using
     End Sub
 
-    Private Sub ToolStripStatusLabel2_Click(sender As Object, e As EventArgs) Handles ToolStripStatusLabel2.Click
-        FileHelper.Open(AppSettingHelper.Instance.TempDirectoryPath)
-    End Sub
-
     Private Sub CheckBoxItem1_CheckedChanged(sender As Object, e As CheckBoxChangeEventArgs) Handles CheckBoxItem1.CheckedChanged
-        SplitContainer2.Panel2Collapsed = Not CheckBoxItem1.Checked
+
+        For Each item As SuperTabItem In SuperTabControl1.Tabs
+            Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
+            tmpBOMTemplateControl.SplitContainer2.Panel2Collapsed = Not CheckBoxItem1.Checked
+        Next
 
         AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer2.Panel2Collapsed", CheckBoxItem1.Checked)
     End Sub
 
     Private Sub CheckBoxItem2_CheckedChanged(sender As Object, e As CheckBoxChangeEventArgs) Handles CheckBoxItem2.CheckedChanged
-        SplitContainer1.Panel2Collapsed = Not CheckBoxItem2.Checked
+
+        For Each item As SuperTabItem In SuperTabControl1.Tabs
+            Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
+            tmpBOMTemplateControl.SplitContainer1.Panel2Collapsed = Not CheckBoxItem2.Checked
+        Next
 
         AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed", CheckBoxItem2.Checked)
     End Sub
 
-    Private Sub ConfigurationGroupList_SizeChanged(sender As Object, e As EventArgs) Handles ConfigurationGroupList.SizeChanged
+    ''' <summary>
+    ''' 当前BOM模板
+    ''' </summary>
+    Public CurrentBOMTemplateInfo As BOMTemplateInfo
 
-        For Each item As ConfigurationGroupControl In ConfigurationGroupList.Controls
-            item.CheckBox1.Width = ConfigurationGroupList.Width - 28
-        Next
+    Private Sub SuperTabControl1_SelectedTabChanged(sender As Object, e As SuperTabStripSelectedTabChangedEventArgs) Handles SuperTabControl1.SelectedTabChanged
 
-        ConfigurationGroupList.ResumeLayout()
+        Dim item As SuperTabItem = SuperTabControl1.SelectedTab
+
+        If item Is Nothing Then
+            Exit Sub
+        End If
+
+        If item.AttachedControl.Controls.Count = 0 Then
+            Exit Sub
+        End If
+
+        Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
+        CurrentBOMTemplateInfo = tmpBOMTemplateControl.CacheBOMTemplateInfo
+
+        ToolStripStatusLabel1.Text = CurrentBOMTemplateInfo.SourceFilePath
+
+    End Sub
+
+    Private Sub SuperTabControl1_TabItemClose(sender As Object, e As SuperTabStripTabItemCloseEventArgs) Handles SuperTabControl1.TabItemClose
+
+        AppSettingHelper.Instance.OpenFileList.Remove(e.Tab.Tooltip)
+
+        If SuperTabControl1.Tabs.Count > 1 Then
+            Exit Sub
+        End If
+
+        ToolStripStatusLabel1.Text = "未选择文件"
 
     End Sub
 
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+#Region "调试信息"
 
-        Using tmpDialog As New ExportBOMNameSettingsForm
-            If tmpDialog.ShowDialog() <> DialogResult.OK Then
-                Exit Sub
-            End If
+#Region "显示调试菜单"
+    Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
 
-        End Using
+        Static password As String = Nothing
 
-        Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
-            .Text = "更新BOM名称"
-        }
+        If RibbonBar6.Visible Then
+            Exit Sub
+        End If
 
-            tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
+        password &= Convert.ToChar(e.KeyValue)
 
-                                Using readFS = New FileStream(AppSettingHelper.Instance.CurrentBOMTemplateInfo.TemplateFilePath,
-                                                              FileMode.Open,
-                                                              FileAccess.Read,
-                                                              FileShare.ReadWrite)
+        If password.Length > 128 Then
+            password = Microsoft.VisualBasic.Right(password, 32)
+        End If
 
-                                    Using tmpExcelPackage As New ExcelPackage(readFS)
+        If password.IndexOf("yestech".ToUpper) > -1 Then
+            RibbonBar6.Visible = True
+            RibbonBar6.RecalcLayout()
 
-                                        For Each rowItem As DataGridViewRow In ExportBOMList.Rows
-                                            be.Write(ExportBOMList.Rows.IndexOf(rowItem) * 100 \ ExportBOMList.Rows.Count)
-
-                                            Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = rowItem.Tag
-
-                                            For Each item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems
-                                                item.Exist = False
-
-                                                Dim findNodes = From node In tmpBOMConfigurationInfo.ConfigurationItems
-                                                                Where node.ConfigurationNodeName.ToUpper.Equals(item.Name.ToUpper)
-                                                                Select node
-                                                If findNodes.Count = 0 Then Continue For
-
-                                                Dim findNode = findNodes.First
-
-                                                item.Exist = True
-                                                item.ValueID = findNode.SelectedValueID
-                                                item.Value = findNode.SelectedValue
-                                                item.IsMaterial = findNode.IsMaterial
-                                                If item.IsMaterial Then
-                                                    item.MaterialValue = AppSettingHelper.Instance.CurrentBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
-                                                End If
-
-                                            Next
-
-                                            tmpBOMConfigurationInfo.Name = BOMTemplateHelper.JoinBOMName(tmpExcelPackage, AppSettingHelper.Instance.CurrentBOMTemplateInfo.ExportConfigurationNodeItems)
-
-                                        Next
-
-                                    End Using
-                                End Using
-
-                            End Sub)
-
-            If tmpDialog.Error IsNot Nothing Then
-                MsgBox(tmpDialog.Error.Message, MsgBoxStyle.Exclamation, "更新BOM名称出错")
-                Exit Sub
-            End If
-
-        End Using
-
-        For Each rowItem As DataGridViewRow In ExportBOMList.Rows
-            Dim tmpBOMConfigurationInfo As BOMConfigurationInfo = rowItem.Tag
-            rowItem.Cells(1).Value = tmpBOMConfigurationInfo.Name
-        Next
+        End If
 
     End Sub
+#End Region
+
+    ' 已打开文件列表
+    Private Sub ButtonItem14_Click(sender As Object, e As EventArgs) Handles ButtonItem14.Click
+        MsgBox($"count : {AppSettingHelper.Instance.OpenFileList.Count}
+{String.Join(vbCrLf, AppSettingHelper.Instance.OpenFileList)}")
+    End Sub
+
+    ' 临时文件夹
+    Private Sub ButtonItem15_Click(sender As Object, e As EventArgs) Handles ButtonItem15.Click
+        FileHelper.Open(AppSettingHelper.Instance.TempDirectoryPath)
+    End Sub
+
+#End Region
 
 End Class

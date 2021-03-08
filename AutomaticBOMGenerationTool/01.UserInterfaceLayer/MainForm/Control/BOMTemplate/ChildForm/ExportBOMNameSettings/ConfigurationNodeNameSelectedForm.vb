@@ -1,4 +1,7 @@
 ﻿Public Class ConfigurationNodeNameSelectedForm
+
+    Public CacheBOMTemplateInfo As BOMTemplateInfo
+
     Private _checkedItems() As String
     ''' <summary>
     ''' 勾选的节点名集合
@@ -13,11 +16,11 @@
     Public ExcludeItems As String()
 
     Private Sub ConfigurationNodeNameSelectedForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        If AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Count = 0 Then
+        If CacheBOMTemplateInfo.ConfigurationNodeControlTable.Count = 0 Then
             Exit Sub
         End If
 
-        Dim tmplist = From item In AppSettingHelper.Instance.CurrentBOMTemplateInfo.ConfigurationNodeControlTable.Values
+        Dim tmplist = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
                       Where Not ExcludeItems.Contains(item.NodeInfo.Name)
                       Order By item.NodeInfo.SortID
                       Select item.NodeInfo.Name

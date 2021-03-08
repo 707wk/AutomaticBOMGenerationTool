@@ -3,6 +3,7 @@
 ''' BOM模板信息
 ''' </summary>
 Public Class BOMTemplateInfo
+    Implements IDisposable
 
     ''' <summary>
     ''' 原文件地址
@@ -41,6 +42,11 @@ Public Class BOMTemplateInfo
     ''' 本地数据库辅助模块
     ''' </summary>
     Public BOMTDHelper As BOMTemplateDatabaseHelper
+
+    ''' <summary>
+    ''' BOM显示控件
+    ''' </summary>
+    Public BOMTControl As BOMTemplateControl
 
     ''' <summary>
     ''' 配置控件查找表
@@ -105,20 +111,30 @@ Public Class BOMTemplateInfo
 
     End Sub
 
-    Protected Overrides Sub Finalize()
+    Private disposedValue As Boolean
+    Protected Overridable Sub Dispose(disposing As Boolean)
+        If Not disposedValue Then
+            If disposing Then
 
-        BOMTHelper = Nothing
-        BOMTDHelper = Nothing
+                BOMTHelper = Nothing
+                BOMTDHelper.Dispose()
 
-        Try
-            IO.Directory.Delete(TempDirectoryPath, True)
+                Try
+                    IO.Directory.Delete(TempDirectoryPath, True)
 
 #Disable Warning CA1031 ' Do not catch general exception types
-        Catch ex As Exception
+                Catch ex As Exception
 #Enable Warning CA1031 ' Do not catch general exception types
-        End Try
+                End Try
+            End If
 
-        MyBase.Finalize()
+            disposedValue = True
+        End If
+    End Sub
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+        Dispose(disposing:=True)
+        GC.SuppressFinalize(Me)
     End Sub
 
 End Class

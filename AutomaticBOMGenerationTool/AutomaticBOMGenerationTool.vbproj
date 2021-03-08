@@ -141,16 +141,16 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.Designer.vb">
       <DependentUpon>ExportBOMNameSettingsForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.Designer.vb">
       <DependentUpon>ConfigurationNodeNameSelectedForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\SettingsForm.Designer.vb">
@@ -201,25 +201,31 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewMaterialPriceInfo\ViewMaterialPriceInfoForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\ConfigurationGroupControl.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\BOMTemplateControl.Designer.vb">
+      <DependentUpon>BOMTemplateControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\BOMTemplateControl.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\ConfigurationGroupControl.Designer.vb">
       <DependentUpon>ConfigurationGroupControl.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\ConfigurationGroupControl.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\ConfigurationGroupControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\ConfigurationGroupCheckBox.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\ConfigurationGroupCheckBox.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\ConfigurationNodeControl.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\Control\ConfigurationNodeControl.Designer.vb">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\ConfigurationNodeControl.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\Control\ConfigurationNodeControl.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\ConfigurationNodeLabel.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\Control\ConfigurationNodeLabel.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\MaterialInfoControl.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\Control\MaterialInfoControl.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\MainForm.Designer.vb">
@@ -274,10 +280,10 @@
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.resx">
       <DependentUpon>ExportBOMNameSettingsForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ConfigurationNodeNameSelectedForm.resx">
       <DependentUpon>ConfigurationNodeNameSelectedForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\Settings\SettingsForm.resx">
@@ -306,10 +312,13 @@
       <DependentUpon>ViewMaterialPriceInfoForm.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\ConfigurationGroupControl.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\BOMTemplateControl.resx">
+      <DependentUpon>BOMTemplateControl.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\ConfigurationGroupControl.resx">
       <DependentUpon>ConfigurationGroupControl.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\ConfigurationGroup\Control\ConfigurationNodeControl.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\Control\ConfigurationGroup\Control\ConfigurationNodeControl.resx">
       <DependentUpon>ConfigurationNodeControl.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\MainForm.resx">
@@ -359,6 +368,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\test_16px.png" />
+    <None Include="res\xlsx_20px.png" />
     <None Include="res\setting_20px.png" />
     <None Include="res\temp_16px.png" />
     <None Include="res\logo.png" />

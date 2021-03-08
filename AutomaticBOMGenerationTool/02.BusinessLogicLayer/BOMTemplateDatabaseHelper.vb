@@ -4,6 +4,7 @@ Imports System.Data.SQLite
 ''' BOM模板数据库辅助模块
 ''' </summary>
 Public Class BOMTemplateDatabaseHelper
+    Implements IDisposable
 
     Private ReadOnly CacheBOMTemplateInfo As BOMTemplateInfo
 
@@ -14,6 +15,7 @@ Public Class BOMTemplateDatabaseHelper
     End Sub
 
     Private _DatabaseConnection As SQLite.SQLiteConnection
+
     Private ReadOnly Property DatabaseConnection() As SQLiteConnection
         Get
             If _DatabaseConnection Is Nothing Then
@@ -32,17 +34,27 @@ Public Class BOMTemplateDatabaseHelper
         End Get
     End Property
 
-    Protected Overrides Sub Finalize()
+    Private disposedValue As Boolean
+    Protected Overridable Sub Dispose(disposing As Boolean)
+        If Not disposedValue Then
+            If disposing Then
 
-        Try
-            _DatabaseConnection?.Close()
+                Try
+                    _DatabaseConnection?.Close()
 
 #Disable Warning CA1031 ' Do not catch general exception types
-        Catch ex As Exception
+                Catch ex As Exception
 #Enable Warning CA1031 ' Do not catch general exception types
-        End Try
+                End Try
+            End If
 
-        MyBase.Finalize()
+            disposedValue = True
+        End If
+    End Sub
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+        Dispose(disposing:=True)
+        GC.SuppressFinalize(Me)
     End Sub
 
 #Region "是否有数据"
@@ -991,6 +1003,8 @@ where ConfigurationNodeInfo.Priority=@parentPriority
         cmd.ExecuteNonQuery()
 
     End Sub
+
+
 
 #End Region
 

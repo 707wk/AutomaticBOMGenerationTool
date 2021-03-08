@@ -56,7 +56,9 @@
 
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
 
+        FlowLayoutPanel1.SuspendLayout()
         FlowLayoutPanel1.Visible = CheckBox1.Checked
+        FlowLayoutPanel1.ResumeLayout()
 
         If CheckBox1.Checked Then
             CheckBox1.Image = My.Resources.expand_16px

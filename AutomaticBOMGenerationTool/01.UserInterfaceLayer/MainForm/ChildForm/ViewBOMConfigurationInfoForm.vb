@@ -9,7 +9,7 @@ Public Class ViewBOMConfigurationInfoForm
 
             For Each item In value.ConfigurationItems
                 Dim addListViewItem = ListView1.Items.Add(New ListViewItem({
-                                                                           item.ConfigurationNodeName,
+                                                                           $"{ListView1.Items.Count + 1}. {item.ConfigurationNodeName}",
                                                                            item.SelectedValue
                                                                            },
                                                                            If(item.IsMaterial, 1, 0)))
