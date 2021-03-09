@@ -76,6 +76,9 @@
     <Reference Include="EPPlus, Version=5.5.5.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <HintPath>..\packages\EPPlus.5.5.5\lib\net45\EPPlus.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.31.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.31\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=1.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.1.4.0\lib\net45\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
@@ -139,6 +142,12 @@
       <DependentUpon>AboutForm.vb</DependentUpon>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.Designer.vb">
+      <DependentUpon>UpdateInfoForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.Designer.vb">
@@ -247,6 +256,7 @@
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
     <Compile Include="03.DataAccessLayer\BOMTemplateInfo.vb" />
+    <Compile Include="03.DataAccessLayer\CommitInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNode\BOMConfigurationInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNode\ConfigurationGroupInfo.vb" />
     <Compile Include="03.DataAccessLayer\ConfigurationNode\ConfigurationNodeInfo.vb" />
@@ -279,6 +289,9 @@
   <ItemGroup>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.resx">
+      <DependentUpon>UpdateInfoForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.resx">
       <DependentUpon>ExportBOMNameSettingsForm.vb</DependentUpon>
@@ -368,6 +381,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\update_32px.png" />
     <None Include="res\refresh_20px.png" />
     <None Include="res\combine_20px.png" />
     <None Include="res\test_16px.png" />

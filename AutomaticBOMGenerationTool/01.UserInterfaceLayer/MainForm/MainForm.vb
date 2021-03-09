@@ -30,11 +30,12 @@ Public Class MainForm
         CheckBoxItem2.Checked = AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed")
 
         With ToolTip1
-            .IsBalloon = True
+            .IsBalloon = False
             .UseAnimation = False
             .UseFading = False
             .InitialDelay = 1
             .ReshowDelay = 1
+            .ShowAlways = True
         End With
 
     End Sub
@@ -47,22 +48,6 @@ Public Class MainForm
         End If
 
         ToolStripStatusLabel1_TextChanged(Nothing, Nothing)
-
-        'If IO.File.Exists(AppSettingHelper.Instance.CurrentBOMTemplateFilePath) Then
-
-        '    IsCreateNewTab = True
-
-        '    ToolStripStatusLabel1.Text = AppSettingHelper.Instance.CurrentBOMTemplateFilePath
-
-        '    ParseBOMTemplate()
-
-        'End If
-
-        'For Each item As SuperTabItem In SuperTabControl1.Tabs
-        '    Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
-        '    tmpBOMTemplateControl.SplitContainer2.Panel2Collapsed = Not CheckBoxItem1.Checked
-        '    tmpBOMTemplateControl.SplitContainer1.Panel2Collapsed = Not CheckBoxItem2.Checked
-        'Next
 
     End Sub
 
@@ -677,6 +662,13 @@ Public Class MainForm
         End Using
     End Sub
 #End Region
+
+    Private Sub ButtonItem16_Click(sender As Object, e As EventArgs) Handles ButtonItem16.Click
+        Using tmpDialog As New UpdateInfoForm
+            tmpDialog.ShowDialog()
+        End Using
+    End Sub
+
     Private Sub ButtonItem13_Click(sender As Object, e As EventArgs) Handles ButtonItem13.Click
         Using tmpDialog As New AboutForm
             tmpDialog.ShowDialog()
@@ -777,6 +769,7 @@ Public Class MainForm
     Private Sub ButtonItem15_Click(sender As Object, e As EventArgs) Handles ButtonItem15.Click
         FileHelper.Open(AppSettingHelper.Instance.TempDirectoryPath)
     End Sub
+
 #End Region
 
 End Class

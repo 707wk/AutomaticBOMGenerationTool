@@ -85,8 +85,12 @@
 
     End Sub
 
-    Private Sub MaterialInfoControl_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
-        UIFormHelper.UIForm.ToolTip1.SetToolTip(Me, Nothing)
-    End Sub
+    '    Private Sub MaterialInfoControl_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
+    '        UIFormHelper.UIForm.ToolTip1.Show($"品名 : {Cache.pName}
+    '品号 : {Cache.pID}
+    '规格 : {Cache.pConfig}
+    '单价 : ￥{Cache.pUnitPrice} / {Cache.pUnit}",
+    '                                          Me)
+    '    End Sub
 
 End Class

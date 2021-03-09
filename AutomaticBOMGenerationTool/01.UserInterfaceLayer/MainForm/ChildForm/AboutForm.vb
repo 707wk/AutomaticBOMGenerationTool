@@ -18,7 +18,8 @@ Public Class AboutForm
         For Each item In tmpDirectoryInfo.GetFiles("*.dll")
             Dim tmpFileVersionInfo = FileVersionInfo.GetVersionInfo(item.FullName)
 
-            If tmpFileVersionInfo.ProductName.ToLower.Contains("Microsoft".ToLower) Then
+            If tmpFileVersionInfo.ProductName.ToLower.Contains("Microsoft".ToLower) OrElse
+                tmpFileVersionInfo.ProductName.ToLower.Contains("Wangk".ToLower) Then
                 Continue For
             End If
 
