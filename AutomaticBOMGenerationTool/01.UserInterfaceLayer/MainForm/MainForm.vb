@@ -667,6 +667,16 @@ Public Class MainForm
     End Sub
 #End Region
 
+#Region "显示编写规则"
+    Private Sub ButtonItem1_Click(sender As Object, e As EventArgs) Handles ButtonItem1.Click
+        Using tmpDialog As New ShowTxtContentForm With {
+                .Text = ButtonItem1.Text,
+                .filePath = ".\Data\ConfigurationRule.txt"
+            }
+            tmpDialog.ShowDialog()
+        End Using
+    End Sub
+#End Region
     Private Sub ButtonItem13_Click(sender As Object, e As EventArgs) Handles ButtonItem13.Click
         Using tmpDialog As New AboutForm
             tmpDialog.ShowDialog()
@@ -693,10 +703,12 @@ Public Class MainForm
         AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed", CheckBoxItem2.Checked)
     End Sub
 
+#Disable Warning CA2213 ' Disposable fields should be disposed
     ''' <summary>
     ''' 当前BOM模板
     ''' </summary>
     Public CurrentBOMTemplateInfo As BOMTemplateInfo
+#Enable Warning CA2213 ' Disposable fields should be disposed
 
     Private Sub SuperTabControl1_SelectedTabChanged(sender As Object, e As SuperTabStripSelectedTabChangedEventArgs) Handles SuperTabControl1.SelectedTabChanged
 
@@ -765,7 +777,6 @@ Public Class MainForm
     Private Sub ButtonItem15_Click(sender As Object, e As EventArgs) Handles ButtonItem15.Click
         FileHelper.Open(AppSettingHelper.Instance.TempDirectoryPath)
     End Sub
-
 #End Region
 
 End Class

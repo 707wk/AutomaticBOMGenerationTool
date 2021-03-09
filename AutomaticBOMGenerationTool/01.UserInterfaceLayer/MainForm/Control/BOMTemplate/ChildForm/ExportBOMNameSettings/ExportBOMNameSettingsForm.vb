@@ -44,8 +44,9 @@ Public Class ExportBOMNameSettingsForm
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
 
         Using tmpDialog As New ConfigurationNodeNameSelectedForm With {
-           .ExcludeItems = (From item As DataGridViewRow In CheckBoxDataGridView1.Rows
-                            Select $"{item.Cells(1).Value}").ToArray
+                .CacheBOMTemplateInfo = CacheBOMTemplateInfo,
+                .ExcludeItems = (From item As DataGridViewRow In CheckBoxDataGridView1.Rows
+                                 Select $"{item.Cells(1).Value}").ToArray
            }
 
             If tmpDialog.ShowDialog <> DialogResult.OK Then

@@ -192,7 +192,6 @@ Public Class BOMTemplateHelper
                 Dim pNameStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 1).Value}"
                 Dim pConfigStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 2).Value}"
                 Dim pUnitStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 3).Value}"
-                'Dim pUnitPriceValue = Val($"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}")
 
                 '有内容为空则报错
                 If String.IsNullOrWhiteSpace(pIDStr) OrElse
@@ -326,9 +325,9 @@ Public Class BOMTemplateHelper
     ''' <summary>
     ''' 替换物料价格并保存
     ''' </summary>
-    Public Shared Sub ReplaceMaterialPriceAndSave(filePath As String,
-                                                  saveFilePath As String,
-                                                  MaterialPriceItems As Dictionary(Of String, MaterialPriceInfo))
+    Public Shared Sub ReplaceMaterialPriceAndSaveAs(filePath As String,
+                                                    saveFilePath As String,
+                                                    MaterialPriceItems As Dictionary(Of String, MaterialPriceInfo))
 
         Using readFS = New FileStream(filePath,
                                       FileMode.Open,
@@ -1259,12 +1258,12 @@ Public Class BOMTemplateHelper
     End Function
 #End Region
 
-#Region "替换物料并输出"
+#Region "替换物料并另存为"
     ''' <summary>
-    ''' 替换物料并输出
+    ''' 替换物料并另存为
     ''' </summary>
-    Public Sub ReplaceMaterialAndSave(outputFilePath As String,
-                                      values As List(Of ConfigurationNodeRowInfo))
+    Public Sub ReplaceMaterialAndSaveAs(outputFilePath As String,
+                                        values As List(Of ConfigurationNodeRowInfo))
 
         Using readFS = New FileStream(CacheBOMTemplateInfo.TemplateFilePath,
                                       FileMode.Open,
@@ -1290,9 +1289,6 @@ Public Class BOMTemplateHelper
                 headerLocation = FindTextLocation(tmpExcelPackage, "备注")
                 tmpWorkSheet.DeleteColumn(headerLocation.X + 1)
 
-                '删除临时物料类型列
-                tmpWorkSheet.DeleteColumn(headerLocation.X + 1)
-
                 '更新BOM名称
                 headerLocation = FindTextLocation(tmpExcelPackage, "显示屏规格")
                 Dim BOMName = JoinBOMName(tmpExcelPackage, CacheBOMTemplateInfo.ExportConfigurationNodeItems)
@@ -1312,7 +1308,6 @@ Public Class BOMTemplateHelper
                 tmpWorkSheet.View.TopLeftCell = tmpWorkSheet.Cells(1, 1).Address
 
                 headerLocation = FindTextLocation(tmpExcelPackage, "阶层")
-                Dim levelColumnID = headerLocation.X
                 Dim MaterialRowMinID = headerLocation.Y + 2
                 Dim MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
 
@@ -1330,6 +1325,48 @@ Public Class BOMTemplateHelper
 
                 Next
 #End Region
+
+#Region "删除无子节点的组合物料"
+                headerLocation = FindTextLocation(tmpExcelPackage, "阶层")
+                MaterialRowMinID = headerLocation.Y + 2
+                MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
+                Dim baseMaterialFlagColumnID = FindTextLocation(tmpExcelPackage, "备注").X + 1
+
+                For rid = MaterialRowMaxID To MaterialRowMinID Step -1
+
+                    Dim baseMaterialFlagStr = $"{tmpWorkSheet.Cells(rid, baseMaterialFlagColumnID).Value}"
+                    Dim baseMaterialFlag = Boolean.Parse(baseMaterialFlagStr)
+
+                    If rid = MaterialRowMaxID Then
+                        '最后一行
+                        If baseMaterialFlag Then
+                            '是基础物料
+                            '无操作
+                        Else
+                            '是组合料
+                            tmpWorkSheet.DeleteRow(rid)
+                        End If
+                    Else
+                        '其他行
+                        If baseMaterialFlag Then
+                            '是基础物料
+                            '无操作
+                        Else
+                            '是组合料
+                            If GetLevel(tmpExcelPackage, rid) >= GetLevel(tmpExcelPackage, rid + 1) Then
+                                '无子节点
+                                tmpWorkSheet.DeleteRow(rid)
+                            Else
+                                '有子节点
+                                '无操作
+                            End If
+                        End If
+                    End If
+                Next
+#End Region
+
+                '删除临时物料类型列
+                tmpWorkSheet.DeleteColumn(baseMaterialFlagColumnID)
 
                 '重新计算序号
                 headerLocation = FindTextLocation(tmpExcelPackage, "阶层")

@@ -4,7 +4,9 @@ Imports OfficeOpenXml
 
 Public Class BOMTemplateControl
 
+#Disable Warning CA2213 ' Disposable fields should be disposed
     Public CacheBOMTemplateInfo As BOMTemplateInfo
+#Enable Warning CA2213 ' Disposable fields should be disposed
 
     Private Sub BOMTemplateControl_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -550,7 +552,7 @@ Public Class BOMTemplateControl
                                 Next
 
                                 be.Write("处理物料信息", 100 / stepCount * 4)
-                                CacheBOMTemplateInfo.BOMTHelper.ReplaceMaterialAndSave(outputFilePath, tmpConfigurationNodeRowInfoList)
+                                CacheBOMTemplateInfo.BOMTHelper.ReplaceMaterialAndSaveAs(outputFilePath, tmpConfigurationNodeRowInfoList)
 
                                 be.Write("打开保存文件夹", 100 / stepCount * 5)
                                 FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
@@ -648,7 +650,7 @@ Public Class BOMTemplateControl
 
                                     Next
 
-                                    CacheBOMTemplateInfo.BOMTHelper.ReplaceMaterialAndSave(Path.Combine(saveFolderPath, tmpBOMConfigurationInfo.FileName), tmpBOMConfigurationInfo.ConfigurationItems)
+                                    CacheBOMTemplateInfo.BOMTHelper.ReplaceMaterialAndSaveAs(Path.Combine(saveFolderPath, tmpBOMConfigurationInfo.FileName), tmpBOMConfigurationInfo.ConfigurationItems)
 
                                 Next
 
@@ -848,7 +850,10 @@ Public Class BOMTemplateControl
 #Region "编辑BOM名称设置"
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
 
-        Using tmpDialog As New ExportBOMNameSettingsForm
+        Using tmpDialog As New ExportBOMNameSettingsForm With {
+            .CacheBOMTemplateInfo = CacheBOMTemplateInfo
+        }
+
             If tmpDialog.ShowDialog() <> DialogResult.OK Then
                 Exit Sub
             End If
