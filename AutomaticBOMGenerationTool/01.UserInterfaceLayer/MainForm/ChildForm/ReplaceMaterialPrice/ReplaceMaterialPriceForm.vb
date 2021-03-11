@@ -68,7 +68,7 @@
 
             tmpDialog.Start(Sub(uie As Wangk.Resource.BackgroundWorkEventArgs)
 
-                                uie.Result = BOMTemplateHelper.GetNeedsReplaceMaterialPriceInfoItems(replaceFilePath)
+                                uie.Result = BOMTemplateMaterialPriceHelper.GetNeedsReplaceMaterialPriceInfoItems(replaceFilePath)
 
                             End Sub)
 
@@ -192,7 +192,7 @@
 
             tmpDialog.Start(Sub(uie As Wangk.Resource.BackgroundWorkEventArgs)
 
-                                BOMTemplateHelper.ReplaceMaterialPriceAndSaveAs(replaceFilePath, saveAsPath, tmpDictionary)
+                                BOMTemplateMaterialPriceHelper.ReplaceMaterialPriceAndSaveAs(replaceFilePath, saveAsPath, tmpDictionary)
 
                             End Sub)
 

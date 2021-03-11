@@ -57,27 +57,6 @@ Public Class BOMTemplateDatabaseHelper
         GC.SuppressFinalize(Me)
     End Sub
 
-#Region "是否有数据"
-    ''' <summary>
-    ''' 是否有数据
-    ''' </summary>
-    Public Function HaveData() As Boolean
-
-        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
-                .CommandText = "select count(ID) from ConfigurationGroupInfo"
-            }
-
-        Using reader As SQLiteDataReader = cmd.ExecuteReader()
-            If reader.Read Then
-                Return reader(0) > 0
-            End If
-        End Using
-
-        Return False
-
-    End Function
-#End Region
-
 #Region "初始化数据库"
     ''' <summary>
     ''' 初始化数据库
@@ -271,9 +250,9 @@ values(
     End Sub
 #End Region
 
-#Region "根据配置值获取配置值信息"
+#Region "根据选项值获取选项值信息"
     ''' <summary>
-    ''' 根据配置值获取配置值信息
+    ''' 根据选项值获取选项值信息
     ''' </summary>
     Public Function GetConfigurationNodeValueInfoByValue(configurationNodeID As String,
                                                          value As String) As ConfigurationNodeValueInfo
@@ -301,9 +280,9 @@ where ConfigurationNodeID=@ConfigurationNodeID and Value=@Value"
     End Function
 #End Region
 
-#Region "根据配置值获取配置值信息(仅限物料只与一个配置项关联的情况)"
+#Region "根据选项值获取选项值信息(仅限选项值只存在一个配置项关联的情况)"
     ''' <summary>
-    ''' 根据配置值获取配置值信息(仅限物料只与一个配置项关联的情况)
+    ''' 根据选项值获取选项值信息(仅限选项值只存在一个配置项关联的情况)
     ''' </summary>
     Public Function GetConfigurationNodeValueInfoByValue(value As String) As ConfigurationNodeValueInfo
 

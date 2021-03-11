@@ -262,115 +262,7 @@ Public Class BOMTemplateHelper
     End Sub
 #End Region
 
-#Region "获取需要替换的物料价格信息列表"
-    ''' <summary>
-    ''' 获取需要替换的物料价格信息列表
-    ''' </summary>
-    Public Shared Function GetNeedsReplaceMaterialPriceInfoItems(filePath As String) As Dictionary(Of String, MaterialPriceInfo)
 
-        Dim tmpList = New Dictionary(Of String, MaterialPriceInfo)
-
-        Using readFS = New FileStream(filePath,
-                                      FileMode.Open,
-                                      FileAccess.Read,
-                                      FileShare.ReadWrite)
-
-            Using tmpExcelPackage As New ExcelPackage(readFS)
-                Dim tmpWorkBook = tmpExcelPackage.Workbook
-                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-                Dim MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
-                Dim MaterialRowMinID = FindTextLocation(tmpExcelPackage, "阶层").Y + 2
-                Dim pIDColumnID = FindTextLocation(tmpExcelPackage, "品 号").X
-
-                For rID = MaterialRowMinID To MaterialRowMaxID
-
-                    Dim pIDStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".ToUpper.Trim
-
-                    Dim findMaterialPriceInfo = LocalDatabaseHelper.GetMaterialPriceInfo(pIDStr)
-
-                    If findMaterialPriceInfo Is Nothing Then
-                        '未找到
-                        Continue For
-                    End If
-
-                    '在价格库存在
-                    If tmpList.ContainsKey(pIDStr) Then
-                        '已记录
-                        Continue For
-                    End If
-
-                    '未记录
-                    Dim pUnitPriceStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value}"
-                    Dim pUnitPriceValue = Val(pUnitPriceStr)
-
-                    '忽略价格相同
-                    If pUnitPriceValue = findMaterialPriceInfo.pUnitPrice Then
-                        Continue For
-                    End If
-
-                    findMaterialPriceInfo.pUnitPriceOld = pUnitPriceValue
-
-                    tmpList.Add(pIDStr, findMaterialPriceInfo)
-
-                Next
-            End Using
-        End Using
-
-        Return tmpList
-    End Function
-#End Region
-
-#Region "替换物料价格并保存"
-    ''' <summary>
-    ''' 替换物料价格并保存
-    ''' </summary>
-    Public Shared Sub ReplaceMaterialPriceAndSaveAs(filePath As String,
-                                                    saveFilePath As String,
-                                                    MaterialPriceItems As Dictionary(Of String, MaterialPriceInfo))
-
-        Using readFS = New FileStream(filePath,
-                                      FileMode.Open,
-                                      FileAccess.Read,
-                                      FileShare.ReadWrite)
-
-            Using tmpExcelPackage As New ExcelPackage(readFS)
-                Dim tmpWorkBook = tmpExcelPackage.Workbook
-                Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-                Dim MaterialRowMaxID = FindTextLocation(tmpExcelPackage, "版次").Y - 1
-                Dim MaterialRowMinID = FindTextLocation(tmpExcelPackage, "阶层").Y + 2
-                Dim pIDColumnID = FindTextLocation(tmpExcelPackage, "品 号").X
-
-                Dim DefaultBackgroundColor = UIFormHelper.SuccessColor 'Color.FromArgb(169, 208, 142)
-
-                For rID = MaterialRowMinID To MaterialRowMaxID
-
-                    Dim pIDStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".ToUpper.Trim
-
-                    If Not MaterialPriceItems.ContainsKey(pIDStr) Then
-                        Continue For
-                    End If
-
-                    Dim tmpMaterialPriceInfo = MaterialPriceItems(pIDStr)
-
-                    tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value = $"{tmpMaterialPriceInfo.pUnitPrice:n4}"
-
-                    tmpWorkSheet.Cells(rID, pIDColumnID + 5).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-                    tmpWorkSheet.Cells(rID, pIDColumnID + 5).Style.Fill.BackgroundColor.SetColor(DefaultBackgroundColor)
-
-                Next
-
-                '另存为
-                Using tmpSaveFileStream = New FileStream(saveFilePath, FileMode.Create)
-                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
-                End Using
-
-            End Using
-        End Using
-
-    End Sub
-#End Region
 
 #Region "获取配置表中的替换物料品号"
     ''' <summary>
@@ -404,7 +296,7 @@ Public Class BOMTemplateHelper
 
                     '统一字符格式
                     tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-                    tmpStr = tmpStr.ToUpper
+                    'tmpStr = tmpStr.ToUpper
 
                     '分割
                     Dim tmpArray = tmpStr.Split(",")
@@ -415,7 +307,7 @@ Public Class BOMTemplateHelper
                             Continue For
                         End If
 
-                        tmpHashSet.Add(item.Trim.ToUpper)
+                        tmpHashSet.Add(item.Trim)
                     Next
 
                 Next
@@ -459,7 +351,7 @@ Public Class BOMTemplateHelper
                     Dim tmpStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}"
                     '统一字符格式
                     tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-                    tmpStr = tmpStr.ToUpper
+                    'tmpStr = tmpStr.ToUpper
 
                     '判断是否是替换物料
                     If Not String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}") Then
@@ -525,7 +417,7 @@ Public Class BOMTemplateHelper
 #Region "遍历物料信息"
                 For rID = MaterialRowMinID To MaterialRowMaxID
 
-                    Dim pIDStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".ToUpper.Trim
+                    Dim pIDStr = $"{tmpWorkSheet.Cells(rID, pIDColumnID).Value}".Trim
 
                     '单元格内容为空跳过
                     If String.IsNullOrWhiteSpace(pIDStr) Then Continue For
@@ -556,14 +448,14 @@ Public Class BOMTemplateHelper
     End Function
 #End Region
 
-#Region "查找文本所在位置"
+#Region "查找文本所在位置(区分大小写,不区分宽窄字符)"
     ''' <summary>
-    ''' 查找文本所在位置
+    ''' 查找文本所在位置(区分大小写,不区分宽窄字符)
     ''' </summary>
     Public Shared Function FindTextLocation(wb As ExcelPackage,
                                             headText As String) As Point
 
-        Dim findStr = StrConv(headText, VbStrConv.Narrow).ToUpper
+        Dim findStr = StrConv(headText, VbStrConv.Narrow)
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -578,7 +470,7 @@ Public Class BOMTemplateHelper
         For rID = rowMinID To rowMaxID
             '逐列
             For cID = colMinID To colMaxID
-                Dim valueStr = StrConv($"{tmpWorkSheet.Cells(rID, cID).Value}", VbStrConv.Narrow).ToUpper
+                Dim valueStr = StrConv($"{tmpWorkSheet.Cells(rID, cID).Value}", VbStrConv.Narrow)
 
                 '空单元格跳过
                 If String.IsNullOrWhiteSpace(valueStr) Then
@@ -706,10 +598,10 @@ Public Class BOMTemplateHelper
                     Dim tmpNodeStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}".Trim
 
                     '解析替代料品号集
-                    '转换为大写
-                    Dim materialStr As String = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}".ToUpper
-                    '转换为窄字符标点
-                    materialStr = StrConv(materialStr, VbStrConv.Narrow)
+                    '统一字符格式
+                    'Dim materialStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}".ToUpper
+                    Dim materialStr = StrConv($"{tmpWorkSheet.Cells(rID, headerLocation.X + 3).Value}", VbStrConv.Narrow)
+
                     If String.IsNullOrWhiteSpace(materialStr) Then
                         Continue For
                     End If
@@ -808,10 +700,8 @@ Public Class BOMTemplateHelper
 
                 For rID = headerLocation.Y + 1 To rowMaxID
 
-                    '转换为大写
-                    Dim materialStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}".ToUpper
                     '转换为窄字符标点
-                    materialStr = StrConv(materialStr, VbStrConv.Narrow)
+                    Dim materialStr = StrConv($"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}", VbStrConv.Narrow)
 
                     '内容为空则跳过
                     If String.IsNullOrWhiteSpace(materialStr) Then Continue For
@@ -827,13 +717,13 @@ Public Class BOMTemplateHelper
                             Continue For
                         End If
 
-                        Dim tmpStr = item.Replace("AND", ",")
+                        Dim tmpStr = item.Replace("and", ",")
                         Dim tmpMaterialArray = tmpStr.Split(",")
 
                         Dim parentNode As ConfigurationNodeValueInfo
 
                         If tmpMaterialArray(0).Contains("(") Then
-                            '品号不唯一
+                            '选项值不唯一
                             Dim nodeNameStartIndex = tmpMaterialArray(0).IndexOf("(") + 1
                             Dim nodeNameLength = tmpMaterialArray(0).IndexOf(")") - nodeNameStartIndex
                             Dim configurationNodeName = tmpMaterialArray(0).Substring(nodeNameStartIndex, nodeNameLength).Trim
@@ -847,7 +737,7 @@ Public Class BOMTemplateHelper
                             parentNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
 
                         Else
-                            '品号唯一
+                            '选项值唯一
                             parentNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(0).Trim())
 
                         End If
@@ -861,7 +751,7 @@ Public Class BOMTemplateHelper
                             Dim linkNode As ConfigurationNodeValueInfo
 
                             If tmpMaterialArray(i001).Contains("(") Then
-                                '品号不唯一
+                                '选项值不唯一
                                 Dim nodeNameStartIndex = tmpMaterialArray(i001).IndexOf("(") + 1
                                 Dim nodeNameLength = tmpMaterialArray(i001).IndexOf(")") - nodeNameStartIndex
                                 Dim configurationNodeName = tmpMaterialArray(i001).Substring(nodeNameStartIndex, nodeNameLength).Trim
@@ -875,13 +765,13 @@ Public Class BOMTemplateHelper
                                 linkNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
 
                             Else
-                                '品号唯一
+                                '选项值唯一
                                 linkNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(i001).Trim())
 
                             End If
 
                             If linkNode Is Nothing Then
-                                Throw New Exception($"0x0026: 第 {rID} 行 替换物料 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
+                                Throw New Exception($"0x0026: 第 {rID} 行 选项值 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
                             End If
 
                             CacheBOMTemplateInfo.BOMTDHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
@@ -1161,9 +1051,9 @@ Public Class BOMTemplateHelper
     End Function
 #End Region
 
-#Region "获取标记的替换位置"
+#Region "获取标记的替换位置(区分大小写,宽窄字符)"
     ''' <summary>
-    ''' 获取标记的替换位置
+    ''' 获取标记的替换位置(区分大小写,宽窄字符)
     ''' </summary>
     Private Function GetMarkLocations(wb As ExcelPackage,
                                       nodeName As String) As List(Of Integer)
@@ -1188,12 +1078,11 @@ Public Class BOMTemplateHelper
 
             '统一字符格式
             tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-            tmpStr = tmpStr.ToUpper
 
-            '移除标记
+            '移除替换标记
             tmpStr = tmpStr.Trim.Substring(1)
 
-            If tmpStr.Equals(nodeName.ToUpper) Then
+            If tmpStr.Equals(nodeName) Then
                 tmpList.Add(rID)
             End If
 
@@ -1204,9 +1093,9 @@ Public Class BOMTemplateHelper
     End Function
 #End Region
 
-#Region "获取无标记的替换位置"
+#Region "获取无标记的替换位置(区分大小写)"
     ''' <summary>
-    ''' 获取无标记的替换位置
+    ''' 获取无标记的替换位置(区分大小写)
     ''' </summary>
     Private Function GetNoMarkLocations(wb As ExcelPackage,
                                         pIDItems As HashSet(Of String)) As List(Of Integer)
@@ -1231,7 +1120,6 @@ Public Class BOMTemplateHelper
 
             '统一字符格式
             tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-            tmpStr = tmpStr.ToUpper
             tmpStr = tmpStr.Trim
 
             '跳过有标记的替换物料
@@ -1244,7 +1132,6 @@ Public Class BOMTemplateHelper
 
             '统一字符格式
             tmpStr = StrConv(tmpStr, VbStrConv.Narrow)
-            tmpStr = tmpStr.ToUpper
             tmpStr = tmpStr.Trim
 
             If pIDItems.Contains(tmpStr) Then
@@ -1595,8 +1482,7 @@ Public Class BOMTemplateHelper
         Dim nameStr = $"{tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value}"
         '统一字符格式
         nameStr = StrConv(nameStr, VbStrConv.Narrow)
-        nameStr = nameStr.ToUpper
-        nameStr = nameStr.Split(";").First
+        nameStr = nameStr.Split(";").FirstOrDefault
 
         '根据选项拼接
         For Each item In values
@@ -1982,8 +1868,8 @@ Public Class BOMTemplateHelper
 
         Dim tmpNodeList = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoItems()
 
-        For Each item In CacheBOMTemplateInfo.ExportBOMList
-            item.ConfigurationItems = New List(Of ConfigurationNodeRowInfo)
+        For Each exportBOMItem In CacheBOMTemplateInfo.ExportBOMList
+            exportBOMItem.ConfigurationItems = New List(Of ConfigurationNodeRowInfo)
 
             For Each nodeItem In tmpNodeList
 
@@ -1996,14 +1882,13 @@ Public Class BOMTemplateHelper
                     .SelectedValueID = Nothing
                 }
 
-                If item.ConfigurationInfoValueTable.ContainsKey(nodeItem.Name) Then
+                If exportBOMItem.ConfigurationInfoValueTable.ContainsKey(nodeItem.Name) Then
                     '存在配置项
 
-                    Dim tmpSelectedValue As String = item.ConfigurationInfoValueTable(nodeItem.Name)
+                    Dim tmpSelectedValue As String = exportBOMItem.ConfigurationInfoValueTable(nodeItem.Name)
 
                     If String.IsNullOrWhiteSpace(tmpSelectedValue) Then
                         '空值不做处理
-                        'item.ConfigurationInfoValueTable.Remove(nodeItem.Name)
 
                     Else
                         '有值
@@ -2015,31 +1900,24 @@ Public Class BOMTemplateHelper
                             addConfigurationNodeRowInfo.SelectedValue = tmpConfigurationNodeValueInfo.Value
                             addConfigurationNodeRowInfo.SelectedValueID = tmpConfigurationNodeValueInfo.ID
 
-                            'item.ConfigurationInfoValueTable.Remove(nodeItem.Name)
-
                         Else
                             '不存在值
-                            item.MissingConfigurationNodeValueInfoList.Add(tmpSelectedValue)
-                            item.MissingConfigurationNodeInfoList.Add(nodeItem.Name)
+                            exportBOMItem.MissingConfigurationNodeValueInfoList.Add($"{tmpSelectedValue} ({nodeItem.Name})")
+                            exportBOMItem.MissingConfigurationNodeInfoList.Add(nodeItem.Name)
+
                         End If
 
                     End If
 
                 Else
                     '不存在配置项
-                    item.MissingConfigurationNodeInfoList.Add(nodeItem.Name)
+                    exportBOMItem.MissingConfigurationNodeInfoList.Add(nodeItem.Name)
 
                 End If
 
-                item.ConfigurationItems.Add(addConfigurationNodeRowInfo)
+                exportBOMItem.ConfigurationItems.Add(addConfigurationNodeRowInfo)
 
             Next
-
-            'If item.ConfigurationInfoValueTable.Count > 0 Then
-            '    For Each configurationNodeName In item.ConfigurationInfoValueTable.Keys
-            '        item.MissingConfigurationNodeInfoList.Add(configurationNodeName)
-            '    Next
-            'End If
 
         Next
 

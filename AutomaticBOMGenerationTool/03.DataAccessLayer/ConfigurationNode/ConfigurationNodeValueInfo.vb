@@ -13,7 +13,7 @@ Public Class ConfigurationNodeValueInfo
 
     Private _value As String
     ''' <summary>
-    ''' 值(区分大小写)
+    ''' 值
     ''' </summary>
     Public Property Value As String
         Get

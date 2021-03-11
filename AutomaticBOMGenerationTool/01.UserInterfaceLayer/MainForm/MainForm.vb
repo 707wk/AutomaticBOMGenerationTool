@@ -624,9 +624,19 @@ Public Class MainForm
                     BOMTHelper.
                     SaveAsConfigurationInfoToBOMTemplate(isOldFileVersion, outputFilePath)
 
+                AppSettingHelper.Instance.OpenFileList.Remove(CurrentBOMTemplateInfo.SourceFilePath)
                 CurrentBOMTemplateInfo.SourceFilePath = outputFilePath
+                AppSettingHelper.Instance.OpenFileList.Add(CurrentBOMTemplateInfo.SourceFilePath)
+
+                CurrentBOMTemplateInfo.ExportBOMList.Clear()
+
+                Dim tmpSuperTabItem As SuperTabItem = SuperTabControl1.SelectedTab
+                tmpSuperTabItem.Text = IO.Path.GetFileNameWithoutExtension(outputFilePath)
+                tmpSuperTabItem.Tooltip = outputFilePath
 
                 ToolStripStatusLabel1.Text = outputFilePath
+
+                UIFormHelper.ToastSuccess("保存成功")
 
 #Disable Warning CA1031 ' Do not catch general exception types
             Catch ex As Exception
@@ -647,10 +657,6 @@ Public Class MainForm
             Exit Do
 
         Loop
-
-        CurrentBOMTemplateInfo.ExportBOMList.Clear()
-
-        UIFormHelper.ToastSuccess("保存成功")
 
     End Sub
 #End Region

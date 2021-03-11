@@ -6,10 +6,9 @@ Public Class ConfigurationNodeInfo
 
     Public SortID As Integer
 
-
     Private _name As String
     ''' <summary>
-    ''' 名称(区分大小写)
+    ''' 名称
     ''' </summary>
     Public Property Name As String
         Get
