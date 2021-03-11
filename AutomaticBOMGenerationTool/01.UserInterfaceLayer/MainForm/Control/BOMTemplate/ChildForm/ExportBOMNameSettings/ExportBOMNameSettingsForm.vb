@@ -140,11 +140,11 @@ Public Class ExportBOMNameSettingsForm
 
                         If tmpWorkSheet Is Nothing Then
                             '无配置表
-                            Throw New Exception("未找到配置表")
+                            Throw New Exception("0x0003: 未找到配置表")
 
                         ElseIf tmpWorkSheet.Dimension Is Nothing Then
                             '有配置表但无数据
-                            Throw New Exception("配置表无数据")
+                            Throw New Exception("0x0004: 配置表无数据")
 
                         Else
                             '有配置表有数据
@@ -165,7 +165,7 @@ Public Class ExportBOMNameSettingsForm
                         Next
 
                         If tmpExportConfigurationNodeItems.Count = 0 Then
-                            Throw New Exception("未导入有效数据")
+                            Throw New Exception("0x0005: 未导入有效数据")
                         End If
 
                         CacheBOMTemplateInfo.ExportConfigurationNodeItems = tmpExportConfigurationNodeItems

@@ -88,7 +88,7 @@
         PageNum.Minimum = 1
 
         If PageID <= 0 Then
-            Throw New Exception("页面页码不能小于1")
+            Throw New Exception("0x0001: 页面页码不能小于1")
         Else
 
             If PageID <= PageNum.Maximum Then

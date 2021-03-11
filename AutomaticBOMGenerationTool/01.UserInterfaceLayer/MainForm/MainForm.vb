@@ -228,6 +228,9 @@ Public Class MainForm
             addSuperTabItem.PredefinedColor = eTabItemColor.OfficeMobile2014Blue
             addSuperTabItem.TabColor.Default.Normal.Background.Colors = {Color.FromArgb(56, 56, 60)}
             addSuperTabItem.TabColor.Default.Normal.Text = Color.White
+            addSuperTabItem.TabColor.Default.Selected.Background.Colors = {UIFormHelper.NormalColor}
+            addSuperTabItem.TabColor.Default.MouseOver.Background = addSuperTabItem.TabColor.Default.Selected.Background
+            addSuperTabItem.TabColor.Default.SelectedMouseOver.Background = addSuperTabItem.TabColor.Default.Selected.Background
 
             Dim addControl As New BOMTemplateControl With {
                 .CacheBOMTemplateInfo = addBOMTemplateInfo,
@@ -312,7 +315,7 @@ Public Class MainForm
                                 Dim tmpImportPriceFileInfo = PriceFileHelper.GetFileInfo(importFilePath)
 
                                 If tmpImportPriceFileInfo.FileType = PriceFileHelper.PriceFileType.UnknownType Then
-                                    Throw New Exception("不支持的导入格式")
+                                    Throw New Exception("0x0002: 不支持的导入格式")
                                 End If
 
                                 uie.Write("获取物料价格信息")

@@ -78,7 +78,7 @@ Public Class BOMTemplateHelper
 
                 '检测根节点阶层
                 If lastLevel = 0 Then
-                    Throw New Exception($"第 {MaterialRowMinID} 行 阶层标记错误")
+                    Throw New Exception($"0x0012: 第 {MaterialRowMinID} 行 阶层标记错误")
                 End If
 
                 '检测子节点阶层
@@ -96,7 +96,7 @@ Public Class BOMTemplateHelper
                             '正常
                         Else
                             '阶层错误
-                            Throw New Exception($"第 {rid} 行 阶层标记错误")
+                            Throw New Exception($"0x0013: 第 {rid} 行 阶层标记错误")
                         End If
 
                     Else
@@ -135,7 +135,7 @@ Public Class BOMTemplateHelper
                             tmpWorkSheet.DeleteRow(rID)
                         Else
                             '未标记阶层的物料
-                            Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料未标记阶层")
+                            Throw New Exception($"0x0014: 第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料未标记阶层")
                         End If
 
                     Else
@@ -199,7 +199,7 @@ Public Class BOMTemplateHelper
                     String.IsNullOrWhiteSpace(pConfigStr) OrElse
                     String.IsNullOrWhiteSpace(pUnitStr) Then
 
-                    Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料信息不完整")
+                    Throw New Exception($"0x0015: 第 {tmpWorkSheet.Cells(rID, 1).Value} 行 物料信息不完整")
                 End If
 
             Else
@@ -242,7 +242,7 @@ Public Class BOMTemplateHelper
 
                 If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, pIDColumnID - 1).Value}") Then
                     '空行
-                    Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 未处理的空行")
+                    Throw New Exception($"0x0016: 第 {tmpWorkSheet.Cells(rID, 1).Value} 行 未处理的空行")
                 Else
                     '替换物料
                 End If
@@ -487,13 +487,13 @@ Public Class BOMTemplateHelper
         Dim tmpHashSet = New HashSet(Of String)(pIDList)
         tmpHashSet.ExceptWith(BOMpIDList)
         If tmpHashSet.Count > 0 Then
-            Throw New Exception($"配置表中品号为 {String.Join(", ", tmpHashSet)} 的替换物料未出现在BOM中")
+            Throw New Exception($"0x0017: 配置表中品号为 {String.Join(", ", tmpHashSet)} 的替换物料未出现在BOM中")
         End If
 
         tmpHashSet = New HashSet(Of String)(BOMpIDList)
         tmpHashSet.ExceptWith(pIDList)
         If tmpHashSet.Count > 0 Then
-            Throw New Exception($"BOM中品号为 {String.Join(", ", tmpHashSet)} 的替换物料未出现在配置表中")
+            Throw New Exception($"0x0018: BOM中品号为 {String.Join(", ", tmpHashSet)} 的替换物料未出现在配置表中")
         End If
 
     End Sub
@@ -593,7 +593,7 @@ Public Class BOMTemplateHelper
 
         Next
 
-        Throw New Exception($"未找到 {headText}")
+        Throw New Exception($"0x0019: 未找到 {headText}")
 
     End Function
 #End Region
@@ -652,7 +652,7 @@ Public Class BOMTemplateHelper
                         }
                         '查重
                         If CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(tmpStr) IsNot Nothing Then
-                            Throw New Exception($"第 {rID} 行 配置选项 {tmpStr} 名称重复")
+                            Throw New Exception($"0x0020: 第 {rID} 行 配置选项 {tmpStr} 名称重复")
                         End If
 
                         CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeInfo(tmpRootNode)
@@ -682,7 +682,7 @@ Public Class BOMTemplateHelper
                         If Not String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}") Then
                             '第二列内容不为空
                             If tmpRootNode Is Nothing Then
-                                Throw New Exception($"第 {rID} 行 分类类型 缺失 配置选项")
+                                Throw New Exception($"0x0021: 第 {rID} 行 分类类型 缺失 配置选项")
                             End If
 
                             Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
@@ -752,7 +752,7 @@ Public Class BOMTemplateHelper
 
                             Dim tmpMaterialInfo = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoBypID(tmppID)
                             If tmpMaterialInfo Is Nothing Then
-                                Throw New Exception($"第 {tmpWorkSheet.Cells(rID, 1).Value} 行 未找到品号 {tmppID} 对应物料信息")
+                                Throw New Exception($"0x0022: 第 {tmpWorkSheet.Cells(rID, 1).Value} 行 未找到品号 {tmppID} 对应物料信息")
                             End If
 
                             tmpMaterialNode = New ConfigurationNodeValueInfo With {
@@ -841,7 +841,7 @@ Public Class BOMTemplateHelper
                             Dim tmpConfigurationNodeInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
 
                             If tmpConfigurationNodeInfo Is Nothing Then
-                                Throw New Exception($"1第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
+                                Throw New Exception($"0x0023: 第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
                             End If
 
                             parentNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
@@ -853,7 +853,7 @@ Public Class BOMTemplateHelper
                         End If
 
                         If parentNode Is Nothing Then
-                            Throw New Exception($"第 {rID} 行 替换物料 {tmpMaterialArray(0).Trim()} 在配置表中不存在")
+                            Throw New Exception($"0x0024: 第 {rID} 行 替换物料 {tmpMaterialArray(0).Trim()} 在配置表中不存在")
                         End If
 
                         For i001 = 1 To tmpMaterialArray.Count - 1
@@ -869,7 +869,7 @@ Public Class BOMTemplateHelper
                                 Dim tmpConfigurationNodeInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
 
                                 If tmpConfigurationNodeInfo Is Nothing Then
-                                    Throw New Exception($"2第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
+                                    Throw New Exception($"0x0025: 第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
                                 End If
 
                                 linkNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
@@ -881,7 +881,7 @@ Public Class BOMTemplateHelper
                             End If
 
                             If linkNode Is Nothing Then
-                                Throw New Exception($"第 {rID} 行 替换物料 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
+                                Throw New Exception($"0x0026: 第 {rID} 行 替换物料 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
                             End If
 
                             CacheBOMTemplateInfo.BOMTDHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
@@ -1137,7 +1137,7 @@ Public Class BOMTemplateHelper
                         tmpMarkLocations = GetNoMarkLocations(tmpExcelPackage, tmppIDItems)
 
                         If tmpMarkLocations.Count = 0 Then
-                            Throw New Exception($"未找到配置项 {item.Name} 的替换位置")
+                            Throw New Exception($"0x0027: 未找到配置项 {item.Name} 的替换位置")
                         End If
 
                     End If
@@ -1636,7 +1636,7 @@ Public Class BOMTemplateHelper
 
         If value.IsExportpConfigFirstTerm Then
             If Not value.IsMaterial Then
-                Throw New Exception($"BOM名称: {value.Name} 不是物料配置项")
+                Throw New Exception($"0x0028: BOM名称: {value.Name} 不是物料配置项")
             End If
 
             Dim tmpStr = StrConv(value.MaterialValue.pConfig, VbStrConv.Narrow)
@@ -1645,7 +1645,7 @@ Public Class BOMTemplateHelper
 
         If value.IsExportMatchingValue Then
             If Not value.IsMaterial Then
-                Throw New Exception($"BOM名称: {value.Name} 不是物料配置项")
+                Throw New Exception($"0x0029: BOM名称: {value.Name} 不是物料配置项")
             End If
 
             Dim matchValues = value.MatchingValues.Split(";")
@@ -1658,7 +1658,7 @@ Public Class BOMTemplateHelper
             Next
 
             If String.IsNullOrWhiteSpace(findValue) Then
-                Throw New Exception($"BOM名称: 未匹配到 {value.Name} 的型号")
+                Throw New Exception($"0x0030: BOM名称: 未匹配到 {value.Name} 的型号")
             End If
 
             nameStr += findValue

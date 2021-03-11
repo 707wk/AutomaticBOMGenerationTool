@@ -85,9 +85,9 @@ Public Class BOMTemplateInfo
 
     Public Sub New(filePath As String)
 
-        If String.IsNullOrWhiteSpace(filePath) Then Throw New Exception("文件路径不能为空")
+        If String.IsNullOrWhiteSpace(filePath) Then Throw New Exception("0x0010: 文件路径不能为空")
 
-        If Not IO.File.Exists(filePath) Then Throw New Exception("文件不存在")
+        If Not IO.File.Exists(filePath) Then Throw New Exception("0x0011: 文件不存在")
 
         SourceFilePath = filePath
 

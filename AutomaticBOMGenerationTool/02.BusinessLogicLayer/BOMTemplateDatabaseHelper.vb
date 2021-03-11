@@ -265,7 +265,7 @@ values(
         Try
             cmd.ExecuteNonQuery()
         Catch ex As Exception
-            Throw New Exception($"品号 {value.Value} 在配置列表不同项中重复出现")
+            Throw New Exception($"0x0031: 品号 {value.Value} 在配置列表不同项中重复出现")
         End Try
 
     End Sub

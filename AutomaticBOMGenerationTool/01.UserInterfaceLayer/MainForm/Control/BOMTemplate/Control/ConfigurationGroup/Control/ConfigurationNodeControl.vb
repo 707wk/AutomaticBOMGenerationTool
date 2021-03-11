@@ -381,7 +381,7 @@ Public Class ConfigurationNodeControl
 
     End Sub
 
-    Private Shared ReadOnly HeadFontSolidBrush As New SolidBrush(UIFormHelper.SuccessColor)
+    Private Shared ReadOnly HeadFontSolidBrush As New SolidBrush(Color.FromArgb(70, 70, 74)) 'UIFormHelper.SuccessColor)
     Private Sub ConfigurationNodeControl_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         e.Graphics.FillRectangle(HeadFontSolidBrush, 0, 0, 3, Me.Height)
     End Sub

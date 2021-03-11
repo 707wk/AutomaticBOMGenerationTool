@@ -423,6 +423,7 @@
     <None Include="res\toastFail_32px.png" />
     <None Include="res\stop_20px.png" />
     <None Include="res\add_20px.png" />
+    <None Include="res\yes2_16px.png" />
     <None Include="res\yes_16px.png" />
     <None Include="res\no_16px.png" />
   </ItemGroup>

@@ -13,7 +13,7 @@ Public Class ConfigurationNodeValueInfo
 
     Private _value As String
     ''' <summary>
-    ''' 值
+    ''' 值(区分大小写)
     ''' </summary>
     Public Property Value As String
         Get
@@ -21,17 +21,17 @@ Public Class ConfigurationNodeValueInfo
         End Get
         Set(value As String)
 
-            '转换为大写
-            Dim convStr = value.ToUpper
             '转换为窄字符标点
-            convStr = StrConv(convStr, VbStrConv.Narrow)
+            Dim convStr = StrConv(value, VbStrConv.Narrow)
 
-            If convStr.Contains("(") OrElse
+            If convStr.Contains("<") OrElse
+                convStr.Contains(">") OrElse
+                convStr.Contains("(") OrElse
                 convStr.Contains(")") OrElse
                 convStr.Contains(",") OrElse
-                convStr.Contains("AND") Then
+                convStr.ToLower.Contains("and") Then
 
-                Throw New Exception($"配置节点值 {value} 包含 ( ) , and 关键字")
+                Throw New Exception($"0x0008: 配置节点值 {value} 包含 < > ( ) , and 关键字")
 
             End If
 

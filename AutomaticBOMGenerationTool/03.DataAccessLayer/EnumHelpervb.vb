@@ -10,7 +10,7 @@ Public NotInheritable Class EnumHelper
     Public Shared Function GetEnumDescription(Of T)() As List(Of String)
 
         If Not GetType(T).IsEnum Then
-            Throw New Exception("非枚举类型")
+            Throw New Exception("0x0006: 非枚举类型")
         End If
 
         Dim tmpList As New List(Of String)
@@ -23,7 +23,7 @@ Public NotInheritable Class EnumHelper
 
             Dim tmpDescriptionItems() As DescriptionAttribute = item.GetCustomAttributes(GetType(DescriptionAttribute), False)
             If tmpDescriptionItems.Count = 0 Then
-                Throw New Exception("未找到 DescriptionAttribute")
+                Throw New Exception("0x0007: 未找到 DescriptionAttribute")
             End If
 
             tmpList.Add(tmpDescriptionItems(0).Description)
