@@ -2,7 +2,7 @@
 ''' <summary>
 ''' BOM模板信息
 ''' </summary>
-Public Class BOMTemplateInfo
+Public Class BOMTemplateFileInfo
     Implements IDisposable
 
     ''' <summary>
@@ -76,7 +76,7 @@ Public Class BOMTemplateInfo
     ''' <summary>
     ''' 待导出BOM列表
     ''' </summary>
-    Public ExportBOMList As List(Of BOMConfigurationInfo)
+    Public ExportBOMList As List(Of ExportBOMInfo)
 
     ''' <summary>
     ''' 导出BOM名称设置信息

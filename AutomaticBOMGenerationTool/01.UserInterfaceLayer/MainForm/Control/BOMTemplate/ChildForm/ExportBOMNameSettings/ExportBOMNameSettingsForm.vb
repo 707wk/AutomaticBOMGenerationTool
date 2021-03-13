@@ -3,7 +3,7 @@ Imports OfficeOpenXml
 
 Public Class ExportBOMNameSettingsForm
 
-    Public CacheBOMTemplateInfo As BOMTemplateInfo
+    Public CacheBOMTemplateFileInfo As BOMTemplateFileInfo
 
     Private Sub ExportBOMNameSettingsForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Left = MousePosition.X
@@ -26,7 +26,7 @@ Public Class ExportBOMNameSettingsForm
 
         End With
 
-        For Each item In CacheBOMTemplateInfo.ExportConfigurationNodeItems
+        For Each item In CacheBOMTemplateFileInfo.ExportConfigurationNodeItems
             CheckBoxDataGridView1.Rows.Add({
                                            False,
                                            item.Name,
@@ -44,7 +44,7 @@ Public Class ExportBOMNameSettingsForm
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
 
         Using tmpDialog As New ConfigurationNodeNameSelectedForm With {
-                .CacheBOMTemplateInfo = CacheBOMTemplateInfo,
+                .CacheBOMTemplateFileInfo = CacheBOMTemplateFileInfo,
                 .ExcludeItems = (From item As DataGridViewRow In CheckBoxDataGridView1.Rows
                                  Select $"{item.Cells(1).Value}").ToArray
            }
@@ -87,9 +87,9 @@ Public Class ExportBOMNameSettingsForm
             Exit Sub
         End If
 
-        CacheBOMTemplateInfo.ExportConfigurationNodeItems.Clear()
+        CacheBOMTemplateFileInfo.ExportConfigurationNodeItems.Clear()
         For Each item As DataGridViewRow In CheckBoxDataGridView1.Rows
-            CacheBOMTemplateInfo.ExportConfigurationNodeItems.Add(New ExportConfigurationNodeInfo With
+            CacheBOMTemplateFileInfo.ExportConfigurationNodeItems.Add(New ExportConfigurationNodeInfo With
                                                                   {
                                                                   .Name = item.Cells(1).Value,
                                                                   .ExportPrefix = item.Cells(2).Value,
@@ -168,7 +168,7 @@ Public Class ExportBOMNameSettingsForm
                             Throw New Exception("0x0005: 未导入有效数据")
                         End If
 
-                        CacheBOMTemplateInfo.ExportConfigurationNodeItems = tmpExportConfigurationNodeItems
+                        CacheBOMTemplateFileInfo.ExportConfigurationNodeItems = tmpExportConfigurationNodeItems
 
                     End Using
                 End Using

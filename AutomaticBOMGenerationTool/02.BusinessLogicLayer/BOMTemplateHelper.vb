@@ -33,7 +33,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public CurrentBOMMaterialRowMaxID As Integer
 
-    Private ReadOnly CacheBOMTemplateInfo As BOMTemplateInfo
+    Private ReadOnly CacheBOMTemplateFileInfo As BOMTemplateFileInfo
 
     ''' <summary>
     ''' 待导出BOM列表表名
@@ -44,9 +44,9 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Const ExportConfigurationInfoSheetName As String = "ExportConfigurationInfo"
 
-    Public Sub New(value As BOMTemplateInfo)
+    Public Sub New(value As BOMTemplateFileInfo)
 
-        CacheBOMTemplateInfo = value
+        CacheBOMTemplateFileInfo = value
 
     End Sub
 
@@ -56,7 +56,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub PreproccessSourceFile()
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.SourceFilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.SourceFilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -150,7 +150,7 @@ Public Class BOMTemplateHelper
                 CheckIntegrityOfMaterialInfo(tmpExcelPackage)
 
                 '另存为
-                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateInfo.TempfilePath, FileMode.Create)
+                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateFileInfo.TempfilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
                 End Using
 
@@ -272,7 +272,7 @@ Public Class BOMTemplateHelper
 
         Dim tmpHashSet = New HashSet(Of String)
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.TempfilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -329,7 +329,7 @@ Public Class BOMTemplateHelper
 
         Dim tmpHashSet = New HashSet(Of String)
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.TempfilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -399,7 +399,7 @@ Public Class BOMTemplateHelper
 
         Dim tmpList = New List(Of MaterialInfo)
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.TempfilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -508,7 +508,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub ReplaceableMaterialParser()
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.TempfilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -530,7 +530,8 @@ Public Class BOMTemplateHelper
 
                 For rID = headerLocation.Y + 1 To rowMaxID
 
-                    Dim tmpStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}".Trim
+                    Dim tmpStr = StrConv($"{tmpWorkSheet.Cells(rID, headerLocation.X).Value}", VbStrConv.Narrow)
+                    tmpStr = tmpStr.Trim
 
 #Region "解析配置选项及分类类型"
                     If Not String.IsNullOrWhiteSpace(tmpStr) Then
@@ -543,14 +544,14 @@ Public Class BOMTemplateHelper
                             .Priority = 0
                         }
                         '查重
-                        If CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(tmpStr) IsNot Nothing Then
+                        If CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoByName(tmpStr) IsNot Nothing Then
                             Throw New Exception($"0x0020: 第 {rID} 行 配置选项 {tmpStr} 名称重复")
                         End If
 
-                        CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeInfo(tmpRootNode)
+                        CacheBOMTemplateFileInfo.BOMTDHelper.SaveConfigurationNodeInfo(tmpRootNode)
                         rootSortID += 1
 
-                        CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationGroupInfo(New ConfigurationGroupInfo With {
+                        CacheBOMTemplateFileInfo.BOMTDHelper.SaveConfigurationGroupInfo(New ConfigurationGroupInfo With {
                                                                                   .ID = tmpRootNode.ID,
                                                                                   .Name = tmpRootNode.Name,
                                                                                   .SortID = groupSortID
@@ -558,7 +559,8 @@ Public Class BOMTemplateHelper
                         groupSortID += 1
 
                         '第二列内容
-                        Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
+                        Dim tmpChildNodeName = StrConv($"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}", VbStrConv.Narrow)
+                        tmpChildNodeName = tmpChildNodeName.Trim
 
                         tmpChildNode = New ConfigurationNodeValueInfo With {
                             .ID = Wangk.Hash.IDHelper.NewID,
@@ -566,7 +568,7 @@ Public Class BOMTemplateHelper
                             .SortID = childSortID,
                             .Value = If(String.IsNullOrWhiteSpace(tmpChildNodeName), $"{tmpRootNode.Name}默认配置", tmpChildNodeName)
                         }
-                        CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
+                        CacheBOMTemplateFileInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
                         childSortID += 1
 
                     Else
@@ -577,7 +579,8 @@ Public Class BOMTemplateHelper
                                 Throw New Exception($"0x0021: 第 {rID} 行 分类类型 缺失 配置选项")
                             End If
 
-                            Dim tmpChildNodeName = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}".Trim
+                            Dim tmpChildNodeName = StrConv($"{tmpWorkSheet.Cells(rID, headerLocation.X + 1).Value}", VbStrConv.Narrow)
+                            tmpChildNodeName = tmpChildNodeName.Trim
 
                             tmpChildNode = New ConfigurationNodeValueInfo With {
                                 .ID = Wangk.Hash.IDHelper.NewID,
@@ -585,7 +588,7 @@ Public Class BOMTemplateHelper
                                 .SortID = childSortID,
                                 .Value = tmpChildNodeName
                             }
-                            CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
+                            CacheBOMTemplateFileInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpChildNode)
                             childSortID += 1
 
                         Else
@@ -595,7 +598,8 @@ Public Class BOMTemplateHelper
 #End Region
 
                     '物料项名
-                    Dim tmpNodeStr = $"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}".Trim
+                    Dim tmpNodeStr = StrConv($"{tmpWorkSheet.Cells(rID, headerLocation.X + 2).Value}", VbStrConv.Narrow)
+                    tmpNodeStr = tmpNodeStr.Trim
 
                     '解析替代料品号集
                     '统一字符格式
@@ -611,7 +615,7 @@ Public Class BOMTemplateHelper
                     End If
 
 #Region "解析细分选项"
-                    Dim tmpNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(tmpNodeStr)
+                    Dim tmpNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoByName(tmpNodeStr)
                     If tmpNode Is Nothing Then
                         tmpNode = New ConfigurationNodeInfo With {
                             .ID = Wangk.Hash.IDHelper.NewID,
@@ -621,7 +625,7 @@ Public Class BOMTemplateHelper
                             .GroupID = tmpRootNode.ID
                         }
 
-                        CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeInfo(tmpNode)
+                        CacheBOMTemplateFileInfo.BOMTDHelper.SaveConfigurationNodeInfo(tmpNode)
                         rootSortID += 1
                     End If
 #End Region
@@ -638,11 +642,11 @@ Public Class BOMTemplateHelper
 
                         Dim tmppID = item.Trim()
 
-                        Dim tmpMaterialNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpNode.ID, tmppID)
+                        Dim tmpMaterialNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpNode.ID, tmppID)
                         '不存在则添加配置值信息
                         If tmpMaterialNode Is Nothing Then
 
-                            Dim tmpMaterialInfo = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoBypID(tmppID)
+                            Dim tmpMaterialInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetMaterialInfoBypID(tmppID)
                             If tmpMaterialInfo Is Nothing Then
                                 Throw New Exception($"0x0022: 第 {tmpWorkSheet.Cells(rID, 1).Value} 行 未找到品号 {tmppID} 对应物料信息")
                             End If
@@ -653,7 +657,7 @@ Public Class BOMTemplateHelper
                                 .SortID = childSortID,
                                 .Value = tmppID
                             }
-                            CacheBOMTemplateInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpMaterialNode)
+                            CacheBOMTemplateFileInfo.BOMTDHelper.SaveConfigurationNodeValueInfo(tmpMaterialNode)
                             childSortID += 1
                         End If
 
@@ -666,7 +670,7 @@ Public Class BOMTemplateHelper
                             .LinkNodeValueID = tmpMaterialNode.ID
                         }
 
-                        CacheBOMTemplateInfo.BOMTDHelper.SaveMaterialLinkInfo(tmpLinkNode)
+                        CacheBOMTemplateFileInfo.BOMTDHelper.SaveMaterialLinkInfo(tmpLinkNode)
 
                     Next
 #End Region
@@ -685,7 +689,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub FixedMatchingMaterialParser()
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.TempfilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -726,19 +730,20 @@ Public Class BOMTemplateHelper
                             '选项值不唯一
                             Dim nodeNameStartIndex = tmpMaterialArray(0).IndexOf("(") + 1
                             Dim nodeNameLength = tmpMaterialArray(0).IndexOf(")") - nodeNameStartIndex
-                            Dim configurationNodeName = tmpMaterialArray(0).Substring(nodeNameStartIndex, nodeNameLength).Trim
+                            Dim configurationNodeName = StrConv(tmpMaterialArray(0).Substring(nodeNameStartIndex, nodeNameLength), VbStrConv.Narrow)
+                            configurationNodeName = configurationNodeName.Trim
                             Dim pIDStr = tmpMaterialArray(0).Substring(0, nodeNameStartIndex - 1).Trim
-                            Dim tmpConfigurationNodeInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
+                            Dim tmpConfigurationNodeInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
 
                             If tmpConfigurationNodeInfo Is Nothing Then
                                 Throw New Exception($"0x0023: 第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
                             End If
 
-                            parentNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
+                            parentNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
 
                         Else
                             '选项值唯一
-                            parentNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(0).Trim())
+                            parentNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(0).Trim())
 
                         End If
 
@@ -754,19 +759,20 @@ Public Class BOMTemplateHelper
                                 '选项值不唯一
                                 Dim nodeNameStartIndex = tmpMaterialArray(i001).IndexOf("(") + 1
                                 Dim nodeNameLength = tmpMaterialArray(i001).IndexOf(")") - nodeNameStartIndex
-                                Dim configurationNodeName = tmpMaterialArray(i001).Substring(nodeNameStartIndex, nodeNameLength).Trim
+                                Dim configurationNodeName = StrConv(tmpMaterialArray(i001).Substring(nodeNameStartIndex, nodeNameLength), VbStrConv.Narrow)
+                                configurationNodeName = configurationNodeName.Trim
                                 Dim pIDStr = tmpMaterialArray(i001).Substring(0, nodeNameStartIndex - 1).Trim
-                                Dim tmpConfigurationNodeInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
+                                Dim tmpConfigurationNodeInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
 
                                 If tmpConfigurationNodeInfo Is Nothing Then
                                     Throw New Exception($"0x0025: 第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
                                 End If
 
-                                linkNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
+                                linkNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
 
                             Else
                                 '选项值唯一
-                                linkNode = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(i001).Trim())
+                                linkNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(i001).Trim())
 
                             End If
 
@@ -774,7 +780,7 @@ Public Class BOMTemplateHelper
                                 Throw New Exception($"0x0026: 第 {rID} 行 选项值 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
                             End If
 
-                            CacheBOMTemplateInfo.BOMTDHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
+                            CacheBOMTemplateFileInfo.BOMTDHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
                                                                                 .ID = Wangk.Hash.IDHelper.NewID,
                                                                                 .NodeID = parentNode.ConfigurationNodeID,
                                                                                 .NodeValueID = parentNode.ID,
@@ -803,7 +809,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub CreateTemplate()
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.TempfilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.TempfilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -874,7 +880,7 @@ Public Class BOMTemplateHelper
                 CalculateMaterialCount(tmpExcelPackage)
 
                 '另存为模板
-                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateInfo.TemplateFilePath, FileMode.Create)
+                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateFileInfo.TemplateFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
                 End Using
 
@@ -993,7 +999,7 @@ Public Class BOMTemplateHelper
 
         Dim tmpList = New List(Of ConfigurationNodeRowInfo)
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.TemplateFilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.TemplateFilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -1009,7 +1015,7 @@ Public Class BOMTemplateHelper
                 Dim pIDColumnID = CurrentBOMpIDColumnID
 
 #Region "新格式"
-                Dim MaterialItems = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoItems()
+                Dim MaterialItems = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoItems()
 
                 For Each item In MaterialItems
                     '跳过非物料选项
@@ -1022,7 +1028,7 @@ Public Class BOMTemplateHelper
                         '有标记
                     Else
                         '无标记
-                        Dim tmppIDItems = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialpIDItems(item.ID)
+                        Dim tmppIDItems = CacheBOMTemplateFileInfo.BOMTDHelper.GetMaterialpIDItems(item.ID)
 
                         tmpMarkLocations = GetNoMarkLocations(tmpExcelPackage, tmppIDItems)
 
@@ -1152,7 +1158,7 @@ Public Class BOMTemplateHelper
     Public Sub ReplaceMaterialAndSaveAs(outputFilePath As String,
                                         values As List(Of ConfigurationNodeRowInfo))
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.TemplateFilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.TemplateFilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -1178,7 +1184,7 @@ Public Class BOMTemplateHelper
 
                 '更新BOM名称
                 headerLocation = FindTextLocation(tmpExcelPackage, "显示屏规格")
-                Dim BOMName = JoinBOMName(tmpExcelPackage, CacheBOMTemplateInfo.ExportConfigurationNodeItems)
+                Dim BOMName = JoinBOMName(tmpExcelPackage, CacheBOMTemplateFileInfo.ExportConfigurationNodeItems)
                 tmpWorkSheet.Cells(headerLocation.Y, headerLocation.X + 2).Value = BOMName
 
                 '自动调整行高
@@ -1396,16 +1402,16 @@ Public Class BOMTemplateHelper
                 Next
             End If
 
-            Dim tmpConfigurationNode = CacheBOMTemplateInfo.ConfigurationNodeControlTable(node.ConfigurationNodeID).NodeInfo
+            Dim tmpConfigurationNode = CacheBOMTemplateFileInfo.ConfigurationNodeControlTable(node.ConfigurationNodeID).NodeInfo
 
             '记录价格
             tmpConfigurationNode.TotalPrice = tmpUnitPrice
 
             '计算占比
-            If CacheBOMTemplateInfo.TotalPrice = 0 Then
+            If CacheBOMTemplateFileInfo.TotalPrice = 0 Then
                 tmpConfigurationNode.TotalPricePercentage = 0
             Else
-                tmpConfigurationNode.TotalPricePercentage = tmpConfigurationNode.TotalPrice * 100 / CacheBOMTemplateInfo.TotalPrice
+                tmpConfigurationNode.TotalPricePercentage = tmpConfigurationNode.TotalPrice * 100 / CacheBOMTemplateFileInfo.TotalPrice
             End If
 
         Next
@@ -1419,7 +1425,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub CalculateMaterialTotalPrice(wb As ExcelPackage)
 
-        CacheBOMTemplateInfo.MaterialTotalPriceTable.Clear()
+        CacheBOMTemplateFileInfo.MaterialTotalPriceTable.Clear()
 
         Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
         Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
@@ -1452,13 +1458,13 @@ Public Class BOMTemplateHelper
             Dim tmpPrice As Decimal = Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, pUnitPriceColumnID).Value}")) *
                     Decimal.Parse(Val($"{tmpWorkSheet.Cells(rID, tmpCountColumnID).Value}"))
 
-            If CacheBOMTemplateInfo.MaterialTotalPriceTable.ContainsKey(pName) Then
+            If CacheBOMTemplateFileInfo.MaterialTotalPriceTable.ContainsKey(pName) Then
                 '已存在
-                Dim oldPrice = CacheBOMTemplateInfo.MaterialTotalPriceTable(pName)
-                CacheBOMTemplateInfo.MaterialTotalPriceTable(pName) = oldPrice + tmpPrice
+                Dim oldPrice = CacheBOMTemplateFileInfo.MaterialTotalPriceTable(pName)
+                CacheBOMTemplateFileInfo.MaterialTotalPriceTable(pName) = oldPrice + tmpPrice
             Else
                 '不存在
-                CacheBOMTemplateInfo.MaterialTotalPriceTable.Add(pName, tmpPrice)
+                CacheBOMTemplateFileInfo.MaterialTotalPriceTable.Add(pName, tmpPrice)
             End If
 
         Next
@@ -1678,7 +1684,7 @@ Public Class BOMTemplateHelper
     ''' 生成文件配置清单文件
     ''' </summary>
     Public Sub CreateConfigurationListFile(outputFilePath As String,
-                                           BOMList As List(Of BOMConfigurationInfo))
+                                           ExportBOMList As List(Of ExportBOMInfo))
 
         Using tmpExcelPackage As New ExcelPackage()
             Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1688,7 +1694,7 @@ Public Class BOMTemplateHelper
             tmpWorkSheet.Cells(1, 1).Value = "文件名"
             tmpWorkSheet.Cells(1, 2).Value = "操作"
             Dim tmpID = 3
-            For Each item In CacheBOMTemplateInfo.ExportConfigurationNodeItems
+            For Each item In CacheBOMTemplateFileInfo.ExportConfigurationNodeItems
                 If Not item.Exist Then
                     Continue For
                 End If
@@ -1697,17 +1703,17 @@ Public Class BOMTemplateHelper
             Next
             tmpWorkSheet.Cells(1, tmpID).Value = "总价"
 
-            Dim tmpKeys = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
+            Dim tmpKeys = From item In CacheBOMTemplateFileInfo.ConfigurationNodeControlTable.Values
                           Where item.NodeInfo.IsMaterial = True
                           Order By item.NodeInfo.SortID
                           Select item.NodeInfo.ID
             '显示物料选项标题
             For i001 = 0 To tmpKeys.Count - 1
-                tmpWorkSheet.Cells(1, tmpID + i001 + 1).Value = CacheBOMTemplateInfo.ConfigurationNodeControlTable(tmpKeys(i001)).NodeInfo.Name
+                tmpWorkSheet.Cells(1, tmpID + i001 + 1).Value = CacheBOMTemplateFileInfo.ConfigurationNodeControlTable(tmpKeys(i001)).NodeInfo.Name
             Next
 
-            For i001 = 0 To BOMList.Count - 1
-                Dim tmpBOMConfigurationInfo = BOMList(i001)
+            For i001 = 0 To ExportBOMList.Count - 1
+                Dim tmpBOMConfigurationInfo = ExportBOMList(i001)
 
                 '文件名
                 tmpWorkSheet.Cells(i001 + 1 + 1, 1).Value = tmpBOMConfigurationInfo.FileName
@@ -1715,7 +1721,7 @@ Public Class BOMTemplateHelper
                 tmpWorkSheet.Cells(i001 + 1 + 1, 2).Style.Font.Color.SetColor(UIFormHelper.NormalColor)
 
                 '配置
-                For Each item In CacheBOMTemplateInfo.ExportConfigurationNodeItems
+                For Each item In CacheBOMTemplateFileInfo.ExportConfigurationNodeItems
                     If Not item.Exist Then
                         Continue For
                     End If
@@ -1730,7 +1736,7 @@ Public Class BOMTemplateHelper
                     item.Value = findNode.SelectedValue
                     item.IsMaterial = findNode.IsMaterial
                     If item.IsMaterial Then
-                        item.MaterialValue = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
+                        item.MaterialValue = CacheBOMTemplateFileInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
                     End If
 
                     tmpWorkSheet.Cells(i001 + 1 + 1, item.ColIndex + 3).Value = JoinConfigurationName(item)
@@ -1793,8 +1799,8 @@ Public Class BOMTemplateHelper
         tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
 
         Dim rID = 1
-        For i001 = 0 To CacheBOMTemplateInfo.ExportBOMList.Count - 1
-            Dim BOMConfigurationInfoItem = CacheBOMTemplateInfo.ExportBOMList(i001)
+        For i001 = 0 To CacheBOMTemplateFileInfo.ExportBOMList.Count - 1
+            Dim BOMConfigurationInfoItem = CacheBOMTemplateFileInfo.ExportBOMList(i001)
 
             For Each item In BOMConfigurationInfoItem.ConfigurationItems
 
@@ -1816,7 +1822,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Private Sub ReadBOMConfigurationInfoFromBOMTemplate(wb As ExcelPackage)
 
-        CacheBOMTemplateInfo.ExportBOMList = New List(Of BOMConfigurationInfo)
+        CacheBOMTemplateFileInfo.ExportBOMList = New List(Of ExportBOMInfo)
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -1837,23 +1843,23 @@ Public Class BOMTemplateHelper
         End If
 
         Dim BOMConfigurationID = -1
-        Dim CurrentBOMConfigurationInfo As BOMConfigurationInfo = Nothing
+        Dim CurrentExportBOMInfo As ExportBOMInfo = Nothing
 
         For rID = 1 To tmpWorkSheet.Dimension.End.Row
 
-            If CurrentBOMConfigurationInfo Is Nothing OrElse
+            If CurrentExportBOMInfo Is Nothing OrElse
                 BOMConfigurationID <> tmpWorkSheet.Cells(rID, 1).Value Then
 
                 BOMConfigurationID += 1
 
-                CurrentBOMConfigurationInfo = New BOMConfigurationInfo With {
+                CurrentExportBOMInfo = New ExportBOMInfo With {
                     .ConfigurationInfoValueTable = New Dictionary(Of String, String)
                 }
 
-                CacheBOMTemplateInfo.ExportBOMList.Add(CurrentBOMConfigurationInfo)
+                CacheBOMTemplateFileInfo.ExportBOMList.Add(CurrentExportBOMInfo)
             End If
 
-            CurrentBOMConfigurationInfo.ConfigurationInfoValueTable.Add($"{tmpWorkSheet.Cells(rID, 2).Value}", $"{tmpWorkSheet.Cells(rID, 3).Value}")
+            CurrentExportBOMInfo.ConfigurationInfoValueTable.Add($"{tmpWorkSheet.Cells(rID, 2).Value}", $"{tmpWorkSheet.Cells(rID, 3).Value}")
 
         Next
 
@@ -1866,9 +1872,9 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub MatchingExportBOMListConfigurationNodeAndValue()
 
-        Dim tmpNodeList = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeInfoItems()
+        Dim tmpNodeList = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoItems()
 
-        For Each exportBOMItem In CacheBOMTemplateInfo.ExportBOMList
+        For Each exportBOMItem In CacheBOMTemplateFileInfo.ExportBOMList
             exportBOMItem.ConfigurationItems = New List(Of ConfigurationNodeRowInfo)
 
             For Each nodeItem In tmpNodeList
@@ -1892,7 +1898,7 @@ Public Class BOMTemplateHelper
 
                     Else
                         '有值
-                        Dim tmpConfigurationNodeValueInfo = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(nodeItem.ID, tmpSelectedValue)
+                        Dim tmpConfigurationNodeValueInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(nodeItem.ID, tmpSelectedValue)
 
                         If tmpConfigurationNodeValueInfo IsNot Nothing Then
                             '存在值
@@ -1930,7 +1936,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub CalculateExportBOMListConfigurationPrice()
 
-        For Each exportBOMItem In CacheBOMTemplateInfo.ExportBOMList
+        For Each exportBOMItem In CacheBOMTemplateFileInfo.ExportBOMList
 
             '获取位置及物料信息
             For Each item In exportBOMItem.ConfigurationItems
@@ -1939,13 +1945,13 @@ Public Class BOMTemplateHelper
                     Continue For
                 End If
 
-                item.MaterialRowIDList = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialRowID(item.ConfigurationNodeID)
-                item.MaterialValue = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.SelectedValueID)
+                item.MaterialRowIDList = CacheBOMTemplateFileInfo.BOMTDHelper.GetMaterialRowID(item.ConfigurationNodeID)
+                item.MaterialValue = CacheBOMTemplateFileInfo.BOMTDHelper.GetMaterialInfoByID(item.SelectedValueID)
 
             Next
 
             '处理物料信息
-            Using readFS = New FileStream(CacheBOMTemplateInfo.TemplateFilePath,
+            Using readFS = New FileStream(CacheBOMTemplateFileInfo.TemplateFilePath,
                                           FileMode.Open,
                                           FileAccess.Read,
                                           FileShare.ReadWrite)
@@ -1954,18 +1960,18 @@ Public Class BOMTemplateHelper
                     Dim tmpWorkBook = tmpExcelPackage.Workbook
                     Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                    CacheBOMTemplateInfo.BOMTHelper.ReadBOMInfo(tmpExcelPackage)
+                    CacheBOMTemplateFileInfo.BOMTHelper.ReadBOMInfo(tmpExcelPackage)
 
-                    CacheBOMTemplateInfo.BOMTHelper.ReplaceMaterial(tmpExcelPackage, exportBOMItem.ConfigurationItems)
+                    CacheBOMTemplateFileInfo.BOMTHelper.ReplaceMaterial(tmpExcelPackage, exportBOMItem.ConfigurationItems)
 
                     Dim headerLocation = FindTextLocation(tmpExcelPackage, "单价")
 
                     exportBOMItem.UnitPrice = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
 
-                    CacheBOMTemplateInfo.BOMTHelper.CalculateExportBOMListConfigurationMaterialTotalPrice(tmpExcelPackage, exportBOMItem.ConfigurationItems)
+                    CacheBOMTemplateFileInfo.BOMTHelper.CalculateExportBOMListConfigurationMaterialTotalPrice(tmpExcelPackage, exportBOMItem.ConfigurationItems)
 
                     '获取导出项信息
-                    For Each item In CacheBOMTemplateInfo.ExportConfigurationNodeItems
+                    For Each item In CacheBOMTemplateFileInfo.ExportConfigurationNodeItems
                         item.Exist = False
 
                         Dim findNodes = From node In exportBOMItem.ConfigurationItems
@@ -1980,13 +1986,13 @@ Public Class BOMTemplateHelper
                         item.Value = findNode.SelectedValue
                         item.IsMaterial = findNode.IsMaterial
                         If item.IsMaterial Then
-                            item.MaterialValue = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
+                            item.MaterialValue = CacheBOMTemplateFileInfo.BOMTDHelper.GetMaterialInfoByID(item.ValueID)
                         End If
 
                     Next
 
                     '获取BOM名称
-                    exportBOMItem.Name = JoinBOMName(tmpExcelPackage, CacheBOMTemplateInfo.ExportConfigurationNodeItems)
+                    exportBOMItem.Name = JoinBOMName(tmpExcelPackage, CacheBOMTemplateFileInfo.ExportConfigurationNodeItems)
 
                 End Using
             End Using
@@ -2044,7 +2050,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Private Sub ReadExportConfigurationNodeItemsFromBOMTemplate(wb As ExcelPackage)
 
-        CacheBOMTemplateInfo.ExportConfigurationNodeItems = New List(Of ExportConfigurationNodeInfo)
+        CacheBOMTemplateFileInfo.ExportConfigurationNodeItems = New List(Of ExportConfigurationNodeInfo)
 
         Dim tmpExcelPackage = wb
         Dim tmpWorkBook = tmpExcelPackage.Workbook
@@ -2075,7 +2081,7 @@ Public Class BOMTemplateHelper
                 .MatchingValues = tmpWorkSheet.Cells(rID, 7).Value
             }
 
-            CacheBOMTemplateInfo.ExportConfigurationNodeItems.Add(addExportConfigurationNodeInfo)
+            CacheBOMTemplateFileInfo.ExportConfigurationNodeItems.Add(addExportConfigurationNodeInfo)
         Next
 
     End Sub
@@ -2102,9 +2108,9 @@ Public Class BOMTemplateHelper
         '调试时不隐藏
         tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
 
-        For rID = 0 To CacheBOMTemplateInfo.ExportConfigurationNodeItems.Count - 1
+        For rID = 0 To CacheBOMTemplateFileInfo.ExportConfigurationNodeItems.Count - 1
 
-            Dim tmpExportConfigurationNodeInfo = CacheBOMTemplateInfo.ExportConfigurationNodeItems(rID)
+            Dim tmpExportConfigurationNodeInfo = CacheBOMTemplateFileInfo.ExportConfigurationNodeItems(rID)
 
             With tmpExportConfigurationNodeInfo
                 tmpWorkSheet.Cells(rID + 1, 1).Value = .Name
@@ -2127,7 +2133,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub ReadConfigurationInfoFromBOMTemplate()
 
-        Using readFS = New FileStream(CacheBOMTemplateInfo.SourceFilePath,
+        Using readFS = New FileStream(CacheBOMTemplateFileInfo.SourceFilePath,
                                       FileMode.Open,
                                       FileAccess.Read,
                                       FileShare.ReadWrite)
@@ -2150,7 +2156,7 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Sub SaveConfigurationInfoToBOMTemplate(isOldFileVersion As Boolean)
 
-        Dim sourceFilePath = If(isOldFileVersion, CacheBOMTemplateInfo.BackupFilePath, CacheBOMTemplateInfo.SourceFilePath)
+        Dim sourceFilePath = If(isOldFileVersion, CacheBOMTemplateFileInfo.BackupFilePath, CacheBOMTemplateFileInfo.SourceFilePath)
 
         Using readFS = New FileStream(sourceFilePath,
                                       FileMode.Open,
@@ -2164,14 +2170,14 @@ Public Class BOMTemplateHelper
                 SaveExportConfigurationNodeItemsToBOMTemplate(tmpExcelPackage)
 
                 '另存为
-                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateInfo.SourceFilePath, FileMode.Create)
+                Using tmpSaveFileStream = New FileStream(CacheBOMTemplateFileInfo.SourceFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
                 End Using
 
             End Using
         End Using
 
-        IO.File.Copy(CacheBOMTemplateInfo.SourceFilePath, CacheBOMTemplateInfo.BackupFilePath, True)
+        IO.File.Copy(CacheBOMTemplateFileInfo.SourceFilePath, CacheBOMTemplateFileInfo.BackupFilePath, True)
 
     End Sub
 #End Region
@@ -2183,7 +2189,7 @@ Public Class BOMTemplateHelper
     Public Sub SaveAsConfigurationInfoToBOMTemplate(isOldFileVersion As Boolean,
                                                     destFilePath As String)
 
-        Dim sourceFilePath = If(isOldFileVersion, CacheBOMTemplateInfo.BackupFilePath, CacheBOMTemplateInfo.SourceFilePath)
+        Dim sourceFilePath = If(isOldFileVersion, CacheBOMTemplateFileInfo.BackupFilePath, CacheBOMTemplateFileInfo.SourceFilePath)
 
         Using readFS = New FileStream(sourceFilePath,
                                       FileMode.Open,
@@ -2204,7 +2210,7 @@ Public Class BOMTemplateHelper
             End Using
         End Using
 
-        IO.File.Copy(destFilePath, CacheBOMTemplateInfo.BackupFilePath, True)
+        IO.File.Copy(destFilePath, CacheBOMTemplateFileInfo.BackupFilePath, True)
 
     End Sub
 #End Region

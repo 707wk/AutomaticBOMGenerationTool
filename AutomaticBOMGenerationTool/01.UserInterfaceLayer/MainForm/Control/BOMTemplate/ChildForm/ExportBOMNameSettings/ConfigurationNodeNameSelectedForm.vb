@@ -1,6 +1,6 @@
 ﻿Public Class ConfigurationNodeNameSelectedForm
 
-    Public CacheBOMTemplateInfo As BOMTemplateInfo
+    Public CacheBOMTemplateFileInfo As BOMTemplateFileInfo
 
     Private _checkedItems() As String
     ''' <summary>
@@ -16,11 +16,11 @@
     Public ExcludeItems As String()
 
     Private Sub ConfigurationNodeNameSelectedForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        If CacheBOMTemplateInfo.ConfigurationNodeControlTable.Count = 0 Then
+        If CacheBOMTemplateFileInfo.ConfigurationNodeControlTable.Count = 0 Then
             Exit Sub
         End If
 
-        Dim tmplist = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
+        Dim tmplist = From item In CacheBOMTemplateFileInfo.ConfigurationNodeControlTable.Values
                       Where Not ExcludeItems.Contains(item.NodeInfo.Name)
                       Order By item.NodeInfo.SortID
                       Select item.NodeInfo.Name

@@ -266,11 +266,6 @@ Public Class AppSettingHelper
     ''' </summary>
     Public Shared SQLiteConnection As String = "data source= .\Data\LocalDatabase.db"
 
-    '''' <summary>
-    '''' 当前BOM模板文件地址
-    '''' </summary>
-    'Public CurrentBOMTemplateFilePath As String
-
     ''' <summary>
     ''' 打开文件历史
     ''' </summary>
@@ -281,12 +276,6 @@ Public Class AppSettingHelper
     ''' </summary>
     <Newtonsoft.Json.JsonIgnore>
     Public OpenFileList As New HashSet(Of String)
-
-    '''' <summary>
-    '''' 当前BOM模板
-    '''' </summary>
-    '<Newtonsoft.Json.JsonIgnore>
-    'Public CurrentBOMTemplateInfo As BOMTemplateInfo
 
 #Region "视图状态"
     ''' <summary>

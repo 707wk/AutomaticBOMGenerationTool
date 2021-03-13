@@ -1,7 +1,7 @@
 ﻿''' <summary>
-''' BOM配置信息
+''' 待导出BOM信息
 ''' </summary>
-Public Class BOMConfigurationInfo
+Public Class ExportBOMInfo
     ''' <summary>
     ''' 名称
     ''' </summary>

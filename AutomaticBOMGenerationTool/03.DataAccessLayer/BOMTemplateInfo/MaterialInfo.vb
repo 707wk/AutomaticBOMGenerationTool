@@ -5,7 +5,7 @@ Public Class MaterialInfo
     Public ID As String
 
     ''' <summary>
-    ''' 品号(使用大写形式)
+    ''' 品号
     ''' </summary>
     Public pID As String
 

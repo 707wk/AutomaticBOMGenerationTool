@@ -2,8 +2,8 @@
 
 Public Class ViewBOMConfigurationInfoForm
 
-    Public WriteOnly Property CacheBOMConfigurationInfo As BOMConfigurationInfo
-        Set(value As BOMConfigurationInfo)
+    Public WriteOnly Property CacheExportBOMInfo As ExportBOMInfo
+        Set(value As ExportBOMInfo)
 
             ListView1.Items.Clear()
 

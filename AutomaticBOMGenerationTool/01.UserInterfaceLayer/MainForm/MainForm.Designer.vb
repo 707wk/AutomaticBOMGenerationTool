@@ -346,7 +346,7 @@ Partial Class MainForm
         'CheckBoxItem1
         '
         Me.CheckBoxItem1.Name = "CheckBoxItem1"
-        Me.CheckBoxItem1.Text = "配置信息"
+        Me.CheckBoxItem1.Text = "BOM配置信息"
         '
         'CheckBoxItem2
         '

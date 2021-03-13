@@ -2,7 +2,7 @@
 
 Public Class ConfigurationNodeControl
 
-    Public CacheBOMTemplateInfo As BOMTemplateInfo
+    Public CacheBOMTemplateFileInfo As BOMTemplateFileInfo
 
     Public GroupControl As ConfigurationGroupControl
 
@@ -16,7 +16,7 @@ Public Class ConfigurationNodeControl
         End Get
         Set(ByVal value As ConfigurationNodeInfo)
             _NodeInfo = value
-            ParentNodeIDHashSet = CacheBOMTemplateInfo.BOMTDHelper.GetParentConfigurationNodeIDItems(NodeInfo.ID)
+            ParentNodeIDHashSet = CacheBOMTemplateFileInfo.BOMTDHelper.GetParentConfigurationNodeIDItems(NodeInfo.ID)
         End Set
     End Property
 
@@ -66,7 +66,7 @@ Public Class ConfigurationNodeControl
     ''' </summary>
     Public Sub Init()
 
-        If CacheBOMTemplateInfo.BOMTDHelper.GetLinkCount(NodeInfo.ID) > 0 Then
+        If CacheBOMTemplateFileInfo.BOMTDHelper.GetLinkCount(NodeInfo.ID) > 0 Then
             Exit Sub
         End If
 
@@ -76,7 +76,7 @@ Public Class ConfigurationNodeControl
 
         '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
-            Dim tmpList = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoItems(NodeInfo.ID)
+            Dim tmpList = CacheBOMTemplateFileInfo.BOMTDHelper.GetMaterialInfoItems(NodeInfo.ID)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -87,7 +87,7 @@ Public Class ConfigurationNodeControl
             Next
 
         Else
-            Dim tmpList = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoItems(NodeInfo.ID)
+            Dim tmpList = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoItems(NodeInfo.ID)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -113,13 +113,13 @@ Public Class ConfigurationNodeControl
             If FlowLayoutPanel1.Controls.Count > 1 Then
                 Me.Visible = True
             Else
-                Me.Visible = CacheBOMTemplateInfo.ShowHideConfigurationNodeItems
+                Me.Visible = CacheBOMTemplateFileInfo.ShowHideConfigurationNodeItems
             End If
 
         Else
 
             Me.Label1.BackColor = UIFormHelper.ErrorColor
-            Me.Visible = CacheBOMTemplateInfo.ShowHideConfigurationNodeItems
+            Me.Visible = CacheBOMTemplateFileInfo.ShowHideConfigurationNodeItems
 
             UpdateChildNodeValue()
 
@@ -150,7 +150,7 @@ Public Class ConfigurationNodeControl
         UpdateChildNodeValue()
 
         If IsUserChecked Then
-            CacheBOMTemplateInfo.BOMTControl.ShowUnitPrice()
+            CacheBOMTemplateFileInfo.BOMTControl.ShowUnitPrice()
         End If
 
     End Sub
@@ -167,9 +167,9 @@ Public Class ConfigurationNodeControl
         SelectedValueID = Nothing
         SelectedValue = Nothing
 
-        Dim originDictionary = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueIDItems(NodeInfo.ID)
+        Dim originDictionary = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueIDItems(NodeInfo.ID)
 
-        Dim tmpParentNodeValueIDList = (From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
+        Dim tmpParentNodeValueIDList = (From item In CacheBOMTemplateFileInfo.ConfigurationNodeControlTable.Values
                                         Where ParentNodeIDHashSet.Contains(item.NodeInfo.ID)
                                         Select item.SelectedValueID).ToList
 
@@ -185,10 +185,10 @@ Public Class ConfigurationNodeControl
             originDictionary.Clear()
         Else
 
-            If CacheBOMTemplateInfo.BOMTDHelper.IsHaveParentValueLink(tmpParentNodeValueIDList, NodeInfo.ID) Then
+            If CacheBOMTemplateFileInfo.BOMTDHelper.IsHaveParentValueLink(tmpParentNodeValueIDList, NodeInfo.ID) Then
                 '有关联,取交集
                 '遍历其他配置项当前值
-                Dim tmpValues = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
+                Dim tmpValues = From item In CacheBOMTemplateFileInfo.ConfigurationNodeControlTable.Values
                                 Order By item.NodeInfo.Priority
                                 Select item
                 For Each item In tmpValues
@@ -196,7 +196,7 @@ Public Class ConfigurationNodeControl
                         Continue For
                     End If
 
-                    Dim tmpHashSet = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueIDItems(item.SelectedValueID, NodeInfo.ID)
+                    Dim tmpHashSet = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueIDItems(item.SelectedValueID, NodeInfo.ID)
 
                     '取交集
                     Dim tmpKeys = originDictionary.Keys.ToList
@@ -213,7 +213,7 @@ Public Class ConfigurationNodeControl
             Else
                 '无关联,排除其他选项值
                 '遍历其他配置项当前值
-                Dim tmpValues = From item In CacheBOMTemplateInfo.ConfigurationNodeControlTable.Values
+                Dim tmpValues = From item In CacheBOMTemplateFileInfo.ConfigurationNodeControlTable.Values
                                 Order By item.NodeInfo.Priority
                                 Select item
                 For Each item In tmpValues
@@ -221,7 +221,7 @@ Public Class ConfigurationNodeControl
                         Continue For
                     End If
 
-                    Dim tmpDictionary = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
+                    Dim tmpDictionary = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeOtherValueIDItems(item.NodeInfo.ID, item.SelectedValueID, NodeInfo.ID)
 
                     '排除
                     For Each key In tmpDictionary.Keys
@@ -254,7 +254,7 @@ Public Class ConfigurationNodeControl
 
         '根据不同节点类型获取不同数据
         If NodeInfo.IsMaterial Then
-            Dim tmpList = CacheBOMTemplateInfo.BOMTDHelper.GetMaterialInfoItems(NodeInfo.ID, originDictionary.Keys.ToList)
+            Dim tmpList = CacheBOMTemplateFileInfo.BOMTDHelper.GetMaterialInfoItems(NodeInfo.ID, originDictionary.Keys.ToList)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -265,7 +265,7 @@ Public Class ConfigurationNodeControl
             Next
 
         Else
-            Dim tmpList = CacheBOMTemplateInfo.BOMTDHelper.GetConfigurationNodeValueInfoItems(originDictionary.Keys.ToList)
+            Dim tmpList = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoItems(originDictionary.Keys.ToList)
             For Each item In tmpList
 
                 FlowLayoutPanel1.Controls.Add(New MaterialInfoControl With {
@@ -291,13 +291,13 @@ Public Class ConfigurationNodeControl
             If FlowLayoutPanel1.Controls.Count > 1 Then
                 Me.Visible = True
             Else
-                Me.Visible = CacheBOMTemplateInfo.ShowHideConfigurationNodeItems
+                Me.Visible = CacheBOMTemplateFileInfo.ShowHideConfigurationNodeItems
             End If
 
         Else
 
             Me.Label1.BackColor = UIFormHelper.ErrorColor
-            Me.Visible = CacheBOMTemplateInfo.ShowHideConfigurationNodeItems
+            Me.Visible = CacheBOMTemplateFileInfo.ShowHideConfigurationNodeItems
 
             UpdateChildNodeValue()
 
@@ -316,9 +316,9 @@ Public Class ConfigurationNodeControl
     ''' </summary>
     Private Sub UpdateChildNodeValue()
 
-        Dim tmpList = CacheBOMTemplateInfo.BOMTDHelper.GetLinkNodeIDListByNodeID(NodeInfo.ID)
+        Dim tmpList = CacheBOMTemplateFileInfo.BOMTDHelper.GetLinkNodeIDListByNodeID(NodeInfo.ID)
         For Each item In tmpList
-            Dim tmpControl As ConfigurationNodeControl = CacheBOMTemplateInfo.ConfigurationNodeControlTable(item)
+            Dim tmpControl As ConfigurationNodeControl = CacheBOMTemplateFileInfo.ConfigurationNodeControlTable(item)
             tmpControl.UpdateValueWithOtherConfiguration()
         Next
 
@@ -351,7 +351,7 @@ Public Class ConfigurationNodeControl
 
         FlowLayoutPanel1.SuspendLayout()
 
-        If CacheBOMTemplateInfo.ShowHideConfigurationNodeItems Then
+        If CacheBOMTemplateFileInfo.ShowHideConfigurationNodeItems Then
             '强制显示
             Me.Visible = True
             tmpVisible = True

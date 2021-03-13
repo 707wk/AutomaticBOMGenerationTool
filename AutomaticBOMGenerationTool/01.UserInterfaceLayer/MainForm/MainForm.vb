@@ -95,14 +95,14 @@ Public Class MainForm
 #End Region
 
     Private Sub ButtonItem3_Click(sender As Object, e As EventArgs) Handles ButtonItem3.Click
-        FileHelper.Open(CurrentBOMTemplateInfo.SourceFilePath)
+        FileHelper.Open(CurrentBOMTemplateFileInfo.SourceFilePath)
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles ButtonItem4.Click
 
         IsCreateNewTab = False
 
-        ParseBOMTemplate(CurrentBOMTemplateInfo.SourceFilePath)
+        ParseBOMTemplate(CurrentBOMTemplateFileInfo.SourceFilePath)
 
     End Sub
 
@@ -114,12 +114,12 @@ Public Class MainForm
 
         Dim tmpStopwatch = New Stopwatch
 
-        Dim addBOMTemplateInfo As BOMTemplateInfo = Nothing
+        Dim addBOMTemplateFileInfo As BOMTemplateFileInfo = Nothing
 
         Do
             tmpStopwatch.Restart()
 
-            addBOMTemplateInfo = New BOMTemplateInfo(filePath)
+            addBOMTemplateFileInfo = New BOMTemplateFileInfo(filePath)
 
             Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
                         .Text = "解析数据"
@@ -129,46 +129,46 @@ Public Class MainForm
                                     Dim stepCount = 14
 
                                     be.Write("清空数据库", 100 / stepCount * 0)
-                                    addBOMTemplateInfo.BOMTDHelper.Clear()
+                                    addBOMTemplateFileInfo.BOMTDHelper.Clear()
 
                                     be.Write("预处理原文件", 100 / stepCount * 1)
-                                    addBOMTemplateInfo.BOMTHelper.PreproccessSourceFile()
+                                    addBOMTemplateFileInfo.BOMTHelper.PreproccessSourceFile()
 
                                     be.Write("获取替换物料品号", 100 / stepCount * 2)
-                                    Dim configurationTablepIDList = addBOMTemplateInfo.BOMTHelper.GetMaterialpIDListFromConfigurationTable()
+                                    Dim configurationTablepIDList = addBOMTemplateFileInfo.BOMTHelper.GetMaterialpIDListFromConfigurationTable()
 
                                     be.Write("检测替换物料完整性", 100 / stepCount * 3)
-                                    addBOMTemplateInfo.BOMTHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
+                                    addBOMTemplateFileInfo.BOMTHelper.TestMaterialInfoCompleteness(configurationTablepIDList)
 
                                     be.Write("获取替换物料信息", 100 / stepCount * 4)
-                                    Dim tmpList = addBOMTemplateInfo.BOMTHelper.GetMaterialInfoList(configurationTablepIDList)
+                                    Dim tmpList = addBOMTemplateFileInfo.BOMTHelper.GetMaterialInfoList(configurationTablepIDList)
 
                                     be.Write("导入替换物料信息到临时数据库", 100 / stepCount * 5)
-                                    addBOMTemplateInfo.BOMTDHelper.SaveMaterialInfo(tmpList)
+                                    addBOMTemplateFileInfo.BOMTDHelper.SaveMaterialInfo(tmpList)
 
                                     be.Write("解析配置节点信息", 100 / stepCount * 6)
-                                    addBOMTemplateInfo.BOMTHelper.TransformationConfigurationTable()
+                                    addBOMTemplateFileInfo.BOMTHelper.TransformationConfigurationTable()
 
                                     be.Write("制作提取模板", 100 / stepCount * 7)
-                                    addBOMTemplateInfo.BOMTHelper.CreateTemplate()
+                                    addBOMTemplateFileInfo.BOMTHelper.CreateTemplate()
 
                                     be.Write("获取替换物料在模板中的位置", 100 / stepCount * 8)
-                                    Dim tmpRowIDList = addBOMTemplateInfo.BOMTHelper.GetMaterialRowIDInTemplate()
+                                    Dim tmpRowIDList = addBOMTemplateFileInfo.BOMTHelper.GetMaterialRowIDInTemplate()
 
                                     be.Write("导入替换物料位置到临时数据库", 100 / stepCount * 9)
-                                    addBOMTemplateInfo.BOMTDHelper.SaveMaterialRowID(tmpRowIDList)
+                                    addBOMTemplateFileInfo.BOMTDHelper.SaveMaterialRowID(tmpRowIDList)
 
                                     be.Write("计算配置节点优先级", 100 / stepCount * 10)
-                                    addBOMTemplateInfo.BOMTDHelper.CalculateConfigurationNodePriority()
+                                    addBOMTemplateFileInfo.BOMTDHelper.CalculateConfigurationNodePriority()
 
                                     be.Write("读取BOM内设置", 100 / stepCount * 11)
-                                    addBOMTemplateInfo.BOMTHelper.ReadConfigurationInfoFromBOMTemplate()
+                                    addBOMTemplateFileInfo.BOMTHelper.ReadConfigurationInfoFromBOMTemplate()
 
                                     be.Write("匹配待导出BOM列表选项信息", 100 / stepCount * 12)
-                                    addBOMTemplateInfo.BOMTHelper.MatchingExportBOMListConfigurationNodeAndValue()
+                                    addBOMTemplateFileInfo.BOMTHelper.MatchingExportBOMListConfigurationNodeAndValue()
 
                                     be.Write("计算待导出BOM列表物料价格", 100 / stepCount * 13)
-                                    addBOMTemplateInfo.BOMTHelper.CalculateExportBOMListConfigurationPrice()
+                                    addBOMTemplateFileInfo.BOMTHelper.CalculateExportBOMListConfigurationPrice()
 
                                     ''测试耗时
                                     'be.Write($"{tmpStopwatch.Elapsed:mm\:ss\.fff} 处理完成", 100 / stepCount * 10)
@@ -180,18 +180,18 @@ Public Class MainForm
 
                 If tmpDialog.Error IsNot Nothing Then
 
-                    If MsgBox($"文件 {addBOMTemplateInfo.SourceFilePath}
+                    If MsgBox($"文件 {addBOMTemplateFileInfo.SourceFilePath}
 {tmpDialog.Error.Message}",
                               MsgBoxStyle.RetryCancel Or MsgBoxStyle.Exclamation,
                               "解析出错") <> MsgBoxResult.Cancel Then
 
-                        addBOMTemplateInfo = Nothing
+                        addBOMTemplateFileInfo = Nothing
                         Continue Do
                     Else
 
                         SuperTabControl1_SelectedTabChanged(Nothing, Nothing)
 
-                        addBOMTemplateInfo = Nothing
+                        addBOMTemplateFileInfo = Nothing
 
                         If IsCreateNewTab Then
                             AppSettingHelper.Instance.OpenFileList.Remove(filePath)
@@ -233,10 +233,10 @@ Public Class MainForm
             addSuperTabItem.TabColor.Default.SelectedMouseOver.Background = addSuperTabItem.TabColor.Default.Selected.Background
 
             Dim addControl As New BOMTemplateControl With {
-                .CacheBOMTemplateInfo = addBOMTemplateInfo,
+                .CacheBOMTemplateFileInfo = addBOMTemplateFileInfo,
                 .Dock = DockStyle.Fill
             }
-            addBOMTemplateInfo.BOMTControl = addControl
+            addBOMTemplateFileInfo.BOMTControl = addControl
 
             addSuperTabItem.AttachedControl.Controls.Add(addControl)
 
@@ -248,14 +248,14 @@ Public Class MainForm
 
             Dim item As SuperTabItem = SuperTabControl1.SelectedTab
             Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
-            addBOMTemplateInfo.BOMTControl = tmpBOMTemplateControl
-            addBOMTemplateInfo.ShowHideConfigurationNodeItems = tmpBOMTemplateControl.ShowHideItems.Checked
-            tmpBOMTemplateControl.CacheBOMTemplateInfo = addBOMTemplateInfo
+            addBOMTemplateFileInfo.BOMTControl = tmpBOMTemplateControl
+            addBOMTemplateFileInfo.ShowHideConfigurationNodeItems = tmpBOMTemplateControl.ShowHideItems.Checked
+            tmpBOMTemplateControl.CacheBOMTemplateFileInfo = addBOMTemplateFileInfo
             tmpBOMTemplateControl.ShowBOMTemplateData()
 
         End If
 
-        CurrentBOMTemplateInfo = addBOMTemplateInfo
+        CurrentBOMTemplateFileInfo = addBOMTemplateFileInfo
 
         Dim UITimeSpan = tmpStopwatch.Elapsed
 
@@ -496,8 +496,8 @@ Public Class MainForm
 #Region "文件保存修改"
     Private Sub ButtonItem11_Click(sender As Object, e As EventArgs) Handles ButtonItem11.Click
 
-        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateInfo.BackupFilePath)
-        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateInfo.SourceFilePath)
+        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateFileInfo.BackupFilePath)
+        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateFileInfo.SourceFilePath)
 
         Dim isOldFileVersion = True
 
@@ -527,14 +527,14 @@ Public Class MainForm
 
         End If
 
-        CurrentBOMTemplateInfo.ExportBOMList.Clear()
-        CurrentBOMTemplateInfo.ExportBOMList.AddRange(From item As DataGridViewRow In CurrentBOMTemplateInfo.BOMTControl.ExportBOMList.Rows
-                                                      Select CType(item.Tag, BOMConfigurationInfo))
+        CurrentBOMTemplateFileInfo.ExportBOMList.Clear()
+        CurrentBOMTemplateFileInfo.ExportBOMList.AddRange(From item As DataGridViewRow In CurrentBOMTemplateFileInfo.BOMTControl.ExportBOMList.Rows
+                                                          Select CType(item.Tag, ExportBOMInfo))
 
         Do
             Try
 
-                CurrentBOMTemplateInfo.
+                CurrentBOMTemplateFileInfo.
                     BOMTHelper.
                     SaveConfigurationInfoToBOMTemplate(isOldFileVersion)
 
@@ -558,7 +558,7 @@ Public Class MainForm
 
         Loop
 
-        CurrentBOMTemplateInfo.ExportBOMList.Clear()
+        CurrentBOMTemplateFileInfo.ExportBOMList.Clear()
 
         UIFormHelper.ToastSuccess("保存成功")
 
@@ -568,8 +568,8 @@ Public Class MainForm
 #Region "文件另存为修改"
     Private Sub ButtonItem12_Click(sender As Object, e As EventArgs) Handles ButtonItem12.Click
 
-        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateInfo.BackupFilePath)
-        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateInfo.SourceFilePath)
+        Dim fileHashCodeOld = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateFileInfo.BackupFilePath)
+        Dim fileHashCodeNew = Wangk.Hash.MD5Helper.GetFile128MD5(CurrentBOMTemplateFileInfo.SourceFilePath)
 
         Dim isOldFileVersion = True
 
@@ -603,7 +603,7 @@ Public Class MainForm
 
         Using tmpDialog As New SaveFileDialog With {
             .Filter = "BOM模板文件|*.xlsx",
-            .FileName = IO.Path.GetFileName(CurrentBOMTemplateInfo.SourceFilePath)
+            .FileName = IO.Path.GetFileName(CurrentBOMTemplateFileInfo.SourceFilePath)
         }
             If tmpDialog.ShowDialog() <> DialogResult.OK Then
                 Exit Sub
@@ -613,22 +613,22 @@ Public Class MainForm
 
         End Using
 
-        CurrentBOMTemplateInfo.ExportBOMList.Clear()
-        CurrentBOMTemplateInfo.ExportBOMList.AddRange(From item As DataGridViewRow In CurrentBOMTemplateInfo.BOMTControl.ExportBOMList.Rows
-                                                      Select CType(item.Tag, BOMConfigurationInfo))
+        CurrentBOMTemplateFileInfo.ExportBOMList.Clear()
+        CurrentBOMTemplateFileInfo.ExportBOMList.AddRange(From item As DataGridViewRow In CurrentBOMTemplateFileInfo.BOMTControl.ExportBOMList.Rows
+                                                          Select CType(item.Tag, ExportBOMInfo))
 
         Do
             Try
 
-                CurrentBOMTemplateInfo.
+                CurrentBOMTemplateFileInfo.
                     BOMTHelper.
                     SaveAsConfigurationInfoToBOMTemplate(isOldFileVersion, outputFilePath)
 
-                AppSettingHelper.Instance.OpenFileList.Remove(CurrentBOMTemplateInfo.SourceFilePath)
-                CurrentBOMTemplateInfo.SourceFilePath = outputFilePath
-                AppSettingHelper.Instance.OpenFileList.Add(CurrentBOMTemplateInfo.SourceFilePath)
+                AppSettingHelper.Instance.OpenFileList.Remove(CurrentBOMTemplateFileInfo.SourceFilePath)
+                CurrentBOMTemplateFileInfo.SourceFilePath = outputFilePath
+                AppSettingHelper.Instance.OpenFileList.Add(CurrentBOMTemplateFileInfo.SourceFilePath)
 
-                CurrentBOMTemplateInfo.ExportBOMList.Clear()
+                CurrentBOMTemplateFileInfo.ExportBOMList.Clear()
 
                 Dim tmpSuperTabItem As SuperTabItem = SuperTabControl1.SelectedTab
                 tmpSuperTabItem.Text = IO.Path.GetFileNameWithoutExtension(outputFilePath)
@@ -708,7 +708,7 @@ Public Class MainForm
     ''' <summary>
     ''' 当前BOM模板
     ''' </summary>
-    Public CurrentBOMTemplateInfo As BOMTemplateInfo
+    Public CurrentBOMTemplateFileInfo As BOMTemplateFileInfo
 #Enable Warning CA2213 ' Disposable fields should be disposed
 
     Private Sub SuperTabControl1_SelectedTabChanged(sender As Object, e As SuperTabStripSelectedTabChangedEventArgs) Handles SuperTabControl1.SelectedTabChanged
@@ -716,6 +716,7 @@ Public Class MainForm
         Dim item As SuperTabItem = SuperTabControl1.SelectedTab
 
         If item Is Nothing Then
+            ToolStripStatusLabel1.Text = "未选择文件"
             Exit Sub
         End If
 
@@ -724,9 +725,9 @@ Public Class MainForm
         End If
 
         Dim tmpBOMTemplateControl As BOMTemplateControl = item.AttachedControl.Controls(0)
-        CurrentBOMTemplateInfo = tmpBOMTemplateControl.CacheBOMTemplateInfo
+        CurrentBOMTemplateFileInfo = tmpBOMTemplateControl.CacheBOMTemplateFileInfo
 
-        ToolStripStatusLabel1.Text = CurrentBOMTemplateInfo.SourceFilePath
+        ToolStripStatusLabel1.Text = CurrentBOMTemplateFileInfo.SourceFilePath
 
     End Sub
 

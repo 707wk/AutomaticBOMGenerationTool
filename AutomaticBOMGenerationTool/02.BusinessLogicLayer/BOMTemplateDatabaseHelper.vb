@@ -6,11 +6,11 @@ Imports System.Data.SQLite
 Public Class BOMTemplateDatabaseHelper
     Implements IDisposable
 
-    Private ReadOnly CacheBOMTemplateInfo As BOMTemplateInfo
+    Private ReadOnly CacheBOMTemplateFileInfo As BOMTemplateFileInfo
 
-    Public Sub New(value As BOMTemplateInfo)
+    Public Sub New(value As BOMTemplateFileInfo)
 
-        CacheBOMTemplateInfo = value
+        CacheBOMTemplateFileInfo = value
 
     End Sub
 
@@ -20,7 +20,7 @@ Public Class BOMTemplateDatabaseHelper
         Get
             If _DatabaseConnection Is Nothing Then
                 _DatabaseConnection = New SQLite.SQLiteConnection With {
-                    .ConnectionString = CacheBOMTemplateInfo.SQLiteConnection
+                    .ConnectionString = CacheBOMTemplateFileInfo.SQLiteConnection
                 }
                 _DatabaseConnection.Open()
 
@@ -293,17 +293,29 @@ where Value=@Value"
         cmd.Parameters.Add(New SQLiteParameter("@Value", DbType.String) With {.Value = value})
 
         Using reader As SQLiteDataReader = cmd.ExecuteReader()
-            If reader.Read Then
-                Return New ConfigurationNodeValueInfo With {
-                    .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
-                    .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
-                    .Value = reader(NameOf(ConfigurationNodeValueInfo.Value)),
-                    .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID))
-                }
-            End If
-        End Using
 
-        Return Nothing
+            Dim tmpList = New List(Of ConfigurationNodeValueInfo)
+
+            While reader.Read
+                tmpList.Add(New ConfigurationNodeValueInfo With {
+                            .ID = reader(NameOf(ConfigurationNodeValueInfo.ID)),
+                            .ConfigurationNodeID = reader(NameOf(ConfigurationNodeValueInfo.ConfigurationNodeID)),
+                            .Value = reader(NameOf(ConfigurationNodeValueInfo.Value)),
+                            .SortID = reader(NameOf(ConfigurationNodeValueInfo.SortID))
+                            })
+            End While
+
+            If tmpList.Count = 0 Then
+                Return Nothing
+
+            ElseIf tmpList.Count = 1 Then
+                Return tmpList(0)
+
+            Else
+                Throw New Exception($"0x0032: 选项值 {value} 在多个配置项中出现")
+            End If
+
+        End Using
 
     End Function
 #End Region
