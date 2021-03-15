@@ -29,9 +29,10 @@ Public Class ConfigurationNodeValueInfo
                 convStr.Contains("(") OrElse
                 convStr.Contains(")") OrElse
                 convStr.Contains(",") OrElse
+                convStr.Contains("!") OrElse
                 convStr.ToLower.Contains("and") Then
 
-                Throw New Exception($"0x0008: 配置节点值 {value} 包含 < > ( ) , and 关键字")
+                Throw New Exception($"0x0008: 配置节点值 {value} 包含 < > ( ) , ! and 关键字")
 
             End If
 

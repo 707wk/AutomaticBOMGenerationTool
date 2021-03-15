@@ -44,6 +44,11 @@ Public Class BOMTemplateHelper
     ''' </summary>
     Public Const ExportConfigurationInfoSheetName As String = "ExportConfigurationInfo"
 
+    ''' <summary>
+    ''' 固定搭配分割字符
+    ''' </summary>
+    Private ReadOnly FixedLinkSplitChars As Char() = {"<", ">", ",", "(", ")"}
+
     Public Sub New(value As BOMTemplateFileInfo)
 
         CacheBOMTemplateFileInfo = value
@@ -261,8 +266,6 @@ Public Class BOMTemplateHelper
 
     End Sub
 #End Region
-
-
 
 #Region "获取配置表中的替换物料品号"
     ''' <summary>
@@ -490,17 +493,18 @@ Public Class BOMTemplateHelper
     End Function
 #End Region
 
-#Region "转换配置表"
+#Region "解析配置表"
     ''' <summary>
-    ''' 转换配置表
+    ''' 解析配置表
     ''' </summary>
-    Public Sub TransformationConfigurationTable()
+    Public Sub ConfigurationTableParser()
 
         ReplaceableMaterialParser()
 
         FixedMatchingMaterialParser()
 
     End Sub
+#End Region
 
 #Region "解析可替换物料"
     ''' <summary>
@@ -714,79 +718,37 @@ Public Class BOMTemplateHelper
 
 #Region "解析固定替换"
                     '分割
-                    Dim tmpArray = materialStr.Split(",")
+                    Dim tmpArray = FixedlinkStrParser(materialStr, rID)
 
                     For Each item In tmpArray
                         If String.IsNullOrWhiteSpace(item) Then
                             Continue For
                         End If
 
-                        Dim tmpStr = item.Replace("and", ",")
-                        Dim tmpMaterialArray = tmpStr.Split(",")
+                        Dim tmpStr = item.Replace("and", "!")
+                        Dim tmpMaterialArray = tmpStr.Split("!")
 
-                        Dim parentNode As ConfigurationNodeValueInfo
-
-                        If tmpMaterialArray(0).Contains("(") Then
-                            '选项值不唯一
-                            Dim nodeNameStartIndex = tmpMaterialArray(0).IndexOf("(") + 1
-                            Dim nodeNameLength = tmpMaterialArray(0).IndexOf(")") - nodeNameStartIndex
-                            Dim configurationNodeName = StrConv(tmpMaterialArray(0).Substring(nodeNameStartIndex, nodeNameLength), VbStrConv.Narrow)
-                            configurationNodeName = configurationNodeName.Trim
-                            Dim pIDStr = tmpMaterialArray(0).Substring(0, nodeNameStartIndex - 1).Trim
-                            Dim tmpConfigurationNodeInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
-
-                            If tmpConfigurationNodeInfo Is Nothing Then
-                                Throw New Exception($"0x0023: 第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
-                            End If
-
-                            parentNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
-
-                        Else
-                            '选项值唯一
-                            parentNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(0).Trim())
-
-                        End If
-
-                        If parentNode Is Nothing Then
-                            Throw New Exception($"0x0024: 第 {rID} 行 替换物料 {tmpMaterialArray(0).Trim()} 在配置表中不存在")
-                        End If
+                        Dim parentNodeItems = FixedlinkConfigurationNodeValueInfoItemsParser(tmpMaterialArray(0), rID)
 
                         For i001 = 1 To tmpMaterialArray.Count - 1
 
-                            Dim linkNode As ConfigurationNodeValueInfo
+                            Dim linkNodeItems = FixedlinkConfigurationNodeValueInfoItemsParser(tmpMaterialArray(i001), rID)
 
-                            If tmpMaterialArray(i001).Contains("(") Then
-                                '选项值不唯一
-                                Dim nodeNameStartIndex = tmpMaterialArray(i001).IndexOf("(") + 1
-                                Dim nodeNameLength = tmpMaterialArray(i001).IndexOf(")") - nodeNameStartIndex
-                                Dim configurationNodeName = StrConv(tmpMaterialArray(i001).Substring(nodeNameStartIndex, nodeNameLength), VbStrConv.Narrow)
-                                configurationNodeName = configurationNodeName.Trim
-                                Dim pIDStr = tmpMaterialArray(i001).Substring(0, nodeNameStartIndex - 1).Trim
-                                Dim tmpConfigurationNodeInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
+                            For Each linkNodeItem In linkNodeItems
 
-                                If tmpConfigurationNodeInfo Is Nothing Then
-                                    Throw New Exception($"0x0025: 第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
-                                End If
+                                For Each parentNodeItem In parentNodeItems
 
-                                linkNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
-
-                            Else
-                                '选项值唯一
-                                linkNode = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpMaterialArray(i001).Trim())
-
-                            End If
-
-                            If linkNode Is Nothing Then
-                                Throw New Exception($"0x0026: 第 {rID} 行 选项值 {tmpMaterialArray(i001).Trim()} 在配置表中不存在")
-                            End If
-
-                            CacheBOMTemplateFileInfo.BOMTDHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
+                                    CacheBOMTemplateFileInfo.BOMTDHelper.SaveMaterialLinkInfo(New MaterialLinkInfo With {
                                                                                 .ID = Wangk.Hash.IDHelper.NewID,
-                                                                                .NodeID = parentNode.ConfigurationNodeID,
-                                                                                .NodeValueID = parentNode.ID,
-                                                                                .LinkNodeID = linkNode.ConfigurationNodeID,
-                                                                                .LinkNodeValueID = linkNode.ID
+                                                                                .NodeID = parentNodeItem.ConfigurationNodeID,
+                                                                                .NodeValueID = parentNodeItem.ID,
+                                                                                .LinkNodeID = linkNodeItem.ConfigurationNodeID,
+                                                                                .LinkNodeValueID = linkNodeItem.ID
                                                                                 })
+
+                                Next
+
+                            Next
 
                         Next
 
@@ -801,6 +763,156 @@ Public Class BOMTemplateHelper
     End Sub
 #End Region
 
+#Region "解析固定搭配选项字符串"
+    ''' <summary>
+    ''' 解析固定搭配选项字符串
+    ''' </summary>
+    Private Function FixedlinkStrParser(fixedLinkStr As String,
+                                        rID As Integer) As String()
+
+        '左尖括号数量
+        Dim leftAngleBracketsCount = 0
+        '右尖括号数量
+        Dim rightAngleBracketsCount = 0
+
+        For Each item In fixedLinkStr
+
+            If item.Equals(FixedLinkSplitChars(0)) Then
+                leftAngleBracketsCount += 1
+            ElseIf item.Equals(FixedLinkSplitChars(1)) Then
+                rightAngleBracketsCount += 1
+            Else
+                '其他字符
+            End If
+
+            If leftAngleBracketsCount < rightAngleBracketsCount Then
+                Throw New Exception($"0x0033: 第 {rID} 行 固定搭配列 尖括号不匹配")
+            End If
+
+        Next
+
+        If leftAngleBracketsCount <> rightAngleBracketsCount Then
+            Throw New Exception($"0x0034: 第 {rID} 行 固定搭配列 尖括号不匹配")
+        End If
+
+        Dim splitArray As New List(Of String)
+
+        Dim isAngleBracketEnd As Boolean = True
+
+        Dim strStartIndex = 0
+
+        For charID = 0 To fixedLinkStr.Length - 1
+
+            If fixedLinkStr(charID).Equals(FixedLinkSplitChars(0)) Then
+                isAngleBracketEnd = False
+
+            ElseIf fixedLinkStr(charID).Equals(FixedLinkSplitChars(1)) Then
+                isAngleBracketEnd = True
+
+            ElseIf fixedLinkStr(charID).Equals(FixedLinkSplitChars(2)) AndAlso
+                isAngleBracketEnd Then
+
+                Dim strLength As Integer = charID - strStartIndex
+
+                Dim tmpStr = fixedLinkStr.Substring(strStartIndex, strLength)
+
+                splitArray.Add(tmpStr.Trim)
+
+                strStartIndex = charID + 1
+
+            End If
+
+        Next
+
+        If strStartIndex < fixedLinkStr.Length - 1 Then
+
+            Dim tmpStr = fixedLinkStr.Substring(strStartIndex)
+            splitArray.Add(tmpStr.Trim)
+
+        End If
+
+        Return splitArray.ToArray
+
+    End Function
+#End Region
+
+#Region "解析固定搭配选项集合信息"
+    ''' <summary>
+    ''' 解析固定搭配选项集合信息
+    ''' </summary>
+    Private Function FixedlinkConfigurationNodeValueInfoItemsParser(value As String,
+                                                                    rID As Integer) As List(Of ConfigurationNodeValueInfo)
+
+        Dim configurationNodeItems As New List(Of ConfigurationNodeValueInfo)
+
+        Dim tmpStr = value.Trim
+
+        If tmpStr.StartsWith(FixedLinkSplitChars(0)) Then
+            '有多个物料
+            Dim nodeNameItemsStr = tmpStr.Replace(FixedLinkSplitChars(0), "").Replace(FixedLinkSplitChars(1), "")
+
+            Dim nodeNameItems = nodeNameItemsStr.Split(FixedLinkSplitChars(2))
+
+            For Each nodeName In nodeNameItems
+
+                If String.IsNullOrWhiteSpace(nodeName) Then
+                    Continue For
+                End If
+
+                configurationNodeItems.Add(FixedlinkConfigurationNodeValueInfoParser(nodeName, rID))
+
+            Next
+
+        Else
+            '单个物料
+            configurationNodeItems.Add(FixedlinkConfigurationNodeValueInfoParser(tmpStr, rID))
+
+        End If
+
+        Return configurationNodeItems
+
+    End Function
+#End Region
+
+#Region "解析固定搭配选项信息"
+    ''' <summary>
+    ''' 解析固定搭配选项信息
+    ''' </summary>
+    Private Function FixedlinkConfigurationNodeValueInfoParser(value As String,
+                                                               rID As Integer) As ConfigurationNodeValueInfo
+
+        Dim tmpStr = value.Trim
+
+        Dim tmpConfigurationNodeValueInfo As ConfigurationNodeValueInfo
+
+        If tmpStr.Contains(FixedLinkSplitChars(3)) Then
+            '选项值不唯一
+            Dim nodeNameStartIndex = tmpStr.IndexOf(FixedLinkSplitChars(3)) + 1
+            Dim nodeNameLength = tmpStr.IndexOf(FixedLinkSplitChars(4)) - nodeNameStartIndex
+            Dim configurationNodeName = StrConv(tmpStr.Substring(nodeNameStartIndex, nodeNameLength), VbStrConv.Narrow)
+            configurationNodeName = configurationNodeName.Trim
+            Dim pIDStr = tmpStr.Substring(0, nodeNameStartIndex - 1).Trim
+            Dim tmpConfigurationNodeInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeInfoByName(configurationNodeName)
+
+            If tmpConfigurationNodeInfo Is Nothing Then
+                Throw New Exception($"0x0023: 第 {rID} 行 配置项 {configurationNodeName} 在配置表中不存在")
+            End If
+
+            tmpConfigurationNodeValueInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpConfigurationNodeInfo.ID, pIDStr)
+
+        Else
+            '选项值唯一
+            tmpConfigurationNodeValueInfo = CacheBOMTemplateFileInfo.BOMTDHelper.GetConfigurationNodeValueInfoByValue(tmpStr)
+
+        End If
+
+        If tmpConfigurationNodeValueInfo Is Nothing Then
+            Throw New Exception($"0x0024: 第 {rID} 行 替换物料 {tmpStr} 在配置表中不存在")
+        End If
+
+        Return tmpConfigurationNodeValueInfo
+
+    End Function
 #End Region
 
 #Region "制作提取模板"

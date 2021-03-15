@@ -147,7 +147,7 @@ Public Class MainForm
                                     addBOMTemplateFileInfo.BOMTDHelper.SaveMaterialInfo(tmpList)
 
                                     be.Write("解析配置节点信息", 100 / stepCount * 6)
-                                    addBOMTemplateFileInfo.BOMTHelper.TransformationConfigurationTable()
+                                    addBOMTemplateFileInfo.BOMTHelper.ConfigurationTableParser()
 
                                     be.Write("制作提取模板", 100 / stepCount * 7)
                                     addBOMTemplateFileInfo.BOMTHelper.CreateTemplate()
