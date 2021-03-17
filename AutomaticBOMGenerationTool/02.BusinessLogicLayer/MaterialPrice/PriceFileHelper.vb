@@ -114,7 +114,7 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "每平方价格")
+                    BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "每平方价格")
 
                     Return True
 
@@ -146,7 +146,7 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "每平方价格:")
+                    BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "每平方价格:")
 
                     Return True
 
@@ -178,7 +178,7 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "核价产品配置表")
+                    BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "核价产品配置表")
 
                     Return True
 
@@ -210,7 +210,7 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "版次")
+                    BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "版次")
 
                     Return True
 
@@ -242,7 +242,7 @@ Public NotInheritable Class PriceFileHelper
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                 Try
-                    BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "采集来源")
+                    BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "采集来源")
 
                     Return True
 

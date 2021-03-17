@@ -26,7 +26,7 @@
         Me.FlatStyle = FlatStyle.Flat
         Me.FlatAppearance.BorderColor = Color.FromArgb(173, 173, 173)
         Me.FlatAppearance.CheckedBackColor = Color.FromArgb(45, 45, 48)
-        Me.Size = New Size(160, 28)
+        Me.Size = New Size(180, 28)
         Me.TextAlign = ContentAlignment.MiddleLeft
         Me.Cursor = Cursors.Hand
         Me.Margin = New Padding(2)

@@ -83,6 +83,16 @@ Public Class BOMTemplateFileInfo
     ''' </summary>
     Public ExportConfigurationNodeItems As List(Of ExportConfigurationNodeInfo)
 
+    ''' <summary>
+    ''' 技术参数信息
+    ''' </summary>
+    Public TechnicalDataItems As List(Of TechnicalDataInfo)
+
+    ''' <summary>
+    ''' 物料品号查找表
+    ''' </summary>
+    Public MaterialpIDTable As New HashSet(Of String)
+
     Public Sub New(filePath As String)
 
         If String.IsNullOrWhiteSpace(filePath) Then Throw New Exception("0x0010: 文件路径不能为空")

@@ -38,6 +38,12 @@ Public Class MainForm
             .ShowAlways = True
         End With
 
+        '#If DEBUG Then
+
+        '#Else
+        RibbonBar6.Visible = False
+        '#End If
+
     End Sub
 #End Region
 
@@ -704,12 +710,10 @@ Public Class MainForm
         AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer1.Panel2Collapsed", CheckBoxItem2.Checked)
     End Sub
 
-#Disable Warning CA2213 ' Disposable fields should be disposed
     ''' <summary>
     ''' 当前BOM模板
     ''' </summary>
     Public CurrentBOMTemplateFileInfo As BOMTemplateFileInfo
-#Enable Warning CA2213 ' Disposable fields should be disposed
 
     Private Sub SuperTabControl1_SelectedTabChanged(sender As Object, e As SuperTabStripSelectedTabChangedEventArgs) Handles SuperTabControl1.SelectedTabChanged
 

@@ -17,9 +17,9 @@ Public NotInheritable Class BOMCostingTemplateByWKTypeHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                ReadBOMInfo(tmpExcelPackage)
+                ReadBOMInfo(tmpWorkSheet)
 
-                SetBaseMaterialMark(tmpExcelPackage)
+                SetBaseMaterialMark(tmpWorkSheet)
 
                 Dim tmpSourceFile = IO.Path.GetFileName(value.SourceFilePath)
 
@@ -104,16 +104,13 @@ Public NotInheritable Class BOMCostingTemplateByWKTypeHelper
     ''' <summary>
     ''' 读取BOM基本信息
     ''' </summary>
-    Public Shared Sub ReadBOMInfo(wb As ExcelPackage)
-        Dim tmpExcelPackage = wb
-        Dim tmpWorkBook = tmpExcelPackage.Workbook
-        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+    Public Shared Sub ReadBOMInfo(workSheet As ExcelWorksheet)
 
-        Dim headerLocation = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "阶层")
+        Dim headerLocation = BOMTemplateHelper.FindTextLocation(workSheet, "阶层")
         BOMMaterialRowMinID = headerLocation.Y + 1
-        BOMpIDColumnID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "品 号").X
+        BOMpIDColumnID = BOMTemplateHelper.FindTextLocation(workSheet, "品 号").X
 
-        BOMMaterialRowMaxID = tmpWorkSheet.Dimension.End.Row
+        BOMMaterialRowMaxID = workSheet.Dimension.End.Row
 
     End Sub
 #End Region
@@ -122,26 +119,22 @@ Public NotInheritable Class BOMCostingTemplateByWKTypeHelper
     ''' <summary>
     ''' 标记基础物料(基础物料为True,组合物料为False,空行为String.Empty)
     ''' </summary>
-    Private Shared Sub SetBaseMaterialMark(wb As ExcelPackage)
-
-        Dim tmpExcelPackage = wb
-        Dim tmpWorkBook = tmpExcelPackage.Workbook
-        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+    Private Shared Sub SetBaseMaterialMark(workSheet As ExcelWorksheet)
 
         Dim MaterialRowMaxID = BOMMaterialRowMaxID
         Dim MaterialRowMinID = BOMMaterialRowMinID
         BOMBaseMaterialFlagColumnID = BOMpIDColumnID + 5 + 1
-        tmpWorkSheet.InsertColumn(BOMBaseMaterialFlagColumnID, 1)
-        tmpWorkSheet.Cells(MaterialRowMinID - 1, BOMBaseMaterialFlagColumnID).Value = "基础物料标记"
+        workSheet.InsertColumn(BOMBaseMaterialFlagColumnID, 1)
+        workSheet.Cells(MaterialRowMinID - 1, BOMBaseMaterialFlagColumnID).Value = "基础物料标记"
 
         For rID = MaterialRowMinID To MaterialRowMaxID
-            tmpWorkSheet.Cells(rID, BOMBaseMaterialFlagColumnID).Value = True
+            workSheet.Cells(rID, BOMBaseMaterialFlagColumnID).Value = True
         Next
 
         Dim lastLevel = 1
         Dim lastRID = MaterialRowMinID
         For rID = MaterialRowMinID + 1 To MaterialRowMaxID
-            Dim nowLevel = GetLevel(tmpExcelPackage, rID)
+            Dim nowLevel = GetLevel(workSheet, rID)
 
             If nowLevel = 0 Then
                 '无阶层标记
@@ -149,7 +142,7 @@ Public NotInheritable Class BOMCostingTemplateByWKTypeHelper
 
             ElseIf lastLevel = nowLevel - 1 Then
                 '当前行是上一行的子节点
-                tmpWorkSheet.Cells(lastRID, BOMBaseMaterialFlagColumnID).Value = False
+                workSheet.Cells(lastRID, BOMBaseMaterialFlagColumnID).Value = False
 
             End If
 
@@ -164,15 +157,10 @@ Public NotInheritable Class BOMCostingTemplateByWKTypeHelper
     ''' <summary>
     ''' 获取阶层等级,未找到则返回0
     ''' </summary>
-    Public Shared Function GetLevel(
-                                   wb As ExcelPackage,
-                                   rowID As Integer) As Integer
+    Public Shared Function GetLevel(workSheet As ExcelWorksheet,
+                                    rowID As Integer) As Integer
 
-        Dim tmpExcelPackage = wb
-        Dim tmpWorkBook = tmpExcelPackage.Workbook
-        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
-
-        Return $"{tmpWorkSheet.Cells(rowID, 1).Value}".Trim.Length
+        Return $"{workSheet.Cells(rowID, 1).Value}".Trim.Length
 
     End Function
 #End Region

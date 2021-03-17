@@ -3,7 +3,7 @@ Imports OfficeOpenXml
 ''' <summary>
 ''' BOM模板物料价格辅助模块
 ''' </summary>
-Public Class BOMTemplateMaterialPriceHelper
+Public NotInheritable Class BOMTemplateMaterialPriceHelper
 
 #Region "获取需要替换的物料价格信息列表"
     ''' <summary>
@@ -22,9 +22,9 @@ Public Class BOMTemplateMaterialPriceHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                Dim MaterialRowMaxID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "版次").Y - 1
-                Dim MaterialRowMinID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "阶层").Y + 2
-                Dim pIDColumnID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "品 号").X
+                Dim MaterialRowMaxID = BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "版次").Y - 1
+                Dim MaterialRowMinID = BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "阶层").Y + 2
+                Dim pIDColumnID = BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "品 号").X
 
                 For rID = MaterialRowMinID To MaterialRowMaxID
 
@@ -81,9 +81,9 @@ Public Class BOMTemplateMaterialPriceHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                Dim MaterialRowMaxID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "版次").Y - 1
-                Dim MaterialRowMinID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "阶层").Y + 2
-                Dim pIDColumnID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "品 号").X
+                Dim MaterialRowMaxID = BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "版次").Y - 1
+                Dim MaterialRowMinID = BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "阶层").Y + 2
+                Dim pIDColumnID = BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "品 号").X
 
                 Dim DefaultBackgroundColor = UIFormHelper.SuccessColor 'Color.FromArgb(169, 208, 142)
 

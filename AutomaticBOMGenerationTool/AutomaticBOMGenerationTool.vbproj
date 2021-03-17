@@ -150,6 +150,12 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewTechnicalDataInfoForm.Designer.vb">
+      <DependentUpon>ViewTechnicalDataInfoForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewTechnicalDataInfoForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.Designer.vb">
       <DependentUpon>ExportBOMNameSettingsForm.vb</DependentUpon>
     </Compile>
@@ -256,18 +262,20 @@
     <Compile Include="02.BusinessLogicLayer\MaterialPrice\PriceFileType\ImportMaterialPriceTableTypeHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\BOMTemplateFileInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\BOMTemplateFileInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\TechnicalData\TechnicalDataConfigurationInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\TechnicalData\TechnicalDataInfo.vb" />
     <Compile Include="03.DataAccessLayer\CommitInfo.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\ExportBOMInfo.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\ConfigurationGroupInfo.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\ConfigurationNodeInfo.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\ConfigurationNodeRowInfo.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\ConfigurationNodeValueInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\ExportBOMInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\ConfigurationGroupInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\ConfigurationNodeInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\ConfigurationNodeRowInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\ConfigurationNodeValueInfo.vb" />
     <Compile Include="03.DataAccessLayer\EnumHelpervb.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\ExportConfigurationNodeInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\ExportConfigurationNodeInfo.vb" />
     <Compile Include="03.DataAccessLayer\MaterialPrice\ImportPriceFileInfo.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\MaterialInfo.vb" />
-    <Compile Include="03.DataAccessLayer\BOMTemplateInfo\MaterialLinkInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\MaterialInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\MaterialLinkInfo.vb" />
     <Compile Include="03.DataAccessLayer\MaterialPrice\MaterialPriceInfo.vb" />
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -294,6 +302,9 @@
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.resx">
       <DependentUpon>UpdateInfoForm.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewTechnicalDataInfoForm.resx">
+      <DependentUpon>ViewTechnicalDataInfoForm.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.resx">
       <DependentUpon>ExportBOMNameSettingsForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -315,6 +326,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewBOMConfigurationInfoForm.resx">
       <DependentUpon>ViewBOMConfigurationInfoForm.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewMaterialPriceInfo\ChildForm\EditMaterialPriceInfoForm.resx">
       <DependentUpon>EditMaterialPriceInfoForm.vb</DependentUpon>
@@ -353,6 +365,7 @@
     <Content Include="Data\LocalDatabase.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="res\view_20px.png" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
@@ -428,6 +441,7 @@
     <None Include="res\yes_16px.png" />
     <None Include="res\no_16px.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PostBuildEvent>%25删除临时文件%25

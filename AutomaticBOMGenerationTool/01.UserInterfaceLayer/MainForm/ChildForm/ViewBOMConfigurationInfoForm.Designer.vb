@@ -66,9 +66,11 @@ Partial Class ViewBOMConfigurationInfoForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(353, 615)
         Me.Controls.Add(Me.ListView1)
         Me.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        Me.ForeColor = System.Drawing.Color.White
         Me.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.MinimizeBox = False
         Me.Name = "ViewBOMConfigurationInfoForm"

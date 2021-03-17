@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class BOMTemplateControl
     Inherits System.Windows.Forms.UserControl
 
     'UserControl 重写释放以清理组件列表。
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,8 +20,9 @@ Partial Class BOMTemplateControl
     '注意: 以下过程是 Windows 窗体设计器所必需的
     '可以使用 Windows 窗体设计器修改它。  
     '不要使用代码编辑器修改它。
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
         Dim Series1 As System.Windows.Forms.DataVisualization.Charting.Series = New System.Windows.Forms.DataVisualization.Charting.Series()
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
@@ -30,6 +31,7 @@ Partial Class BOMTemplateControl
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(BOMTemplateControl))
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
@@ -58,13 +60,16 @@ Partial Class BOMTemplateControl
         Me.ToolStripButton5 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.TreeView1 = New System.Windows.Forms.TreeView()
+        Me.ToolStrip5 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStripButton6 = New System.Windows.Forms.ToolStripButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ExportBOMList = New Wangk.Resource.CheckBoxDataGridView()
         Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ExportAllBOMButton = New System.Windows.Forms.ToolStripButton()
         Me.DeleteButton = New System.Windows.Forms.ToolStripButton()
+        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -84,6 +89,7 @@ Partial Class BOMTemplateControl
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip4.SuspendLayout()
         Me.TabPage3.SuspendLayout()
+        Me.ToolStrip5.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.ExportBOMList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip2.SuspendLayout()
@@ -155,7 +161,6 @@ Partial Class BOMTemplateControl
         'ToolStrip1
         '
         Me.ToolStrip1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSplitButton1, Me.ToolStripButton2, Me.ToolStripSeparator2, Me.AddCurrentToExportBOMListButton, Me.ExportCurrentButton, Me.ToolStripSeparator1, Me.ToolStripLabel1})
         Me.ToolStrip1.Location = New System.Drawing.Point(3, 19)
         Me.ToolStrip1.Name = "ToolStrip1"
@@ -293,7 +298,6 @@ Partial Class BOMTemplateControl
         'ToolStrip3
         '
         Me.ToolStrip3.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.ToolStrip3.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton3, Me.ToolStripLabel3, Me.MinimumTotalPricePercentage, Me.ToolStripLabel2})
         Me.ToolStrip3.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip3.Name = "ToolStrip3"
@@ -382,7 +386,6 @@ Partial Class BOMTemplateControl
         'ToolStrip4
         '
         Me.ToolStrip4.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.ToolStrip4.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip4.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton5, Me.ToolStripButton4})
         Me.ToolStrip4.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip4.Name = "ToolStrip4"
@@ -411,21 +414,44 @@ Partial Class BOMTemplateControl
         'TabPage3
         '
         Me.TabPage3.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.TabPage3.Controls.Add(Me.Label1)
+        Me.TabPage3.Controls.Add(Me.TreeView1)
+        Me.TabPage3.Controls.Add(Me.ToolStrip5)
         Me.TabPage3.Location = New System.Drawing.Point(4, 26)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(631, 459)
+        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage3.Size = New System.Drawing.Size(631, 457)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "技术参数表"
         '
-        'Label1
+        'TreeView1
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(3, 1)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(44, 17)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "未开发"
+        Me.TreeView1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.TreeView1.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TreeView1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TreeView1.ForeColor = System.Drawing.Color.White
+        Me.TreeView1.Location = New System.Drawing.Point(3, 30)
+        Me.TreeView1.Name = "TreeView1"
+        Me.TreeView1.Size = New System.Drawing.Size(625, 424)
+        Me.TreeView1.TabIndex = 0
+        '
+        'ToolStrip5
+        '
+        Me.ToolStrip5.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.ToolStrip5.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton6})
+        Me.ToolStrip5.Location = New System.Drawing.Point(3, 3)
+        Me.ToolStrip5.Name = "ToolStrip5"
+        Me.ToolStrip5.Size = New System.Drawing.Size(625, 27)
+        Me.ToolStrip5.TabIndex = 1
+        Me.ToolStrip5.Text = "ToolStrip5"
+        '
+        'ToolStripButton6
+        '
+        Me.ToolStripButton6.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.view_20px
+        Me.ToolStripButton6.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton6.Name = "ToolStripButton6"
+        Me.ToolStripButton6.Size = New System.Drawing.Size(128, 24)
+        Me.ToolStripButton6.Text = "技术参数匹配信息"
         '
         'GroupBox2
         '
@@ -477,7 +503,6 @@ Partial Class BOMTemplateControl
         'ToolStrip2
         '
         Me.ToolStrip2.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.ToolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
         Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ExportAllBOMButton, Me.DeleteButton})
         Me.ToolStrip2.Location = New System.Drawing.Point(3, 19)
         Me.ToolStrip2.Name = "ToolStrip2"
@@ -511,6 +536,14 @@ Partial Class BOMTemplateControl
         Me.DeleteButton.Name = "DeleteButton"
         Me.DeleteButton.Size = New System.Drawing.Size(101, 24)
         Me.DeleteButton.Text = "移除选中项..."
+        '
+        'ImageList1
+        '
+        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
+        Me.ImageList1.Images.SetKeyName(0, "TechnicalData1_16px.png")
+        Me.ImageList1.Images.SetKeyName(1, "TechnicalData2_16px.png")
+        Me.ImageList1.Images.SetKeyName(2, "TechnicalData3_16px.png")
         '
         'BOMTemplateControl
         '
@@ -548,6 +581,8 @@ Partial Class BOMTemplateControl
         Me.ToolStrip4.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage3.PerformLayout()
+        Me.ToolStrip5.ResumeLayout(False)
+        Me.ToolStrip5.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.ExportBOMList, System.ComponentModel.ISupportInitialize).EndInit()
@@ -591,5 +626,8 @@ Partial Class BOMTemplateControl
     Friend WithEvents ToolStripButton4 As ToolStripButton
     Friend WithEvents ToolStripButton5 As ToolStripButton
     Friend WithEvents TabPage3 As TabPage
-    Friend WithEvents Label1 As Label
+    Friend WithEvents TreeView1 As TreeView
+    Friend WithEvents ImageList1 As ImageList
+    Friend WithEvents ToolStrip5 As ToolStrip
+    Friend WithEvents ToolStripButton6 As ToolStripButton
 End Class

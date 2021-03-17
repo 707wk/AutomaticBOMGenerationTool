@@ -160,7 +160,6 @@ Partial Class MainForm
         '
         '
         Me.RibbonBar6.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square
-        Me.RibbonBar6.Visible = False
         '
         'ItemContainer2
         '

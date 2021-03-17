@@ -18,9 +18,9 @@ Public NotInheritable Class BOMFromBOMTemplateTypeHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                ReadBOMInfo(tmpExcelPackage)
+                ReadBOMInfo(tmpWorkSheet)
 
-                SetBaseMaterialMark(tmpExcelPackage)
+                SetBaseMaterialMark(tmpWorkSheet)
 
                 Dim tmpSourceFile = IO.Path.GetFileName(value.SourceFilePath)
 
@@ -108,20 +108,17 @@ Public NotInheritable Class BOMFromBOMTemplateTypeHelper
     ''' <summary>
     ''' 读取BOM基本信息
     ''' </summary>
-    Public Shared Sub ReadBOMInfo(wb As ExcelPackage)
-        Dim tmpExcelPackage = wb
-        Dim tmpWorkBook = tmpExcelPackage.Workbook
-        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+    Public Shared Sub ReadBOMInfo(workSheet As ExcelWorksheet)
 
-        Dim headerLocation = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "阶层")
+        Dim headerLocation = BOMTemplateHelper.FindTextLocation(workSheet, "阶层")
         BOMlevelColumnID = headerLocation.X
         BOMMaterialRowMinID = headerLocation.Y + 2
-        BOMpIDColumnID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "品 号").X
+        BOMpIDColumnID = BOMTemplateHelper.FindTextLocation(workSheet, "品 号").X
         BOMLevelCount = BOMpIDColumnID - headerLocation.X
 
-        BOMMaterialRowMaxID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "版次").Y - 1
+        BOMMaterialRowMaxID = BOMTemplateHelper.FindTextLocation(workSheet, "版次").Y - 1
 
-        BOMRemarkColumnID = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "备注").X
+        BOMRemarkColumnID = BOMTemplateHelper.FindTextLocation(workSheet, "备注").X
 
     End Sub
 #End Region
@@ -130,26 +127,22 @@ Public NotInheritable Class BOMFromBOMTemplateTypeHelper
     ''' <summary>
     ''' 标记基础物料(基础物料为True,组合物料为False,空行为String.Empty)
     ''' </summary>
-    Private Shared Sub SetBaseMaterialMark(wb As ExcelPackage)
-
-        Dim tmpExcelPackage = wb
-        Dim tmpWorkBook = tmpExcelPackage.Workbook
-        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+    Private Shared Sub SetBaseMaterialMark(workSheet As ExcelWorksheet)
 
         Dim MaterialRowMaxID = BOMMaterialRowMaxID
         Dim MaterialRowMinID = BOMMaterialRowMinID
         BOMBaseMaterialFlagColumnID = BOMRemarkColumnID + 1
-        tmpWorkSheet.InsertColumn(BOMBaseMaterialFlagColumnID, 1)
-        tmpWorkSheet.Cells(MaterialRowMinID - 1, BOMBaseMaterialFlagColumnID).Value = "基础物料标记"
+        workSheet.InsertColumn(BOMBaseMaterialFlagColumnID, 1)
+        workSheet.Cells(MaterialRowMinID - 1, BOMBaseMaterialFlagColumnID).Value = "基础物料标记"
 
         For rID = MaterialRowMinID To MaterialRowMaxID
-            tmpWorkSheet.Cells(rID, BOMBaseMaterialFlagColumnID).Value = True
+            workSheet.Cells(rID, BOMBaseMaterialFlagColumnID).Value = True
         Next
 
         Dim lastLevel = 1
         Dim lastRID = MaterialRowMinID
         For rID = MaterialRowMinID + 1 To MaterialRowMaxID
-            Dim nowLevel = GetLevel(tmpExcelPackage, rID)
+            Dim nowLevel = GetLevel(workSheet, rID)
 
             If nowLevel = 0 Then
                 '无阶层标记
@@ -157,7 +150,7 @@ Public NotInheritable Class BOMFromBOMTemplateTypeHelper
 
             ElseIf lastLevel = nowLevel - 1 Then
                 '当前行是上一行的子节点
-                tmpWorkSheet.Cells(lastRID, BOMBaseMaterialFlagColumnID).Value = False
+                workSheet.Cells(lastRID, BOMBaseMaterialFlagColumnID).Value = False
 
             End If
 
@@ -172,19 +165,14 @@ Public NotInheritable Class BOMFromBOMTemplateTypeHelper
     ''' <summary>
     ''' 获取阶层等级,未找到则返回0
     ''' </summary>
-    Public Shared Function GetLevel(
-                                   wb As ExcelPackage,
-                                   rowID As Integer) As Integer
-
-        Dim tmpExcelPackage = wb
-        Dim tmpWorkBook = tmpExcelPackage.Workbook
-        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
+    Public Shared Function GetLevel(workSheet As ExcelWorksheet,
+                                    rowID As Integer) As Integer
 
         Dim levelColumnID = BOMlevelColumnID
         Dim LevelCount = BOMLevelCount
 
         For i001 = levelColumnID To levelColumnID + LevelCount - 1
-            If String.IsNullOrWhiteSpace($"{tmpWorkSheet.Cells(rowID, i001).Value}") Then
+            If String.IsNullOrWhiteSpace($"{workSheet.Cells(rowID, i001).Value}") Then
 
             Else
                 Return i001 - levelColumnID + 1

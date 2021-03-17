@@ -4,9 +4,7 @@ Imports OfficeOpenXml
 
 Public Class BOMTemplateControl
 
-#Disable Warning CA2213 ' Disposable fields should be disposed
     Public CacheBOMTemplateFileInfo As BOMTemplateFileInfo
-#Enable Warning CA2213 ' Disposable fields should be disposed
 
     Private Sub BOMTemplateControl_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -86,6 +84,14 @@ Public Class BOMTemplateControl
             .GridColor = Color.FromArgb(45, 45, 48)
             .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
 
+        End With
+
+        '技术参数列表
+        With TreeView1
+            .ShowRootLines = True
+            .ShowLines = True
+            .ShowPlusMinus = True
+            .ImageList = ImageList1
         End With
 
         '初始化视图状态
@@ -235,18 +241,20 @@ Public Class BOMTemplateControl
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                CacheBOMTemplateFileInfo.BOMTHelper.ReadBOMInfo(tmpExcelPackage)
+                CacheBOMTemplateFileInfo.BOMTHelper.ReadBOMInfo(tmpWorkSheet)
 
-                CacheBOMTemplateFileInfo.BOMTHelper.ReplaceMaterial(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
+                CacheBOMTemplateFileInfo.BOMTHelper.ReplaceMaterial(tmpWorkSheet, tmpConfigurationNodeRowInfoList)
 
-                Dim headerLocation = BOMTemplateHelper.FindTextLocation(tmpExcelPackage, "单价")
+                Dim headerLocation = BOMTemplateHelper.FindTextLocation(tmpWorkSheet, "单价")
 
                 CacheBOMTemplateFileInfo.TotalPrice = tmpWorkSheet.Cells(headerLocation.Y + 2, headerLocation.X).Value
                 ToolStripLabel1.Text = $"当前总价: ￥{CacheBOMTemplateFileInfo.TotalPrice:n4}"
 
-                CacheBOMTemplateFileInfo.BOMTHelper.CalculateConfigurationMaterialTotalPrice(tmpExcelPackage, tmpConfigurationNodeRowInfoList)
+                CacheBOMTemplateFileInfo.BOMTHelper.CalculateConfigurationMaterialTotalPrice(tmpWorkSheet, tmpConfigurationNodeRowInfoList)
 
-                CacheBOMTemplateFileInfo.BOMTHelper.CalculateMaterialTotalPrice(tmpExcelPackage)
+                CacheBOMTemplateFileInfo.BOMTHelper.CalculateMaterialTotalPrice(tmpWorkSheet)
+
+                CacheBOMTemplateFileInfo.BOMTHelper.StatisticsMaterialpID(tmpWorkSheet)
 
             End Using
         End Using
@@ -259,11 +267,21 @@ Public Class BOMTemplateControl
             nodeitem.GroupControl.UpdatePrice(nodeitem.NodeInfo.ID, nodeitem.NodeInfo.TotalPrice, nodeitem.NodeInfo.TotalPricePercentage)
         Next
 
+        If CacheBOMTemplateFileInfo.ShowHideConfigurationNodeItems Then
+            '显示所有项则不重复计算显示数量
+        Else
+            Dim visibleConfigurationNodeCount = Aggregate item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+                                                        Into Sum(item.NodeHashset.Count)
+            ToolStripSplitButton1.Text = $"全部展开({visibleConfigurationNodeCount})"
+        End If
+
         ShowTotalPrice()
 
         ShowTotalList()
 
-        UIFormHelper.ToastSuccess($"{Now:HH:mm:ss} 价格更新完成", timeoutInterval:=1000)
+        ShowTechnicalDataList()
+
+        UIFormHelper.ToastSuccess($"{Now:HH:mm:ss} 更新完成", timeoutInterval:=1000)
 
     End Sub
 #End Region
@@ -335,6 +353,118 @@ Public Class BOMTemplateControl
         Next
 
     End Sub
+#End Region
+
+#Region "显示技术参数列表"
+    ''' <summary>
+    ''' 显示技术参数列表
+    ''' </summary>
+    Private Sub ShowTechnicalDataList()
+
+        TreeView1.SuspendLayout()
+
+        TreeView1.Nodes.Clear()
+
+        If CacheBOMTemplateFileInfo.TechnicalDataItems.Count = 0 Then
+            TreeView1.Nodes.Add("无技术参数信息")
+            Exit Sub
+        End If
+
+        '参数项
+        For Each TechnicalDataItem In CacheBOMTemplateFileInfo.TechnicalDataItems
+            Dim TechnicalDataNode As New TreeNode(TechnicalDataItem.Name) With {
+                .ImageIndex = 0,
+                .SelectedImageIndex = 0
+            }
+
+            '参数配置项
+            For Each TechnicalDataConfigurationItem In TechnicalDataItem.Values
+
+                Dim TechnicalDataConfigurationNode As New TreeNode($"{TechnicalDataConfigurationItem.Name} - {TechnicalDataConfigurationItem.Description}") With {
+                    .ImageIndex = 1,
+                    .SelectedImageIndex = 1
+                }
+
+                If TechnicalDataConfigurationItem.IsDefault AndAlso
+                    TechnicalDataItem.DefaultValue Is Nothing Then
+                    TechnicalDataItem.DefaultValue = TechnicalDataConfigurationItem
+                End If
+
+                '匹配物料项
+                For i001 = 0 To TechnicalDataConfigurationItem.MatchedMaterialList.Count - 1
+
+                    If IsMatchedMaterial(TechnicalDataConfigurationItem.MatchedMaterialList(i001)) Then
+                        '有匹配到
+                    Else
+                        '未匹配到
+                        Continue For
+                    End If
+
+                    '显示匹配到的物料项
+                    Dim MatchedMaterialNode As New TreeNode(String.Join(" and ",
+                                                                        From item In TechnicalDataConfigurationItem.MatchedMaterialList(i001)
+                                                                        Select If(item.Count > 1, $"<{String.Join(", ", item)}>", String.Join(", ", item)))) With {
+                                                                        .ImageIndex = 2,
+                                                                        .SelectedImageIndex = 2
+                    }
+                    TechnicalDataConfigurationNode.Nodes.Add(MatchedMaterialNode)
+
+                Next
+
+                If TechnicalDataConfigurationNode.Nodes.Count > 0 Then
+                    TechnicalDataNode.Nodes.Add(TechnicalDataConfigurationNode)
+                Else
+
+                End If
+
+            Next
+
+            '未匹配到配置
+            If TechnicalDataNode.Nodes.Count = 0 Then
+                Dim TechnicalDataConfigurationNode As New TreeNode($"{TechnicalDataItem.DefaultValue.Name} - {TechnicalDataItem.DefaultValue.Description}") With {
+                    .ImageIndex = 1,
+                    .SelectedImageIndex = 1
+                }
+
+                TechnicalDataNode.Nodes.Add(TechnicalDataConfigurationNode)
+            End If
+
+            TreeView1.Nodes.Add(TechnicalDataNode)
+        Next
+
+        TreeView1.ExpandAll()
+        TreeView1.Nodes(0).EnsureVisible()
+
+        TreeView1.ResumeLayout()
+
+    End Sub
+#End Region
+
+#Region "是否匹配当前物料项"
+    ''' <summary>
+    ''' 是否匹配当前物料项
+    ''' </summary>
+    Private Function IsMatchedMaterial(values As List(Of List(Of String))) As Boolean
+
+        For Each MaterialpIDItem In values
+
+            Dim contains As Boolean = False
+            For Each item In MaterialpIDItem
+                If CacheBOMTemplateFileInfo.MaterialpIDTable.Contains(item) Then
+                    contains = True
+                    Exit For
+                End If
+            Next
+
+            If Not contains Then
+                Return False
+            End If
+
+        Next
+
+        Return True
+
+    End Function
 #End Region
 
     Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ToolStripButton5.Click
@@ -451,7 +581,7 @@ Public Class BOMTemplateControl
                                         Dim tmpWorkBook = tmpExcelPackage.Workbook
                                         Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
-                                        tmpResult.Name = BOMTemplateHelper.JoinBOMName(tmpExcelPackage, CacheBOMTemplateFileInfo.ExportConfigurationNodeItems)
+                                        tmpResult.Name = BOMTemplateHelper.JoinBOMName(tmpWorkSheet, CacheBOMTemplateFileInfo.ExportConfigurationNodeItems)
 
                                     End Using
                                 End Using
@@ -749,6 +879,10 @@ Public Class BOMTemplateControl
 
         tmpStopwatch.Stop()
 
+        Dim visibleConfigurationNodeCount = Aggregate item As ConfigurationGroupControl In ConfigurationGroupList.Controls
+                                            Into Sum(item.NodeHashset.Count)
+        ToolStripSplitButton1.Text = $"全部展开({visibleConfigurationNodeCount})"
+
         UIFormHelper.ToastSuccess($"界面更新完成,耗时 {tmpStopwatch.Elapsed:mm\:ss\.fff}")
 
     End Sub
@@ -872,6 +1006,8 @@ Public Class BOMTemplateControl
                                                               FileShare.ReadWrite)
 
                                     Using tmpExcelPackage As New ExcelPackage(readFS)
+                                        Dim tmpWorkBook = tmpExcelPackage.Workbook
+                                        Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
                                         For Each rowItem As DataGridViewRow In ExportBOMList.Rows
                                             be.Write(ExportBOMList.Rows.IndexOf(rowItem) * 100 \ ExportBOMList.Rows.Count)
@@ -898,7 +1034,7 @@ Public Class BOMTemplateControl
 
                                             Next
 
-                                            tmpExportBOMInfo.Name = BOMTemplateHelper.JoinBOMName(tmpExcelPackage, CacheBOMTemplateFileInfo.ExportConfigurationNodeItems)
+                                            tmpExportBOMInfo.Name = BOMTemplateHelper.JoinBOMName(tmpWorkSheet, CacheBOMTemplateFileInfo.ExportConfigurationNodeItems)
 
                                         Next
 
@@ -926,6 +1062,15 @@ Public Class BOMTemplateControl
 
         CacheBOMTemplateFileInfo?.Dispose()
 
+    End Sub
+
+    Private Sub ToolStripButton6_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton6.Click
+        Using tmpDialog As New ViewTechnicalDataInfoForm With {
+                   .Text = ToolStripButton6.Text,
+                   .CacheBOMTemplateFileInfo = CacheBOMTemplateFileInfo
+               }
+            tmpDialog.ShowDialog()
+        End Using
     End Sub
 
 End Class
