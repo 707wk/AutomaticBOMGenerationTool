@@ -1860,7 +1860,7 @@ Public Class BOMTemplateHelper
 
             Next
 
-            '自适应高度
+            '自适应宽度
             tmpWorkSheet.Cells.AutoFitColumns()
 
             '首行筛选
@@ -2403,11 +2403,22 @@ Public Class BOMTemplateHelper
                 Next
 
                 If rootNode Is Nothing Then
-                    Throw New Exception($"0x0033: {TechnicalDataConfigurationNameStr} 配置没有所属项目")
+                    Throw New Exception($"0x0033: {TechnicalDataInfoSheetName} {TechnicalDataConfigurationNameStr} 配置没有所属项目")
                 Else
                     rootNode.Values.Add(tmpAddTechnicalDataConfigurationInfo)
                 End If
 
+            End If
+
+        Next
+
+        For Each TechnicalDataItem In CacheBOMTemplateFileInfo.TechnicalDataItems
+            Dim defaultItems = From item In TechnicalDataItem.Values
+                               Where item.IsDefault
+                               Select item
+
+            If defaultItems.Count <> 1 Then
+                Throw New Exception($"0x0034: {TechnicalDataInfoSheetName} {TechnicalDataItem.Name} 没有默认配置")
             End If
 
         Next

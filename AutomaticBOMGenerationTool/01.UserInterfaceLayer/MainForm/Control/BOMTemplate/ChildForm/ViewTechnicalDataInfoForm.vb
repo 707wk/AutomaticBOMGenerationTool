@@ -25,6 +25,8 @@
             Exit Sub
         End If
 
+        TreeView1.SuspendLayout()
+
         For Each TechnicalDataItem In CacheBOMTemplateFileInfo.TechnicalDataItems
             Dim TechnicalDataNode As New TreeNode(TechnicalDataItem.Name) With {
                 .ImageIndex = 0,
@@ -33,10 +35,17 @@
 
             For Each TechnicalDataConfigurationItem In TechnicalDataItem.Values
 
-                Dim TechnicalDataConfigurationNode As New TreeNode($"{TechnicalDataConfigurationItem.Name} - {TechnicalDataConfigurationItem.Description}") With {
+                Dim TechnicalDataConfigurationNode As New TreeNode(TechnicalDataConfigurationItem.Name) With {
                     .ImageIndex = 1,
                     .SelectedImageIndex = 1
                 }
+
+                TechnicalDataConfigurationNode.Nodes.Add(New TreeNode($"说明: {If(String.IsNullOrWhiteSpace(TechnicalDataConfigurationItem.Description),
+                                                                      "无",
+                                                                      TechnicalDataConfigurationItem.Description)}") With {
+                                                                      .ImageIndex = 3,
+                                                                      .SelectedImageIndex = 3
+                                                         })
 
                 If TechnicalDataConfigurationItem.IsDefault Then
                     TechnicalDataConfigurationNode.BackColor = UIFormHelper.WarningColor
@@ -66,6 +75,8 @@
 
         TreeView1.ExpandAll()
         TreeView1.Nodes(0).EnsureVisible()
+
+        TreeView1.ResumeLayout()
 
     End Sub
 

@@ -46,6 +46,7 @@ Partial Class ViewTechnicalDataInfoForm
         Me.ImageList1.Images.SetKeyName(0, "TechnicalData1_16px.png")
         Me.ImageList1.Images.SetKeyName(1, "TechnicalData2_16px.png")
         Me.ImageList1.Images.SetKeyName(2, "TechnicalData3_16px.png")
+        Me.ImageList1.Images.SetKeyName(3, "TechnicalData4_16px.png")
         '
         'ViewTechnicalDataInfoForm
         '

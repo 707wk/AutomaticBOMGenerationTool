@@ -93,6 +93,11 @@ Public Class BOMTemplateFileInfo
     ''' </summary>
     Public MaterialpIDTable As New HashSet(Of String)
 
+    ''' <summary>
+    ''' 显示匹配物料项
+    ''' </summary>
+    Public ShowMaterialItems As Boolean = False
+
     Public Sub New(filePath As String)
 
         If String.IsNullOrWhiteSpace(filePath) Then Throw New Exception("0x0010: 文件路径不能为空")

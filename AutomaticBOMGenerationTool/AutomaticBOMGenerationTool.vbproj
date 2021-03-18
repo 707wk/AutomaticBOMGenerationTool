@@ -150,10 +150,10 @@
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewTechnicalDataInfoForm.Designer.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ViewTechnicalDataInfoForm.Designer.vb">
       <DependentUpon>ViewTechnicalDataInfoForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewTechnicalDataInfoForm.vb">
+    <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ViewTechnicalDataInfoForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.Designer.vb">
@@ -302,7 +302,7 @@
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.resx">
       <DependentUpon>UpdateInfoForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\ViewTechnicalDataInfoForm.resx">
+    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ViewTechnicalDataInfoForm.resx">
       <DependentUpon>ViewTechnicalDataInfoForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ExportBOMNameSettings\ExportBOMNameSettingsForm.resx">

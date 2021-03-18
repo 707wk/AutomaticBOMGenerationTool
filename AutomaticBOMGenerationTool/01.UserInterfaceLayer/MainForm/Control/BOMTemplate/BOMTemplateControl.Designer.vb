@@ -62,6 +62,8 @@ Partial Class BOMTemplateControl
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.TreeView1 = New System.Windows.Forms.TreeView()
         Me.ToolStrip5 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStripSplitButton2 = New System.Windows.Forms.ToolStripSplitButton()
+        Me.ShowMaterialItems = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripButton6 = New System.Windows.Forms.ToolStripButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ExportBOMList = New Wangk.Resource.CheckBoxDataGridView()
@@ -70,6 +72,7 @@ Partial Class BOMTemplateControl
         Me.ExportAllBOMButton = New System.Windows.Forms.ToolStripButton()
         Me.DeleteButton = New System.Windows.Forms.ToolStripButton()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
+        Me.Button1 = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -234,6 +237,7 @@ Partial Class BOMTemplateControl
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.Button1)
         Me.GroupBox3.Controls.Add(Me.TabControl1)
         Me.GroupBox3.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBox3.ForeColor = System.Drawing.Color.White
@@ -250,7 +254,7 @@ Partial Class BOMTemplateControl
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.TabControl1.ItemSize = New System.Drawing.Size(140, 22)
+        Me.TabControl1.ItemSize = New System.Drawing.Size(140, 27)
         Me.TabControl1.Location = New System.Drawing.Point(3, 19)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -263,10 +267,10 @@ Partial Class BOMTemplateControl
         Me.TabPage1.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.TabPage1.Controls.Add(Me.Chart1)
         Me.TabPage1.Controls.Add(Me.ToolStrip3)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 31)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(631, 457)
+        Me.TabPage1.Size = New System.Drawing.Size(631, 452)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "物料价格占比饼图"
         '
@@ -291,7 +295,7 @@ Partial Class BOMTemplateControl
         Series1.Name = "Series1"
         Series1.SmartLabelStyle.IsMarkerOverlappingAllowed = True
         Me.Chart1.Series.Add(Series1)
-        Me.Chart1.Size = New System.Drawing.Size(625, 424)
+        Me.Chart1.Size = New System.Drawing.Size(625, 419)
         Me.Chart1.TabIndex = 0
         Me.Chart1.Text = "Chart1"
         '
@@ -342,10 +346,10 @@ Partial Class BOMTemplateControl
         Me.TabPage2.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.TabPage2.Controls.Add(Me.CheckBoxDataGridView1)
         Me.TabPage2.Controls.Add(Me.ToolStrip4)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 31)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(631, 459)
+        Me.TabPage2.Size = New System.Drawing.Size(631, 452)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "物料价格占比列表"
         '
@@ -380,7 +384,7 @@ Partial Class BOMTemplateControl
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 426)
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 419)
         Me.CheckBoxDataGridView1.TabIndex = 0
         '
         'ToolStrip4
@@ -419,7 +423,7 @@ Partial Class BOMTemplateControl
         Me.TabPage3.Location = New System.Drawing.Point(4, 26)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(631, 457)
+        Me.TabPage3.Size = New System.Drawing.Size(631, 459)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "技术参数表"
         '
@@ -431,18 +435,36 @@ Partial Class BOMTemplateControl
         Me.TreeView1.ForeColor = System.Drawing.Color.White
         Me.TreeView1.Location = New System.Drawing.Point(3, 30)
         Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(625, 424)
+        Me.TreeView1.Size = New System.Drawing.Size(625, 426)
         Me.TreeView1.TabIndex = 0
         '
         'ToolStrip5
         '
         Me.ToolStrip5.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.ToolStrip5.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton6})
+        Me.ToolStrip5.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSplitButton2, Me.ToolStripButton6})
         Me.ToolStrip5.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip5.Name = "ToolStrip5"
         Me.ToolStrip5.Size = New System.Drawing.Size(625, 27)
         Me.ToolStrip5.TabIndex = 1
         Me.ToolStrip5.Text = "ToolStrip5"
+        '
+        'ToolStripSplitButton2
+        '
+        Me.ToolStripSplitButton2.DropDownButtonWidth = 18
+        Me.ToolStripSplitButton2.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowMaterialItems})
+        Me.ToolStripSplitButton2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.refresh_20px
+        Me.ToolStripSplitButton2.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripSplitButton2.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripSplitButton2.Name = "ToolStripSplitButton2"
+        Me.ToolStripSplitButton2.Size = New System.Drawing.Size(75, 24)
+        Me.ToolStripSplitButton2.Text = "刷新"
+        '
+        'ShowMaterialItems
+        '
+        Me.ShowMaterialItems.CheckOnClick = True
+        Me.ShowMaterialItems.Name = "ShowMaterialItems"
+        Me.ShowMaterialItems.Size = New System.Drawing.Size(160, 22)
+        Me.ShowMaterialItems.Text = "显示匹配物料项"
         '
         'ToolStripButton6
         '
@@ -544,6 +566,21 @@ Partial Class BOMTemplateControl
         Me.ImageList1.Images.SetKeyName(0, "TechnicalData1_16px.png")
         Me.ImageList1.Images.SetKeyName(1, "TechnicalData2_16px.png")
         Me.ImageList1.Images.SetKeyName(2, "TechnicalData3_16px.png")
+        Me.ImageList1.Images.SetKeyName(3, "TechnicalData4_16px.png")
+        '
+        'Button1
+        '
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.FlatAppearance.BorderSize = 0
+        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportFile_20px
+        Me.Button1.Location = New System.Drawing.Point(499, 19)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(143, 29)
+        Me.Button1.TabIndex = 4
+        Me.Button1.Text = "导出当前配置信息..."
+        Me.Button1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'BOMTemplateControl
         '
@@ -630,4 +667,7 @@ Partial Class BOMTemplateControl
     Friend WithEvents ImageList1 As ImageList
     Friend WithEvents ToolStrip5 As ToolStrip
     Friend WithEvents ToolStripButton6 As ToolStripButton
+    Friend WithEvents ToolStripSplitButton2 As ToolStripSplitButton
+    Friend WithEvents ShowMaterialItems As ToolStripMenuItem
+    Friend WithEvents Button1 As Button
 End Class
