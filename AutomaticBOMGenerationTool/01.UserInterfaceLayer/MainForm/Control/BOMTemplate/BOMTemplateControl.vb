@@ -87,7 +87,7 @@ Public Class BOMTemplateControl
 
         End With
 
-        '技术参数列表
+        '技术参数树状图
         With TreeView1
             .ShowRootLines = True
             .ShowLines = True
@@ -95,6 +95,32 @@ Public Class BOMTemplateControl
             .ImageList = ImageList1
             .ShowNodeToolTips = True
         End With
+
+        '技术参数列表
+        With CheckBoxDataGridView2
+            .ReadOnly = True
+            .ColumnHeadersDefaultCellStyle.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
+            .RowHeadersWidth = 80
+
+            .DefaultCellStyle.WrapMode = DataGridViewTriState.True
+            .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+
+            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "项目", .Width = 120})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "配置名称", .Width = 120})
+            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "配置描述", .Width = 300})
+
+            .EnableHeadersVisualStyles = False
+            .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
+            .RowHeadersDefaultCellStyle.ForeColor = Color.White
+            .RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single
+            .DefaultCellStyle.BackColor = Color.FromArgb(45, 45, 48)
+            .GridColor = Color.FromArgb(45, 45, 48)
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
+        End With
+
+        ToolStripButton8_Click(Nothing, Nothing)
 
         '初始化视图状态
         SplitContainer2.Panel2Collapsed = Not AppSettingHelper.Instance.ViewVisible("MainForm.SplitContainer2.Panel2Collapsed")
@@ -367,6 +393,8 @@ Public Class BOMTemplateControl
 
         TreeView1.Nodes.Clear()
 
+        CheckBoxDataGridView2.Rows.Clear()
+
         If CacheBOMTemplateFileInfo.TechnicalDataItems.Count = 0 Then
             TreeView1.Nodes.Add("无技术参数信息")
             Exit Sub
@@ -453,7 +481,13 @@ Public Class BOMTemplateControl
                                                          })
 
                 TechnicalDataNode.Nodes.Add(TechnicalDataConfigurationNode)
+
             End If
+
+            CheckBoxDataGridView2.Rows.Add({False,
+                                           TechnicalDataItem.Name,
+                                           TechnicalDataNode.Nodes(0).Text,
+                                           TechnicalDataNode.Nodes(0).Nodes(0).ToolTipText})
 
             TreeView1.Nodes.Add(TechnicalDataNode)
         Next
@@ -464,6 +498,38 @@ Public Class BOMTemplateControl
         TreeView1.ResumeLayout()
 
     End Sub
+#End Region
+
+#Region "切换技术参数列表视图"
+
+    Private Sub ToolStripButton7_Click(sender As Object, e As EventArgs) Handles ToolStripButton7.Click
+
+        If ToolStripButton7.Checked Then
+            Exit Sub
+        End If
+
+        ToolStripButton7.Checked = True
+        ToolStripButton8.Checked = False
+
+        SplitContainer3.Panel1Collapsed = False
+        SplitContainer3.Panel2Collapsed = True
+
+    End Sub
+
+    Private Sub ToolStripButton8_Click(sender As Object, e As EventArgs) Handles ToolStripButton8.Click
+
+        If ToolStripButton8.Checked Then
+            Exit Sub
+        End If
+
+        ToolStripButton7.Checked = False
+        ToolStripButton8.Checked = True
+
+        SplitContainer3.Panel1Collapsed = True
+        SplitContainer3.Panel2Collapsed = False
+
+    End Sub
+
 #End Region
 
 #Region "是否匹配当前物料项"
@@ -1129,92 +1195,35 @@ Public Class BOMTemplateControl
 
         End Using
 
-        Using tmpExcelPackage As New ExcelPackage()
-            Dim tmpWorkBook = tmpExcelPackage.Workbook
-            Dim tmpWorkSheet As ExcelWorksheet
+        Try
+
+            Using tmpExcelPackage As New ExcelPackage()
+                Dim tmpWorkBook = tmpExcelPackage.Workbook
+                Dim tmpWorkSheet As ExcelWorksheet
 
 #Region "物料价格占比列表"
 
-            tmpWorkSheet = tmpWorkBook.Worksheets.Add("物料价格占比列表")
-
-            '设置表头
-            tmpWorkSheet.Cells(1, 1).Value = "序号"
-            tmpWorkSheet.Cells(1, 2).Value = "物料项"
-            tmpWorkSheet.Cells(1, 3).Value = "价格"
-            tmpWorkSheet.Cells(1, 4).Value = "比例"
-
-            For i001 = 0 To CheckBoxDataGridView1.Rows.Count - 1
-                Dim rowItem = CheckBoxDataGridView1.Rows(i001)
-
-                tmpWorkSheet.Cells(1 + 1 + i001, 1).Value = $"{i001 + 1}"
-                tmpWorkSheet.Cells(1 + 1 + i001, 1).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
-
-                tmpWorkSheet.Cells(1 + 1 + i001, 2).Value = rowItem.Cells(1).Value
-
-                tmpWorkSheet.Cells(1 + 1 + i001, 3).Value = Math.Round(CType(rowItem.Tag, Decimal), 2)
-                tmpWorkSheet.Cells(1 + 1 + i001, 3).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
-
-                tmpWorkSheet.Cells(1 + 1 + i001, 4).Value = rowItem.Cells(3).Value
-                tmpWorkSheet.Cells(1 + 1 + i001, 4).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
-            Next
-
-            '自适应宽度
-            tmpWorkSheet.Cells.AutoFitColumns()
-
-            '首行筛选
-            tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").AutoFilter = True
-
-            '设置首行背景色
-            tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-            tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
-
-#End Region
-
-#Region "物料价格占比饼图"
-
-            Dim pieChart As ExcelDoughnutChart = tmpWorkSheet.Drawings.AddDoughnutChart(Wangk.Hash.IDHelper.NewID, eDoughnutChartType.Doughnut)
-
-            pieChart.Title.Text = $"物料价格占比饼图"
-
-            pieChart.Series.Add(ExcelRange.GetAddress(1 + 1, 3, CheckBoxDataGridView1.Rows.Count + 1, 3),
-                                ExcelRange.GetAddress(1 + 1, 2, CheckBoxDataGridView1.Rows.Count + 1, 2))
-
-            pieChart.Style = eChartStyle.Style2
-
-            pieChart.Legend.Position = eLegendPosition.Right
-
-            pieChart.DataLabel.Font.Fill.Color = Color.White
-            pieChart.DataLabel.ShowPercent = True
-            pieChart.DataLabel.ShowValue = True
-
-            pieChart.SetSize(900, 600)
-
-            pieChart.SetPosition(1, 0, 5, 0)
-
-#End Region
-
-#Region "技术参数表"
-            'BOM模板无技术参数表则不创建
-            If CacheBOMTemplateFileInfo.TechnicalDataItems.Count > 0 Then
-
-                tmpWorkSheet = tmpWorkBook.Worksheets.Add("技术参数表")
+                tmpWorkSheet = tmpWorkBook.Worksheets.Add("物料价格占比列表")
 
                 '设置表头
                 tmpWorkSheet.Cells(1, 1).Value = "序号"
-                tmpWorkSheet.Cells(1, 2).Value = "项目"
-                tmpWorkSheet.Cells(1, 3).Value = "配置名称"
-                tmpWorkSheet.Cells(1, 4).Value = "配置描述"
+                tmpWorkSheet.Cells(1, 2).Value = "物料项"
+                tmpWorkSheet.Cells(1, 3).Value = "价格"
+                tmpWorkSheet.Cells(1, 4).Value = "比例"
 
-                For i001 = 0 To TreeView1.Nodes.Count - 1
-                    Dim TechnicalDataNode = TreeView1.Nodes(i001)
+                For i001 = 0 To CheckBoxDataGridView1.Rows.Count - 1
+                    Dim rowItem = CheckBoxDataGridView1.Rows(i001)
 
                     tmpWorkSheet.Cells(1 + 1 + i001, 1).Value = $"{i001 + 1}"
                     tmpWorkSheet.Cells(1 + 1 + i001, 1).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
 
-                    tmpWorkSheet.Cells(1 + 1 + i001, 2).Value = TechnicalDataNode.Text
-                    tmpWorkSheet.Cells(1 + 1 + i001, 3).Value = TechnicalDataNode.Nodes(0).Text
-                    tmpWorkSheet.Cells(1 + 1 + i001, 4).Value = TechnicalDataNode.Nodes(0).Nodes(0).ToolTipText
+                    tmpWorkSheet.Cells(1 + 1 + i001, 2).Value = rowItem.Cells(1).Value
 
+                    tmpWorkSheet.Cells(1 + 1 + i001, 3).Value = Math.Round(CType(rowItem.Tag, Decimal), 2)
+                    tmpWorkSheet.Cells(1 + 1 + i001, 3).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
+
+                    tmpWorkSheet.Cells(1 + 1 + i001, 4).Value = rowItem.Cells(3).Value
+                    tmpWorkSheet.Cells(1 + 1 + i001, 4).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
                 Next
 
                 '自适应宽度
@@ -1227,16 +1236,79 @@ Public Class BOMTemplateControl
                 tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.PatternType = Style.ExcelFillStyle.Solid
                 tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
 
-            End If
 #End Region
 
-            Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
-                tmpExcelPackage.SaveAs(tmpSaveFileStream)
+#Region "物料价格占比饼图"
+
+                Dim pieChart As ExcelDoughnutChart = tmpWorkSheet.Drawings.AddDoughnutChart(Wangk.Hash.IDHelper.NewID, eDoughnutChartType.Doughnut)
+
+                pieChart.Title.Text = $"物料价格占比饼图"
+
+                pieChart.Series.Add(ExcelRange.GetAddress(1 + 1, 3, CheckBoxDataGridView1.Rows.Count + 1, 3),
+                                    ExcelRange.GetAddress(1 + 1, 2, CheckBoxDataGridView1.Rows.Count + 1, 2))
+
+                pieChart.Style = eChartStyle.Style2
+
+                pieChart.Legend.Position = eLegendPosition.Right
+
+                pieChart.DataLabel.Font.Fill.Color = Color.White
+                pieChart.DataLabel.ShowPercent = True
+                pieChart.DataLabel.ShowValue = True
+
+                pieChart.SetSize(900, 600)
+
+                pieChart.SetPosition(1, 0, 5, 0)
+
+#End Region
+
+#Region "技术参数表"
+                'BOM模板无技术参数表则不创建
+                If CacheBOMTemplateFileInfo.TechnicalDataItems.Count > 0 Then
+
+                    tmpWorkSheet = tmpWorkBook.Worksheets.Add("技术参数表")
+
+                    '设置表头
+                    tmpWorkSheet.Cells(1, 1).Value = "序号"
+                    tmpWorkSheet.Cells(1, 2).Value = "项目"
+                    tmpWorkSheet.Cells(1, 3).Value = "配置名称"
+                    tmpWorkSheet.Cells(1, 4).Value = "配置描述"
+
+                    For i001 = 0 To TreeView1.Nodes.Count - 1
+                        Dim TechnicalDataNode = TreeView1.Nodes(i001)
+
+                        tmpWorkSheet.Cells(1 + 1 + i001, 1).Value = $"{i001 + 1}"
+                        tmpWorkSheet.Cells(1 + 1 + i001, 1).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
+
+                        tmpWorkSheet.Cells(1 + 1 + i001, 2).Value = TechnicalDataNode.Text
+                        tmpWorkSheet.Cells(1 + 1 + i001, 3).Value = TechnicalDataNode.Nodes(0).Text
+                        tmpWorkSheet.Cells(1 + 1 + i001, 4).Value = TechnicalDataNode.Nodes(0).Nodes(0).ToolTipText
+
+                    Next
+
+                    '自适应宽度
+                    tmpWorkSheet.Cells.AutoFitColumns()
+
+                    '首行筛选
+                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").AutoFilter = True
+
+                    '设置首行背景色
+                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
+
+                End If
+#End Region
+
+                Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
+                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
+                End Using
+
             End Using
 
-        End Using
+            FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
 
-        FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "导出出错")
+        End Try
 
     End Sub
 #End Region

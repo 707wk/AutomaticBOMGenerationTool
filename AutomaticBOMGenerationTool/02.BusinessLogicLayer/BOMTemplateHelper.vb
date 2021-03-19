@@ -908,11 +908,11 @@ Public Class BOMTemplateHelper
     End Function
 #End Region
 
-#Region "制作提取模板"
+#Region "制作BOM基础模板"
     ''' <summary>
-    ''' 制作提取模板
+    ''' 制作BOM基础模板
     ''' </summary>
-    Public Sub CreateTemplate()
+    Public Sub CreateBOMBaseTemplate()
 
         Using readFS = New FileStream(CacheBOMTemplateFileInfo.TempfilePath,
                                       FileMode.Open,
@@ -980,6 +980,8 @@ Public Class BOMTemplateHelper
                 Next
 #End Region
 
+                FormatMaterialCountColumn(tmpWorkSheet)
+
                 ClearCompositeMaterialPrice(tmpWorkSheet)
 
                 CalculateMaterialCount(tmpWorkSheet)
@@ -991,6 +993,38 @@ Public Class BOMTemplateHelper
 
             End Using
         End Using
+
+    End Sub
+#End Region
+
+#Region "格式化物料数量列数据"
+    ''' <summary>
+    ''' 格式化物料数量列数据
+    ''' </summary>
+    Private Sub FormatMaterialCountColumn(workSheet As ExcelWorksheet)
+
+        ReadBOMInfo(workSheet)
+
+        Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
+        Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
+        Dim pIDColumnID = CurrentBOMpIDColumnID
+
+        Dim tmpDataTable As New DataTable
+
+        For rID = MaterialRowMinID To MaterialRowMaxID
+
+            Dim countStr = $"{workSheet.Cells(rID, pIDColumnID + 4).Value}"
+
+            If String.IsNullOrWhiteSpace(countStr) Then
+                workSheet.Cells(rID, pIDColumnID + 4).Value = "0"
+
+            Else
+                Dim value As Double = Val(tmpDataTable.Compute($"{workSheet.Cells(rID, pIDColumnID + 4).Value}", Nothing))
+                workSheet.Cells(rID, pIDColumnID + 4).Value = $"{value:n4}"
+
+            End If
+
+        Next
 
     End Sub
 #End Region

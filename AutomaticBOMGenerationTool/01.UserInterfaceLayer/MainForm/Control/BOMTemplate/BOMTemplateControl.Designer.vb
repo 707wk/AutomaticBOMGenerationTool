@@ -31,6 +31,9 @@ Partial Class BOMTemplateControl
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(BOMTemplateControl))
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
@@ -46,6 +49,7 @@ Partial Class BOMTemplateControl
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.Chart1 = New System.Windows.Forms.DataVisualization.Charting.Chart()
@@ -60,11 +64,16 @@ Partial Class BOMTemplateControl
         Me.ToolStripButton5 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.SplitContainer3 = New System.Windows.Forms.SplitContainer()
         Me.TreeView1 = New System.Windows.Forms.TreeView()
+        Me.CheckBoxDataGridView2 = New Wangk.Resource.CheckBoxDataGridView()
         Me.ToolStrip5 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripSplitButton2 = New System.Windows.Forms.ToolStripSplitButton()
         Me.ShowMaterialItems = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripButton6 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton8 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton7 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripLabel4 = New System.Windows.Forms.ToolStripLabel()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ExportBOMList = New Wangk.Resource.CheckBoxDataGridView()
         Me.ToolStrip2 = New System.Windows.Forms.ToolStrip()
@@ -72,7 +81,6 @@ Partial Class BOMTemplateControl
         Me.ExportAllBOMButton = New System.Windows.Forms.ToolStripButton()
         Me.DeleteButton = New System.Windows.Forms.ToolStripButton()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.Button1 = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -92,6 +100,11 @@ Partial Class BOMTemplateControl
         CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip4.SuspendLayout()
         Me.TabPage3.SuspendLayout()
+        CType(Me.SplitContainer3, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SplitContainer3.Panel1.SuspendLayout()
+        Me.SplitContainer3.Panel2.SuspendLayout()
+        Me.SplitContainer3.SuspendLayout()
+        CType(Me.CheckBoxDataGridView2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip5.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.ExportBOMList, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -248,6 +261,20 @@ Partial Class BOMTemplateControl
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "BOM配置信息"
         '
+        'Button1
+        '
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.FlatAppearance.BorderSize = 0
+        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportFile_20px
+        Me.Button1.Location = New System.Drawing.Point(499, 19)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(143, 29)
+        Me.Button1.TabIndex = 4
+        Me.Button1.Text = "导出当前配置信息..."
+        Me.Button1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'TabControl1
         '
         Me.TabControl1.Controls.Add(Me.TabPage1)
@@ -349,7 +376,7 @@ Partial Class BOMTemplateControl
         Me.TabPage2.Location = New System.Drawing.Point(4, 31)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(631, 452)
+        Me.TabPage2.Size = New System.Drawing.Size(631, 454)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "物料价格占比列表"
         '
@@ -384,7 +411,7 @@ Partial Class BOMTemplateControl
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 419)
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 421)
         Me.CheckBoxDataGridView1.TabIndex = 0
         '
         'ToolStrip4
@@ -418,14 +445,32 @@ Partial Class BOMTemplateControl
         'TabPage3
         '
         Me.TabPage3.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.TabPage3.Controls.Add(Me.TreeView1)
+        Me.TabPage3.Controls.Add(Me.SplitContainer3)
         Me.TabPage3.Controls.Add(Me.ToolStrip5)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 26)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 31)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(631, 459)
+        Me.TabPage3.Size = New System.Drawing.Size(631, 452)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "技术参数表"
+        '
+        'SplitContainer3
+        '
+        Me.SplitContainer3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.SplitContainer3.Location = New System.Drawing.Point(3, 30)
+        Me.SplitContainer3.Name = "SplitContainer3"
+        '
+        'SplitContainer3.Panel1
+        '
+        Me.SplitContainer3.Panel1.Controls.Add(Me.TreeView1)
+        '
+        'SplitContainer3.Panel2
+        '
+        Me.SplitContainer3.Panel2.Controls.Add(Me.CheckBoxDataGridView2)
+        Me.SplitContainer3.Size = New System.Drawing.Size(625, 419)
+        Me.SplitContainer3.SplitterDistance = 316
+        Me.SplitContainer3.SplitterWidth = 1
+        Me.SplitContainer3.TabIndex = 2
         '
         'TreeView1
         '
@@ -433,15 +478,49 @@ Partial Class BOMTemplateControl
         Me.TreeView1.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TreeView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TreeView1.ForeColor = System.Drawing.Color.White
-        Me.TreeView1.Location = New System.Drawing.Point(3, 30)
+        Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(625, 426)
+        Me.TreeView1.Size = New System.Drawing.Size(316, 419)
         Me.TreeView1.TabIndex = 0
+        '
+        'CheckBoxDataGridView2
+        '
+        Me.CheckBoxDataGridView2.AllowUserToAddRows = False
+        Me.CheckBoxDataGridView2.AllowUserToDeleteRows = False
+        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control
+        Me.CheckBoxDataGridView2.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle4
+        Me.CheckBoxDataGridView2.BackgroundColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
+        Me.CheckBoxDataGridView2.BorderStyle = System.Windows.Forms.BorderStyle.None
+        DataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle5.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.CheckBoxDataGridView2.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle5
+        Me.CheckBoxDataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.CheckBoxDataGridView2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.CheckBoxDataGridView2.GridColor = System.Drawing.Color.FromArgb(CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer))
+        Me.CheckBoxDataGridView2.Location = New System.Drawing.Point(0, 0)
+        Me.CheckBoxDataGridView2.Name = "CheckBoxDataGridView2"
+        Me.CheckBoxDataGridView2.ReadOnly = True
+        DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+        DataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle6.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.CheckBoxDataGridView2.RowHeadersDefaultCellStyle = DataGridViewCellStyle6
+        Me.CheckBoxDataGridView2.RowTemplate.Height = 30
+        Me.CheckBoxDataGridView2.Size = New System.Drawing.Size(308, 419)
+        Me.CheckBoxDataGridView2.TabIndex = 0
         '
         'ToolStrip5
         '
         Me.ToolStrip5.BackColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
-        Me.ToolStrip5.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSplitButton2, Me.ToolStripButton6})
+        Me.ToolStrip5.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSplitButton2, Me.ToolStripButton6, Me.ToolStripButton8, Me.ToolStripButton7, Me.ToolStripLabel4})
         Me.ToolStrip5.Location = New System.Drawing.Point(3, 3)
         Me.ToolStrip5.Name = "ToolStrip5"
         Me.ToolStrip5.Size = New System.Drawing.Size(625, 27)
@@ -475,6 +554,35 @@ Partial Class BOMTemplateControl
         Me.ToolStripButton6.Size = New System.Drawing.Size(128, 24)
         Me.ToolStripButton6.Text = "技术参数匹配信息"
         '
+        'ToolStripButton8
+        '
+        Me.ToolStripButton8.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripButton8.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton8.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.listView_20px
+        Me.ToolStripButton8.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton8.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton8.Name = "ToolStripButton8"
+        Me.ToolStripButton8.Size = New System.Drawing.Size(24, 24)
+        Me.ToolStripButton8.Text = "列表"
+        '
+        'ToolStripButton7
+        '
+        Me.ToolStripButton7.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripButton7.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton7.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.treeView_20px
+        Me.ToolStripButton7.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton7.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton7.Name = "ToolStripButton7"
+        Me.ToolStripButton7.Size = New System.Drawing.Size(24, 24)
+        Me.ToolStripButton7.Text = "树状图"
+        '
+        'ToolStripLabel4
+        '
+        Me.ToolStripLabel4.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.ToolStripLabel4.Name = "ToolStripLabel4"
+        Me.ToolStripLabel4.Size = New System.Drawing.Size(59, 24)
+        Me.ToolStripLabel4.Text = "显示视图:"
+        '
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.ExportBOMList)
@@ -492,32 +600,32 @@ Partial Class BOMTemplateControl
         '
         Me.ExportBOMList.AllowUserToAddRows = False
         Me.ExportBOMList.AllowUserToDeleteRows = False
-        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control
-        Me.ExportBOMList.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control
+        Me.ExportBOMList.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle7
         Me.ExportBOMList.BackgroundColor = System.Drawing.Color.FromArgb(CType(CType(45, Byte), Integer), CType(CType(45, Byte), Integer), CType(CType(48, Byte), Integer))
         Me.ExportBOMList.BorderStyle = System.Windows.Forms.BorderStyle.None
-        DataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
-        DataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle5.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        DataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ExportBOMList.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle5
+        DataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter
+        DataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle8.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.ExportBOMList.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle8
         Me.ExportBOMList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.ExportBOMList.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ExportBOMList.GridColor = System.Drawing.Color.FromArgb(CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer), CType(CType(229, Byte), Integer))
         Me.ExportBOMList.Location = New System.Drawing.Point(3, 46)
         Me.ExportBOMList.Name = "ExportBOMList"
         Me.ExportBOMList.ReadOnly = True
-        DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-        DataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle6.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
-        DataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.ExportBOMList.RowHeadersDefaultCellStyle = DataGridViewCellStyle6
+        DataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+        DataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle9.Font = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
+        DataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.ExportBOMList.RowHeadersDefaultCellStyle = DataGridViewCellStyle9
         Me.ExportBOMList.RowTemplate.Height = 30
         Me.ExportBOMList.Size = New System.Drawing.Size(1174, 163)
         Me.ExportBOMList.TabIndex = 0
@@ -568,20 +676,6 @@ Partial Class BOMTemplateControl
         Me.ImageList1.Images.SetKeyName(2, "TechnicalData3_16px.png")
         Me.ImageList1.Images.SetKeyName(3, "TechnicalData4_16px.png")
         '
-        'Button1
-        '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.FlatAppearance.BorderSize = 0
-        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportFile_20px
-        Me.Button1.Location = New System.Drawing.Point(499, 19)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(143, 29)
-        Me.Button1.TabIndex = 4
-        Me.Button1.Text = "导出当前配置信息..."
-        Me.Button1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.Button1.UseVisualStyleBackColor = True
-        '
         'BOMTemplateControl
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
@@ -618,6 +712,11 @@ Partial Class BOMTemplateControl
         Me.ToolStrip4.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage3.PerformLayout()
+        Me.SplitContainer3.Panel1.ResumeLayout(False)
+        Me.SplitContainer3.Panel2.ResumeLayout(False)
+        CType(Me.SplitContainer3, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.SplitContainer3.ResumeLayout(False)
+        CType(Me.CheckBoxDataGridView2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip5.ResumeLayout(False)
         Me.ToolStrip5.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
@@ -670,4 +769,9 @@ Partial Class BOMTemplateControl
     Friend WithEvents ToolStripSplitButton2 As ToolStripSplitButton
     Friend WithEvents ShowMaterialItems As ToolStripMenuItem
     Friend WithEvents Button1 As Button
+    Friend WithEvents ToolStripButton7 As ToolStripButton
+    Friend WithEvents ToolStripButton8 As ToolStripButton
+    Friend WithEvents ToolStripLabel4 As ToolStripLabel
+    Friend WithEvents SplitContainer3 As SplitContainer
+    Friend WithEvents CheckBoxDataGridView2 As Wangk.Resource.CheckBoxDataGridView
 End Class

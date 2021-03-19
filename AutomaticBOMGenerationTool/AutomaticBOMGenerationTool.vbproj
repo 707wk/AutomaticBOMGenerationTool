@@ -365,6 +365,8 @@
     <Content Include="Data\LocalDatabase.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="res\listView_20px.png" />
+    <None Include="res\treeView_20px.png" />
     <None Include="res\view_20px.png" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">

@@ -156,7 +156,7 @@ Public Class MainForm
                                     addBOMTemplateFileInfo.BOMTHelper.ConfigurationTableParser()
 
                                     be.Write("制作提取模板", 100 / stepCount * 7)
-                                    addBOMTemplateFileInfo.BOMTHelper.CreateTemplate()
+                                    addBOMTemplateFileInfo.BOMTHelper.CreateBOMBaseTemplate()
 
                                     be.Write("获取替换物料在模板中的位置", 100 / stepCount * 8)
                                     Dim tmpRowIDList = addBOMTemplateFileInfo.BOMTHelper.GetMaterialRowIDInTemplate()
