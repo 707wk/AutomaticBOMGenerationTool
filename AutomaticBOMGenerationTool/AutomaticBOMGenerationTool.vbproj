@@ -265,6 +265,7 @@
     <Compile Include="03.DataAccessLayer\BOMTemplate\BOMTemplateFileInfo.vb" />
     <Compile Include="03.DataAccessLayer\BOMTemplate\TechnicalData\TechnicalDataConfigurationInfo.vb" />
     <Compile Include="03.DataAccessLayer\BOMTemplate\TechnicalData\TechnicalDataInfo.vb" />
+    <Compile Include="03.DataAccessLayer\BOMTemplate\TechnicalData\TechnicalDataNode.vb" />
     <Compile Include="03.DataAccessLayer\CommitInfo.vb" />
     <Compile Include="03.DataAccessLayer\BOMTemplate\ExportBOMInfo.vb" />
     <Compile Include="03.DataAccessLayer\BOMTemplate\ConfigurationGroupInfo.vb" />
@@ -365,6 +366,14 @@
     <Content Include="Data\LocalDatabase.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="res\analysis_16px.png" />
+    <None Include="res\view_16px.png" />
+    <None Include="res\saveAsFile_16px.png" />
+    <None Include="res\update_16px.png" />
+    <None Include="res\book_16px.png" />
+    <None Include="res\cleanData_16px.png" />
+    <None Include="res\exportData_16px.png" />
+    <None Include="res\importData_16px.png" />
     <None Include="res\listView_20px.png" />
     <None Include="res\treeView_20px.png" />
     <None Include="res\view_20px.png" />

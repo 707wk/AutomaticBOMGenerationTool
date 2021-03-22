@@ -923,6 +923,11 @@ Public Class BOMTemplateHelper
                 Dim tmpWorkBook = tmpExcelPackage.Workbook
                 Dim tmpWorkSheet = tmpWorkBook.Worksheets.First
 
+                '删除多余的表
+                Do While tmpWorkBook.Worksheets.Count > 1
+                    tmpWorkBook.Worksheets.Delete(1)
+                Loop
+
                 '移除核价产品配置表
                 Dim headerLocation = FindTextLocation(tmpWorkSheet, "显示屏规格")
                 tmpWorkSheet.DeleteRow(tmpWorkSheet.Dimension.Start.Row, headerLocation.Y - 1)
@@ -986,6 +991,13 @@ Public Class BOMTemplateHelper
 
                 CalculateMaterialCount(tmpWorkSheet)
 
+                '设置焦点
+                tmpWorkSheet.Select(tmpWorkSheet.Cells(1, 1).Address, True)
+                '设置启动时显示位置
+                tmpWorkSheet.View.TopLeftCell = tmpWorkSheet.Cells(1, 1).Address
+                '设置显示比例
+                tmpWorkSheet.View.ZoomScale = 100
+
                 '另存为模板
                 Using tmpSaveFileStream = New FileStream(CacheBOMTemplateFileInfo.TemplateFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
@@ -1020,7 +1032,7 @@ Public Class BOMTemplateHelper
 
             Else
                 Dim value As Double = Val(tmpDataTable.Compute($"{workSheet.Cells(rID, pIDColumnID + 4).Value}", Nothing))
-                workSheet.Cells(rID, pIDColumnID + 4).Value = $"{value:n4}"
+                workSheet.Cells(rID, pIDColumnID + 4).Value = $"{value:0.0000}"
 
             End If
 
@@ -1318,11 +1330,6 @@ Public Class BOMTemplateHelper
                 '设置标题行行高
                 tmpWorkSheet.Row(1).Height = 32
 
-                '更改焦点
-                tmpWorkSheet.Select(tmpWorkSheet.Cells(1, 1).Address, True)
-                '更改启动时显示位置
-                tmpWorkSheet.View.TopLeftCell = tmpWorkSheet.Cells(1, 1).Address
-
                 headerLocation = FindTextLocation(tmpWorkSheet, "阶层")
                 Dim MaterialRowMinID = headerLocation.Y + 2
                 Dim MaterialRowMaxID = FindTextLocation(tmpWorkSheet, "版次").Y - 1
@@ -1425,6 +1432,45 @@ Public Class BOMTemplateHelper
                 '自动调整价格列宽度
                 tmpWorkSheet.Column(pIDColumnID + 5).AutoFit()
 
+#Region "创建技术参数表"
+                'BOM模板无技术参数表则不创建
+                If CacheBOMTemplateFileInfo.TechnicalDataItems.Count > 0 Then
+
+                    tmpWorkSheet = tmpWorkBook.Worksheets.Add(TechnicalDataInfoSheetName)
+
+                    '设置表头
+                    tmpWorkSheet.Cells(1, 1).Value = "序号"
+                    tmpWorkSheet.Cells(1, 2).Value = "项目"
+                    tmpWorkSheet.Cells(1, 3).Value = "配置名称"
+                    tmpWorkSheet.Cells(1, 4).Value = "配置描述"
+
+                    Dim TechnicalDataNodeItems = CacheBOMTemplateFileInfo.BOMTHelper.GetMatchedTechnicalDataItems()
+
+                    For i001 = 0 To TechnicalDataNodeItems.Count - 1
+                        Dim TechnicalDataNode = TechnicalDataNodeItems(i001)
+
+                        tmpWorkSheet.Cells(1 + 1 + i001, 1).Value = $"{i001 + 1}"
+                        tmpWorkSheet.Cells(1 + 1 + i001, 1).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
+
+                        tmpWorkSheet.Cells(1 + 1 + i001, 2).Value = TechnicalDataNode.Name
+                        tmpWorkSheet.Cells(1 + 1 + i001, 3).Value = TechnicalDataNode.ChildNodes(0).Name
+                        tmpWorkSheet.Cells(1 + 1 + i001, 4).Value = TechnicalDataNode.ChildNodes(0).ChildNodes(0).Name
+
+                    Next
+
+                    '自适应宽度
+                    tmpWorkSheet.Cells.AutoFitColumns()
+
+                    '首行筛选
+                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").AutoFilter = True
+
+                    '设置首行背景色
+                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
+
+                End If
+#End Region
+
                 '另存为
                 Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
@@ -1483,6 +1529,8 @@ Public Class BOMTemplateHelper
         Next
 
         CalculateUnitPrice(workSheet)
+
+        StatisticsMaterialpID(workSheet)
 
     End Sub
 #End Region
@@ -1879,7 +1927,7 @@ Public Class BOMTemplateHelper
                 Next
 
                 '总价
-                tmpWorkSheet.Cells(i001 + 1 + 1, tmpID).Value = $"{tmpBOMConfigurationInfo.UnitPrice:n2}"
+                tmpWorkSheet.Cells(i001 + 1 + 1, tmpID).Value = $"{tmpBOMConfigurationInfo.UnitPrice:0.0000}"
 
                 '单项总价
                 For keyID = 0 To tmpKeys.Count - 1
@@ -1888,7 +1936,7 @@ Public Class BOMTemplateHelper
                                     Where node.ConfigurationNodeID.Equals(nodeKey)
                                     Select node).First()
 
-                    tmpWorkSheet.Cells(i001 + 1 + 1, tmpID + keyID + 1).Value = $"{findNode.TotalPrice:n2}"
+                    tmpWorkSheet.Cells(i001 + 1 + 1, tmpID + keyID + 1).Value = $"{findNode.TotalPrice:0.0000}"
 
                 Next
 
@@ -2399,7 +2447,7 @@ Public Class BOMTemplateHelper
             If Not String.IsNullOrWhiteSpace(TechnicalDataNameStr) Then
                 rootNode = New TechnicalDataInfo With {
                     .Name = TechnicalDataNameStr,
-                    .Values = New List(Of TechnicalDataConfigurationInfo)
+                    .MatchingValues = New List(Of TechnicalDataConfigurationInfo)
                 }
                 CacheBOMTemplateFileInfo.TechnicalDataItems.Add(rootNode)
             End If
@@ -2439,7 +2487,7 @@ Public Class BOMTemplateHelper
                 If rootNode Is Nothing Then
                     Throw New Exception($"0x0033: {TechnicalDataInfoSheetName} {TechnicalDataConfigurationNameStr} 配置没有所属项目")
                 Else
-                    rootNode.Values.Add(tmpAddTechnicalDataConfigurationInfo)
+                    rootNode.MatchingValues.Add(tmpAddTechnicalDataConfigurationInfo)
                 End If
 
             End If
@@ -2447,7 +2495,7 @@ Public Class BOMTemplateHelper
         Next
 
         For Each TechnicalDataItem In CacheBOMTemplateFileInfo.TechnicalDataItems
-            Dim defaultItems = From item In TechnicalDataItem.Values
+            Dim defaultItems = From item In TechnicalDataItem.MatchingValues
                                Where item.IsDefault
                                Select item
 
@@ -2493,6 +2541,122 @@ Public Class BOMTemplateHelper
         End If
 
         Return pIDItems
+
+    End Function
+#End Region
+
+#Region "获取匹配的配置项集合"
+    ''' <summary>
+    ''' 获取匹配的配置项集合
+    ''' </summary>
+    Public Function GetMatchedTechnicalDataItems() As List(Of TechnicalDataNode)
+
+        Dim tmpList As New List(Of TechnicalDataNode)
+
+        '参数项
+        For Each TechnicalDataItem In CacheBOMTemplateFileInfo.TechnicalDataItems
+            Dim addTechnicalDataNode As New TechnicalDataNode() With {
+                .Name = TechnicalDataItem.Name
+            }
+
+            '参数配置项
+            For Each TechnicalDataConfigurationItem In TechnicalDataItem.MatchingValues
+
+                Dim TechnicalDataConfigurationNode As New TechnicalDataNode() With {
+                    .Name = TechnicalDataConfigurationItem.Name
+                }
+
+                TechnicalDataConfigurationNode.ChildNodes.Add(New TechnicalDataNode() With {
+                                                              .Name = $"{TechnicalDataConfigurationItem.Description}"
+                                                              })
+
+                If TechnicalDataConfigurationItem.IsDefault AndAlso
+                    TechnicalDataItem.DefaultValue Is Nothing Then
+                    TechnicalDataItem.DefaultValue = TechnicalDataConfigurationItem
+                End If
+
+                Dim haveMatchedMaterial As Boolean = False
+
+                '匹配物料项
+                For i001 = 0 To TechnicalDataConfigurationItem.MatchedMaterialList.Count - 1
+
+                    If IsMatchedMaterial(TechnicalDataConfigurationItem.MatchedMaterialList(i001)) Then
+                        '有匹配到
+                    Else
+                        '未匹配到
+                        Continue For
+                    End If
+
+                    haveMatchedMaterial = True
+
+                    '显示匹配到的物料项
+                    Dim MatchedMaterialNode As New TechnicalDataNode() With {
+                                                                        .Name = String.Join(" and ",
+                                                                                            From item In TechnicalDataConfigurationItem.MatchedMaterialList(i001)
+                                                                                            Select If(item.Count > 1, $"<{String.Join(", ", item)}>", String.Join(", ", item)))
+                    }
+
+                    TechnicalDataConfigurationNode.ChildNodes.Add(MatchedMaterialNode)
+
+                Next
+
+                If haveMatchedMaterial Then
+                    addTechnicalDataNode.ChildNodes.Add(TechnicalDataConfigurationNode)
+                Else
+
+                End If
+
+            Next
+
+            '未匹配到配置
+            If addTechnicalDataNode.ChildNodes.Count = 0 Then
+                Dim TechnicalDataConfigurationNode As New TechnicalDataNode() With {
+                    .Name = TechnicalDataItem.DefaultValue.Name
+                }
+
+                TechnicalDataConfigurationNode.ChildNodes.Add(New TechnicalDataNode() With {
+                                                              .Name = $"{TechnicalDataItem.DefaultValue.Description}"
+                                                              })
+
+                addTechnicalDataNode.ChildNodes.Add(TechnicalDataConfigurationNode)
+
+            End If
+
+            tmpList.Add(addTechnicalDataNode)
+        Next
+
+        Return tmpList
+
+    End Function
+#End Region
+
+#Region "是否匹配当前物料项"
+    ''' <summary>
+    ''' 是否匹配当前物料项
+    ''' </summary>
+    Private Function IsMatchedMaterial(values As List(Of List(Of String))) As Boolean
+
+        If values.Count = 0 Then
+            Return False
+        End If
+
+        For Each MaterialpIDItem In values
+
+            Dim contains As Boolean = False
+            For Each item In MaterialpIDItem
+                If CacheBOMTemplateFileInfo.MaterialpIDTable.Contains(item) Then
+                    contains = True
+                    Exit For
+                End If
+            Next
+
+            If Not contains Then
+                Return False
+            End If
+
+        Next
+
+        Return True
 
     End Function
 #End Region

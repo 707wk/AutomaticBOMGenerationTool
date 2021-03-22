@@ -9,9 +9,9 @@ Public Class TechnicalDataInfo
     Public Name As String
 
     ''' <summary>
-    ''' 配置项集合
+    ''' 待匹配的配置项集合
     ''' </summary>
-    Public Values As List(Of TechnicalDataConfigurationInfo)
+    Public MatchingValues As List(Of TechnicalDataConfigurationInfo)
 
     ''' <summary>
     ''' 默认配置项

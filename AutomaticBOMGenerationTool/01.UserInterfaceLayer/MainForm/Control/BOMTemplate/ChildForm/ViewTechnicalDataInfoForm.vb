@@ -33,7 +33,7 @@
                 .SelectedImageIndex = 0
             }
 
-            For Each TechnicalDataConfigurationItem In TechnicalDataItem.Values
+            For Each TechnicalDataConfigurationItem In TechnicalDataItem.MatchingValues
 
                 Dim TechnicalDataConfigurationNode As New TreeNode(TechnicalDataConfigurationItem.Name) With {
                     .ImageIndex = 1,

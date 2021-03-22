@@ -97,7 +97,7 @@ Public NotInheritable Class BOMTemplateMaterialPriceHelper
 
                     Dim tmpMaterialPriceInfo = MaterialPriceItems(pIDStr)
 
-                    tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value = $"{tmpMaterialPriceInfo.pUnitPrice:n4}"
+                    tmpWorkSheet.Cells(rID, pIDColumnID + 5).Value = $"{tmpMaterialPriceInfo.pUnitPrice:0.0000}"
 
                     tmpWorkSheet.Cells(rID, pIDColumnID + 5).Style.Fill.PatternType = Style.ExcelFillStyle.Solid
                     tmpWorkSheet.Cells(rID, pIDColumnID + 5).Style.Fill.BackgroundColor.SetColor(DefaultBackgroundColor)

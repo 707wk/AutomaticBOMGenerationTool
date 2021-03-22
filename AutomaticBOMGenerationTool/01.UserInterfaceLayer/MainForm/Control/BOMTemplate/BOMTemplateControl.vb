@@ -282,8 +282,6 @@ Public Class BOMTemplateControl
 
                 CacheBOMTemplateFileInfo.BOMTHelper.CalculateMaterialTotalPrice(tmpWorkSheet)
 
-                CacheBOMTemplateFileInfo.BOMTHelper.StatisticsMaterialpID(tmpWorkSheet)
-
             End Using
         End Using
 
@@ -400,52 +398,35 @@ Public Class BOMTemplateControl
             Exit Sub
         End If
 
+        Dim TechnicalDataNodeItems = CacheBOMTemplateFileInfo.BOMTHelper.GetMatchedTechnicalDataItems()
+
         '参数项
-        For Each TechnicalDataItem In CacheBOMTemplateFileInfo.TechnicalDataItems
+        For Each TechnicalDataItem In TechnicalDataNodeItems
             Dim TechnicalDataNode As New TreeNode(TechnicalDataItem.Name) With {
                 .ImageIndex = 0,
                 .SelectedImageIndex = 0
             }
 
             '参数配置项
-            For Each TechnicalDataConfigurationItem In TechnicalDataItem.Values
+            For Each TechnicalDataConfigurationItem In TechnicalDataItem.ChildNodes
 
                 Dim TechnicalDataConfigurationNode As New TreeNode(TechnicalDataConfigurationItem.Name) With {
                     .ImageIndex = 1,
                     .SelectedImageIndex = 1
                 }
 
-                TechnicalDataConfigurationNode.Nodes.Add(New TreeNode($"说明: {If(String.IsNullOrWhiteSpace(TechnicalDataConfigurationItem.Description),
-                                                                      "无",
-                                                                      TechnicalDataConfigurationItem.Description)}") With {
+                TechnicalDataConfigurationNode.Nodes.Add(New TreeNode(TechnicalDataConfigurationItem.ChildNodes(0).Name) With {
                                                                       .ImageIndex = 3,
-                                                                      .SelectedImageIndex = 3,
-                                                                      .ToolTipText = TechnicalDataConfigurationItem.Description
+                                                                      .SelectedImageIndex = 3
                                                          })
 
-                If TechnicalDataConfigurationItem.IsDefault AndAlso
-                    TechnicalDataItem.DefaultValue Is Nothing Then
-                    TechnicalDataItem.DefaultValue = TechnicalDataConfigurationItem
-                End If
-
-                Dim haveMatchedMaterial As Boolean = False
-
                 '匹配物料项
-                For i001 = 0 To TechnicalDataConfigurationItem.MatchedMaterialList.Count - 1
+                For i001 = 1 To TechnicalDataConfigurationItem.ChildNodes.Count - 1
 
-                    If IsMatchedMaterial(TechnicalDataConfigurationItem.MatchedMaterialList(i001)) Then
-                        '有匹配到
-                    Else
-                        '未匹配到
-                        Continue For
-                    End If
-
-                    haveMatchedMaterial = True
+                    Dim MatchedMaterialItem = TechnicalDataConfigurationItem.ChildNodes(i001)
 
                     '显示匹配到的物料项
-                    Dim MatchedMaterialNode As New TreeNode(String.Join(" and ",
-                                                                        From item In TechnicalDataConfigurationItem.MatchedMaterialList(i001)
-                                                                        Select If(item.Count > 1, $"<{String.Join(", ", item)}>", String.Join(", ", item)))) With {
+                    Dim MatchedMaterialNode As New TreeNode(MatchedMaterialItem.Name) With {
                                                                         .ImageIndex = 2,
                                                                         .SelectedImageIndex = 2,
                                                                         .BackColor = UIFormHelper.SuccessColor
@@ -457,37 +438,14 @@ Public Class BOMTemplateControl
 
                 Next
 
-                If haveMatchedMaterial Then
-                    TechnicalDataNode.Nodes.Add(TechnicalDataConfigurationNode)
-                Else
-
-                End If
-
-            Next
-
-            '未匹配到配置
-            If TechnicalDataNode.Nodes.Count = 0 Then
-                Dim TechnicalDataConfigurationNode As New TreeNode(TechnicalDataItem.DefaultValue.Name) With {
-                    .ImageIndex = 1,
-                    .SelectedImageIndex = 1
-                }
-
-                TechnicalDataConfigurationNode.Nodes.Add(New TreeNode($"说明: {If(String.IsNullOrWhiteSpace(TechnicalDataItem.DefaultValue.Description),
-                                                                      "无",
-                                                                      TechnicalDataItem.DefaultValue.Description)}") With {
-                                                                      .ImageIndex = 3,
-                                                                      .SelectedImageIndex = 3,
-                                                                      .ToolTipText = TechnicalDataItem.DefaultValue.Description
-                                                         })
-
                 TechnicalDataNode.Nodes.Add(TechnicalDataConfigurationNode)
 
-            End If
+            Next
 
             CheckBoxDataGridView2.Rows.Add({False,
                                            TechnicalDataItem.Name,
                                            TechnicalDataNode.Nodes(0).Text,
-                                           TechnicalDataNode.Nodes(0).Nodes(0).ToolTipText})
+                                           TechnicalDataNode.Nodes(0).Nodes(0).Text})
 
             TreeView1.Nodes.Add(TechnicalDataNode)
         Next
@@ -530,33 +488,6 @@ Public Class BOMTemplateControl
 
     End Sub
 
-#End Region
-
-#Region "是否匹配当前物料项"
-    ''' <summary>
-    ''' 是否匹配当前物料项
-    ''' </summary>
-    Private Function IsMatchedMaterial(values As List(Of List(Of String))) As Boolean
-
-        For Each MaterialpIDItem In values
-
-            Dim contains As Boolean = False
-            For Each item In MaterialpIDItem
-                If CacheBOMTemplateFileInfo.MaterialpIDTable.Contains(item) Then
-                    contains = True
-                    Exit For
-                End If
-            Next
-
-            If Not contains Then
-                Return False
-            End If
-
-        Next
-
-        Return True
-
-    End Function
 #End Region
 
     Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ToolStripButton5.Click
@@ -1177,140 +1108,5 @@ Public Class BOMTemplateControl
         ShowTechnicalDataList()
 
     End Sub
-
-#Region "导出当前配置信息"
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-
-        Dim outputFilePath As String
-
-        Using tmpDialog As New SaveFileDialog With {
-            .Filter = "BOM配置信息文件|*.xlsx",
-            .FileName = $"BOM配置信息文件-{Now:yyyyMMddHHmmssfff}.xlsx"
-        }
-            If tmpDialog.ShowDialog() <> DialogResult.OK Then
-                Exit Sub
-            End If
-
-            outputFilePath = tmpDialog.FileName
-
-        End Using
-
-        Try
-
-            Using tmpExcelPackage As New ExcelPackage()
-                Dim tmpWorkBook = tmpExcelPackage.Workbook
-                Dim tmpWorkSheet As ExcelWorksheet
-
-#Region "物料价格占比列表"
-
-                tmpWorkSheet = tmpWorkBook.Worksheets.Add("物料价格占比列表")
-
-                '设置表头
-                tmpWorkSheet.Cells(1, 1).Value = "序号"
-                tmpWorkSheet.Cells(1, 2).Value = "物料项"
-                tmpWorkSheet.Cells(1, 3).Value = "价格"
-                tmpWorkSheet.Cells(1, 4).Value = "比例"
-
-                For i001 = 0 To CheckBoxDataGridView1.Rows.Count - 1
-                    Dim rowItem = CheckBoxDataGridView1.Rows(i001)
-
-                    tmpWorkSheet.Cells(1 + 1 + i001, 1).Value = $"{i001 + 1}"
-                    tmpWorkSheet.Cells(1 + 1 + i001, 1).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
-
-                    tmpWorkSheet.Cells(1 + 1 + i001, 2).Value = rowItem.Cells(1).Value
-
-                    tmpWorkSheet.Cells(1 + 1 + i001, 3).Value = Math.Round(CType(rowItem.Tag, Decimal), 2)
-                    tmpWorkSheet.Cells(1 + 1 + i001, 3).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
-
-                    tmpWorkSheet.Cells(1 + 1 + i001, 4).Value = rowItem.Cells(3).Value
-                    tmpWorkSheet.Cells(1 + 1 + i001, 4).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
-                Next
-
-                '自适应宽度
-                tmpWorkSheet.Cells.AutoFitColumns()
-
-                '首行筛选
-                tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").AutoFilter = True
-
-                '设置首行背景色
-                tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-                tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
-
-#End Region
-
-#Region "物料价格占比饼图"
-
-                Dim pieChart As ExcelDoughnutChart = tmpWorkSheet.Drawings.AddDoughnutChart(Wangk.Hash.IDHelper.NewID, eDoughnutChartType.Doughnut)
-
-                pieChart.Title.Text = $"物料价格占比饼图"
-
-                pieChart.Series.Add(ExcelRange.GetAddress(1 + 1, 3, CheckBoxDataGridView1.Rows.Count + 1, 3),
-                                    ExcelRange.GetAddress(1 + 1, 2, CheckBoxDataGridView1.Rows.Count + 1, 2))
-
-                pieChart.Style = eChartStyle.Style2
-
-                pieChart.Legend.Position = eLegendPosition.Right
-
-                pieChart.DataLabel.Font.Fill.Color = Color.White
-                pieChart.DataLabel.ShowPercent = True
-                pieChart.DataLabel.ShowValue = True
-
-                pieChart.SetSize(900, 600)
-
-                pieChart.SetPosition(1, 0, 5, 0)
-
-#End Region
-
-#Region "技术参数表"
-                'BOM模板无技术参数表则不创建
-                If CacheBOMTemplateFileInfo.TechnicalDataItems.Count > 0 Then
-
-                    tmpWorkSheet = tmpWorkBook.Worksheets.Add("技术参数表")
-
-                    '设置表头
-                    tmpWorkSheet.Cells(1, 1).Value = "序号"
-                    tmpWorkSheet.Cells(1, 2).Value = "项目"
-                    tmpWorkSheet.Cells(1, 3).Value = "配置名称"
-                    tmpWorkSheet.Cells(1, 4).Value = "配置描述"
-
-                    For i001 = 0 To TreeView1.Nodes.Count - 1
-                        Dim TechnicalDataNode = TreeView1.Nodes(i001)
-
-                        tmpWorkSheet.Cells(1 + 1 + i001, 1).Value = $"{i001 + 1}"
-                        tmpWorkSheet.Cells(1 + 1 + i001, 1).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
-
-                        tmpWorkSheet.Cells(1 + 1 + i001, 2).Value = TechnicalDataNode.Text
-                        tmpWorkSheet.Cells(1 + 1 + i001, 3).Value = TechnicalDataNode.Nodes(0).Text
-                        tmpWorkSheet.Cells(1 + 1 + i001, 4).Value = TechnicalDataNode.Nodes(0).Nodes(0).ToolTipText
-
-                    Next
-
-                    '自适应宽度
-                    tmpWorkSheet.Cells.AutoFitColumns()
-
-                    '首行筛选
-                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").AutoFilter = True
-
-                    '设置首行背景色
-                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.PatternType = Style.ExcelFillStyle.Solid
-                    tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
-
-                End If
-#End Region
-
-                Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
-                    tmpExcelPackage.SaveAs(tmpSaveFileStream)
-                End Using
-
-            End Using
-
-            FileHelper.Open(IO.Path.GetDirectoryName(outputFilePath))
-
-        Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "导出出错")
-        End Try
-
-    End Sub
-#End Region
 
 End Class

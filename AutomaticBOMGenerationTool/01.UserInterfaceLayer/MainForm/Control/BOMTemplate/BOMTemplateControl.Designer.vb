@@ -49,7 +49,6 @@ Partial Class BOMTemplateControl
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripLabel1 = New System.Windows.Forms.ToolStripLabel()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
-        Me.Button1 = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.Chart1 = New System.Windows.Forms.DataVisualization.Charting.Chart()
@@ -250,7 +249,6 @@ Partial Class BOMTemplateControl
         '
         'GroupBox3
         '
-        Me.GroupBox3.Controls.Add(Me.Button1)
         Me.GroupBox3.Controls.Add(Me.TabControl1)
         Me.GroupBox3.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBox3.ForeColor = System.Drawing.Color.White
@@ -260,20 +258,6 @@ Partial Class BOMTemplateControl
         Me.GroupBox3.TabIndex = 1
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "BOM配置信息"
-        '
-        'Button1
-        '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.FlatAppearance.BorderSize = 0
-        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportFile_20px
-        Me.Button1.Location = New System.Drawing.Point(499, 19)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(143, 29)
-        Me.Button1.TabIndex = 4
-        Me.Button1.Text = "导出当前配置信息..."
-        Me.Button1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.Button1.UseVisualStyleBackColor = True
         '
         'TabControl1
         '
@@ -450,7 +434,7 @@ Partial Class BOMTemplateControl
         Me.TabPage3.Location = New System.Drawing.Point(4, 31)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(631, 452)
+        Me.TabPage3.Size = New System.Drawing.Size(631, 454)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "技术参数表"
         '
@@ -467,7 +451,7 @@ Partial Class BOMTemplateControl
         'SplitContainer3.Panel2
         '
         Me.SplitContainer3.Panel2.Controls.Add(Me.CheckBoxDataGridView2)
-        Me.SplitContainer3.Size = New System.Drawing.Size(625, 419)
+        Me.SplitContainer3.Size = New System.Drawing.Size(625, 421)
         Me.SplitContainer3.SplitterDistance = 316
         Me.SplitContainer3.SplitterWidth = 1
         Me.SplitContainer3.TabIndex = 2
@@ -480,7 +464,7 @@ Partial Class BOMTemplateControl
         Me.TreeView1.ForeColor = System.Drawing.Color.White
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(316, 419)
+        Me.TreeView1.Size = New System.Drawing.Size(316, 421)
         Me.TreeView1.TabIndex = 0
         '
         'CheckBoxDataGridView2
@@ -514,7 +498,7 @@ Partial Class BOMTemplateControl
         DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView2.RowHeadersDefaultCellStyle = DataGridViewCellStyle6
         Me.CheckBoxDataGridView2.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView2.Size = New System.Drawing.Size(308, 419)
+        Me.CheckBoxDataGridView2.Size = New System.Drawing.Size(308, 421)
         Me.CheckBoxDataGridView2.TabIndex = 0
         '
         'ToolStrip5
@@ -768,7 +752,6 @@ Partial Class BOMTemplateControl
     Friend WithEvents ToolStripButton6 As ToolStripButton
     Friend WithEvents ToolStripSplitButton2 As ToolStripSplitButton
     Friend WithEvents ShowMaterialItems As ToolStripMenuItem
-    Friend WithEvents Button1 As Button
     Friend WithEvents ToolStripButton7 As ToolStripButton
     Friend WithEvents ToolStripButton8 As ToolStripButton
     Friend WithEvents ToolStripLabel4 As ToolStripLabel
