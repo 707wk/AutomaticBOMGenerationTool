@@ -98,6 +98,19 @@ Public Class BOMTemplateFileInfo
     ''' </summary>
     Public ShowMaterialItems As Boolean = False
 
+    ''' <summary>
+    ''' 文件保护密码
+    ''' </summary>
+    Public LockPassword As String
+    ''' <summary>
+    ''' 是否锁定文档
+    ''' </summary>
+    Public ReadOnly Property Locked As Boolean
+        Get
+            Return Not String.IsNullOrWhiteSpace(LockPassword)
+        End Get
+    End Property
+
     Public Sub New(filePath As String)
 
         If String.IsNullOrWhiteSpace(filePath) Then Throw New Exception("0x0010: 文件路径不能为空")

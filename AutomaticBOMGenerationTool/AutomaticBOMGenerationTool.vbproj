@@ -366,6 +366,7 @@
     <Content Include="Data\LocalDatabase.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="res\lock_32px.png" />
     <None Include="res\analysis_16px.png" />
     <None Include="res\view_16px.png" />
     <None Include="res\saveAsFile_16px.png" />

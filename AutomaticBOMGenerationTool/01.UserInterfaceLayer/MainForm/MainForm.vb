@@ -223,6 +223,8 @@ Public Class MainForm
 
         tmpStopwatch.Restart()
 
+        CurrentBOMTemplateFileInfo = addBOMTemplateFileInfo
+
         If IsCreateNewTab Then
 
             Dim title = IO.Path.GetFileNameWithoutExtension(filePath)
@@ -261,8 +263,6 @@ Public Class MainForm
 
         End If
 
-        CurrentBOMTemplateFileInfo = addBOMTemplateFileInfo
-
         Dim UITimeSpan = tmpStopwatch.Elapsed
 
         UIFormHelper.ToastSuccess($"处理完成,解析耗时 {dateTimeSpan:mm\:ss\.fff},UI生成耗时 {UITimeSpan:mm\:ss\.fff}")
@@ -283,11 +283,13 @@ Public Class MainForm
             ButtonItem12.Enabled = True
             ButtonItem3.Enabled = True
             ButtonItem4.Enabled = True
+            ButtonItem17.Enabled = True
         Else
             ButtonItem11.Enabled = False
             ButtonItem12.Enabled = False
             ButtonItem3.Enabled = False
             ButtonItem4.Enabled = False
+            ButtonItem17.Enabled = False
         End If
 
     End Sub
@@ -533,9 +535,7 @@ Public Class MainForm
 
         End If
 
-        CurrentBOMTemplateFileInfo.ExportBOMList.Clear()
-        CurrentBOMTemplateFileInfo.ExportBOMList.AddRange(From item As DataGridViewRow In CurrentBOMTemplateFileInfo.BOMTControl.ExportBOMList.Rows
-                                                          Select CType(item.Tag, ExportBOMInfo))
+        CurrentBOMTemplateFileInfo.BOMTControl.GetExportBOMListData()
 
         Do
             Try
@@ -619,9 +619,7 @@ Public Class MainForm
 
         End Using
 
-        CurrentBOMTemplateFileInfo.ExportBOMList.Clear()
-        CurrentBOMTemplateFileInfo.ExportBOMList.AddRange(From item As DataGridViewRow In CurrentBOMTemplateFileInfo.BOMTControl.ExportBOMList.Rows
-                                                          Select CType(item.Tag, ExportBOMInfo))
+        CurrentBOMTemplateFileInfo.BOMTControl.GetExportBOMListData()
 
         Do
             Try
@@ -715,6 +713,12 @@ Public Class MainForm
     ''' </summary>
     Public CurrentBOMTemplateFileInfo As BOMTemplateFileInfo
 
+    Private Sub SuperTabControl1_TabItemOpen(sender As Object, e As SuperTabStripTabItemOpenEventArgs) Handles SuperTabControl1.TabItemOpen
+
+        ButtonItem17.Checked = CurrentBOMTemplateFileInfo.Locked
+
+    End Sub
+
     Private Sub SuperTabControl1_SelectedTabChanged(sender As Object, e As SuperTabStripSelectedTabChangedEventArgs) Handles SuperTabControl1.SelectedTabChanged
 
         Dim item As SuperTabItem = SuperTabControl1.SelectedTab
@@ -732,6 +736,8 @@ Public Class MainForm
         CurrentBOMTemplateFileInfo = tmpBOMTemplateControl.CacheBOMTemplateFileInfo
 
         ToolStripStatusLabel1.Text = CurrentBOMTemplateFileInfo.SourceFilePath
+
+        ButtonItem17.Checked = CurrentBOMTemplateFileInfo.Locked
 
     End Sub
 
@@ -783,7 +789,60 @@ Public Class MainForm
     Private Sub ButtonItem15_Click(sender As Object, e As EventArgs) Handles ButtonItem15.Click
         FileHelper.Open(AppSettingHelper.Instance.TempDirectoryPath)
     End Sub
-
 #End Region
+
+    Private Sub ButtonItem17_Click(sender As Object, e As EventArgs) Handles ButtonItem17.Click
+
+        If CurrentBOMTemplateFileInfo.Locked Then
+
+            Dim tmpDialog As New Wangk.Resource.InputTextDialog With {
+                .Text = "输入解锁密码",
+                .PasswordChar = "*",
+                .MaxLength = 32
+            }
+            If tmpDialog.ShowDialog <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+            If CurrentBOMTemplateFileInfo.LockPassword = tmpDialog.Value Then
+                CurrentBOMTemplateFileInfo.LockPassword = Nothing
+            End If
+
+        Else
+
+            Dim tmpDialog As New Wangk.Resource.InputTextDialog With {
+                .Text = "输入保护密码",
+                .PasswordChar = "*",
+                .MaxLength = 32
+            }
+            If tmpDialog.ShowDialog <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+            Dim newPassword = tmpDialog.Value
+
+            tmpDialog = New Wangk.Resource.InputTextDialog With {
+                .Text = "再次输入保护密码",
+                .PasswordChar = "*",
+                .MaxLength = 32
+            }
+            If tmpDialog.ShowDialog <> DialogResult.OK Then
+                Exit Sub
+            End If
+
+            Dim newPassword2 = tmpDialog.Value
+
+            If newPassword <> newPassword2 Then
+                UIFormHelper.ToastWarning("密码输入不一致")
+            End If
+
+            CurrentBOMTemplateFileInfo.LockPassword = newPassword
+
+        End If
+
+        ButtonItem17.Checked = CurrentBOMTemplateFileInfo.Locked
+
+    End Sub
+
 
 End Class

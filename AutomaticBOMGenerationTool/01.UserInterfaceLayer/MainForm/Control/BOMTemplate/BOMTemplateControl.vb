@@ -13,7 +13,7 @@ Public Class BOMTemplateControl
         With ExportBOMList
             .EditMode = DataGridViewEditMode.EditOnEnter
             .AllowDrop = True
-            .ReadOnly = True
+            .ReadOnly = False
             .ColumnHeadersDefaultCellStyle.Font = New Font(Me.Font.Name, Me.Font.Size, FontStyle.Bold)
             .RowHeadersWidth = 80
 
@@ -21,21 +21,34 @@ Public Class BOMTemplateControl
             .AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders
             .CellBorderStyle = DataGridViewCellBorderStyle.SingleVertical
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .EditMode = DataGridViewEditMode.EditOnEnter
 
-            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "BOM名称", .Width = 900})
+            .Columns.Add(New DataGridViewTextBoxColumn With {
+                         .HeaderText = "BOM名称",
+                         .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                         .[ReadOnly] = True
+                         })
+            .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "备注(可编辑)", .Width = 160, .[ReadOnly] = False})
 
-            Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "总价", .Width = 120}
+            Dim tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {
+                .HeaderText = "总价",
+                .Width = 120,
+                .[ReadOnly] = True
+            }
             tmpDataGridViewTextBoxColumn.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             .Columns.Add(tmpDataGridViewTextBoxColumn)
 
-            tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {.HeaderText = "错误信息", .Width = 320}
+            tmpDataGridViewTextBoxColumn = New DataGridViewTextBoxColumn With {
+                .HeaderText = "错误信息",
+                .Width = 320,
+                .[ReadOnly] = True
+            }
             tmpDataGridViewTextBoxColumn.DefaultCellStyle.ForeColor = UIFormHelper.ErrorColor
             .Columns.Add(tmpDataGridViewTextBoxColumn)
 
             .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
             .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.NormalColor))
             .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.ErrorColor))
-
 
             .EnableHeadersVisualStyles = False
             .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
@@ -144,6 +157,7 @@ Public Class BOMTemplateControl
 
     End Sub
 
+#Region "显示待导出BOM列表信息"
     ''' <summary>
     ''' 显示待导出BOM列表信息
     ''' </summary>
@@ -151,6 +165,7 @@ Public Class BOMTemplateControl
         For Each item In CacheBOMTemplateFileInfo.ExportBOMList
             ExportBOMList.Rows.Add({False,
                                    item.Name,
+                                   item.Remark,
                                    $"￥{item.UnitPrice:n4}",
                                    If(item.HaveMissingValue, $"缺失配置项: {String.Join(",", item.MissingConfigurationNodeInfoList)}
 缺失选项值: {String.Join(",", item.MissingConfigurationNodeValueInfoList)}", ""),
@@ -160,6 +175,27 @@ Public Class BOMTemplateControl
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = item
         Next
     End Sub
+#End Region
+
+#Region "获取待导出BOM列表信息"
+    ''' <summary>
+    ''' 获取待导出BOM列表信息
+    ''' </summary>
+    Public Sub GetExportBOMListData()
+
+        ExportBOMList.EndEdit()
+
+        For Each item As DataGridViewRow In ExportBOMList.Rows
+            Dim tmpExportBOMInfo As ExportBOMInfo = item.Tag
+            tmpExportBOMInfo.Remark = $"{item.Cells(2).Value}"
+        Next
+
+        CacheBOMTemplateFileInfo.ExportBOMList.Clear()
+        CacheBOMTemplateFileInfo.ExportBOMList.AddRange(From item As DataGridViewRow In ExportBOMList.Rows
+                                                        Select CType(item.Tag, ExportBOMInfo))
+
+    End Sub
+#End Region
 
 #Region "创建配置项选择控件"
     ''' <summary>
@@ -549,6 +585,12 @@ Public Class BOMTemplateControl
 
 #Region "添加当前配置到待导出BOM列表"
     Private Sub AddCurrentToExportBOMListButton_Click(sender As Object, e As EventArgs) Handles AddCurrentToExportBOMListButton.Click
+
+        If CacheBOMTemplateFileInfo.Locked Then
+            UIFormHelper.ToastWarning("文档已锁定")
+            Exit Sub
+        End If
+
         Using tmpDialog As New Wangk.Resource.BackgroundWorkDialog With {
             .Text = "导出数据"
         }
@@ -624,6 +666,7 @@ Public Class BOMTemplateControl
 
             ExportBOMList.Rows.Add({False,
                                    tmpExportBOMInfo.Name,
+                                   "",
                                    $"￥{tmpExportBOMInfo.UnitPrice:n4}",
                                    "",
                                    "[查看选项信息]",
@@ -825,6 +868,12 @@ Public Class BOMTemplateControl
 
 #Region "从待导出BOM列表移除"
     Private Sub DeleteButton_Click(sender As Object, e As EventArgs) Handles DeleteButton.Click
+
+        If CacheBOMTemplateFileInfo.Locked Then
+            UIFormHelper.ToastWarning("文档已锁定")
+            Exit Sub
+        End If
+
         Dim selectedCount As Integer = 0
         For Each item As DataGridViewRow In ExportBOMList.Rows
             If item.Cells(0).EditedFormattedValue Then
@@ -925,7 +974,7 @@ Public Class BOMTemplateControl
 
         Select Case e.ColumnIndex
 
-            Case 4
+            Case 5
 #Region "查看选项信息"
                 Dim BOMConfigurationInfoItem = ExportBOMList.Rows(e.RowIndex).Tag
 
@@ -938,7 +987,7 @@ Public Class BOMTemplateControl
                 UIFormHelper.UIForm.tmpViewBOMConfigurationInfoForm.CacheExportBOMInfo = BOMConfigurationInfoItem
 
 #End Region
-            Case 5
+            Case 6
 #Region "查看配置"
                 ConfigurationGroupList.SuspendLayout()
 
@@ -961,8 +1010,13 @@ Public Class BOMTemplateControl
                 ConfigurationGroupList.ResumeLayout()
 #End Region
 
-            Case 6
+            Case 7
 #Region "移除"
+                If CacheBOMTemplateFileInfo.Locked Then
+                    UIFormHelper.ToastWarning("文档已锁定")
+                    Exit Sub
+                End If
+
                 If MsgBox($"确定移除 {ExportBOMList.Rows(e.RowIndex).Cells(1).Value} ?", MsgBoxStyle.YesNo Or MsgBoxStyle.Question, "移除") <> MsgBoxResult.Yes Then
                     Exit Sub
                 End If
@@ -1007,6 +1061,11 @@ Public Class BOMTemplateControl
 
 #Region "编辑BOM名称设置"
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+
+        If CacheBOMTemplateFileInfo.Locked Then
+            UIFormHelper.ToastWarning("文档已锁定")
+            Exit Sub
+        End If
 
         Using tmpDialog As New ExportBOMNameSettingsForm With {
             .CacheBOMTemplateFileInfo = CacheBOMTemplateFileInfo

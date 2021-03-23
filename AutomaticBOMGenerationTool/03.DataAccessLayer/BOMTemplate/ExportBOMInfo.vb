@@ -8,6 +8,11 @@ Public Class ExportBOMInfo
     Public Name As String
 
     ''' <summary>
+    ''' 备注
+    ''' </summary>
+    Public Remark As String = ""
+
+    ''' <summary>
     ''' 配置项
     ''' </summary>
     Public ConfigurationItems As List(Of ConfigurationNodeRowInfo)

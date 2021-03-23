@@ -133,17 +133,17 @@
   <data name="saveFile_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\saveFile_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="add_20px1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\add_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="view_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\view_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="pageNext_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\pageNext_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="help_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\help_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="setting_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\setting_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="xlsx_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\xlsx_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="expand_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\expand_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -172,6 +172,9 @@
   <data name="pageFirst_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\pageFirst_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="openFile_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\openFile_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="yes2_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\yes2_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -184,29 +187,26 @@
   <data name="viewData_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\viewData_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="pageLast_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\pageLast_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="view_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\view_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="cleanData_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\cleanData_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="analysis_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\analysis_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="yes_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\yes_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="listView_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\listView_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="all_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\all_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="refresh_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\refresh_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="openFile_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\openFile_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="analysis_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\analysis_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="add_20px1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\add_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="setting_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\setting_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="exportData_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\exportData_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -241,26 +241,29 @@
   <data name="book_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\book_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="view_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\view_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="refresh_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\refresh_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="updatePrice_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\updatePrice_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="treeView_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\treeView_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="pageLast_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\pageLast_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="view_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\view_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="stop_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\stop_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="pageNext_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\pageNext_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="xlsx_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\xlsx_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="updatePrice_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\updatePrice_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="cleanData_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\cleanData_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="add_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\add_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -271,10 +274,10 @@
   <data name="test_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\test_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="listView_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\listView_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="stop_20px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\stop_20px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="analysis_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\analysis_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="lock_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\lock_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

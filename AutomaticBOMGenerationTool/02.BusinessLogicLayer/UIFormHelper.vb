@@ -37,6 +37,7 @@ Public NotInheritable Class UIFormHelper
             .HeaderText = If(String.IsNullOrWhiteSpace(headerText), " ", headerText)
             .ReadOnly = True
             .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+            .DefaultCellStyle.WrapMode = DataGridViewTriState.False
             .LinkBehavior = LinkBehavior.NeverUnderline
             .ActiveLinkColor = foreColor
             .LinkColor = tmpColumn.ActiveLinkColor

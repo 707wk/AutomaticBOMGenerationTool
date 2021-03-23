@@ -38,6 +38,7 @@ Partial Class MainForm
         Me.RibbonBar2 = New DevComponents.DotNetBar.RibbonBar()
         Me.ItemContainer3 = New DevComponents.DotNetBar.ItemContainer()
         Me.RibbonBar1 = New DevComponents.DotNetBar.RibbonBar()
+        Me.ItemContainer5 = New DevComponents.DotNetBar.ItemContainer()
         Me.RibbonTabItem1 = New DevComponents.DotNetBar.RibbonTabItem()
         Me.QatCustomizeItem1 = New DevComponents.DotNetBar.QatCustomizeItem()
         Me.StyleManager1 = New DevComponents.DotNetBar.StyleManager(Me.components)
@@ -46,13 +47,13 @@ Partial Class MainForm
         Me.ToolStripStatusLabel3 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.SuperTabControl1 = New DevComponents.DotNetBar.SuperTabControl()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.ItemContainer5 = New DevComponents.DotNetBar.ItemContainer()
         Me.ButtonItem14 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem15 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem1 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem16 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem13 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem6 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem17 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem5 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem7 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem8 = New DevComponents.DotNetBar.ButtonItem()
@@ -60,9 +61,9 @@ Partial Class MainForm
         Me.ButtonItem10 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem2 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem11 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem4 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem12 = New DevComponents.DotNetBar.ButtonItem()
         Me.ButtonItem3 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem4 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonControl1.SuspendLayout()
         Me.RibbonPanel1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -149,7 +150,7 @@ Partial Class MainForm
         Me.RibbonBar6.DragDropSupport = True
         Me.RibbonBar6.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ItemContainer2})
         Me.RibbonBar6.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar6.Location = New System.Drawing.Point(946, 0)
+        Me.RibbonBar6.Location = New System.Drawing.Point(1018, 0)
         Me.RibbonBar6.Name = "RibbonBar6"
         Me.RibbonBar6.Size = New System.Drawing.Size(156, 99)
         Me.RibbonBar6.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
@@ -198,7 +199,7 @@ Partial Class MainForm
         Me.RibbonBar4.DragDropSupport = True
         Me.RibbonBar4.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ItemContainer4, Me.ButtonItem13})
         Me.RibbonBar4.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
-        Me.RibbonBar4.Location = New System.Drawing.Point(780, 0)
+        Me.RibbonBar4.Location = New System.Drawing.Point(852, 0)
         Me.RibbonBar4.Name = "RibbonBar4"
         Me.RibbonBar4.Size = New System.Drawing.Size(166, 99)
         Me.RibbonBar4.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
@@ -245,11 +246,11 @@ Partial Class MainForm
         Me.RibbonBar3.ContainerControlProcessDialogKey = True
         Me.RibbonBar3.Dock = System.Windows.Forms.DockStyle.Left
         Me.RibbonBar3.DragDropSupport = True
-        Me.RibbonBar3.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem6})
+        Me.RibbonBar3.Items.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem17, Me.ButtonItem6})
         Me.RibbonBar3.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F"
         Me.RibbonBar3.Location = New System.Drawing.Point(691, 0)
         Me.RibbonBar3.Name = "RibbonBar3"
-        Me.RibbonBar3.Size = New System.Drawing.Size(89, 99)
+        Me.RibbonBar3.Size = New System.Drawing.Size(161, 99)
         Me.RibbonBar3.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled
         Me.RibbonBar3.TabIndex = 2
         Me.RibbonBar3.Text = "工具"
@@ -401,6 +402,24 @@ Partial Class MainForm
         '
         Me.RibbonBar1.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square
         '
+        'ItemContainer5
+        '
+        '
+        '
+        '
+        Me.ItemContainer5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        Me.ItemContainer5.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical
+        Me.ItemContainer5.Name = "ItemContainer5"
+        Me.ItemContainer5.SubItems.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem12, Me.ButtonItem3, Me.ButtonItem4})
+        '
+        '
+        '
+        Me.ItemContainer5.TitleMouseOverStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
+        '
+        '
+        Me.ItemContainer5.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
         'RibbonTabItem1
         '
         Me.RibbonTabItem1.Checked = True
@@ -467,24 +486,6 @@ Partial Class MainForm
         Me.SuperTabControl1.TabIndex = 11
         Me.SuperTabControl1.Text = "SuperTabControl1"
         '
-        'ItemContainer5
-        '
-        '
-        '
-        '
-        Me.ItemContainer5.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
-        Me.ItemContainer5.LayoutOrientation = DevComponents.DotNetBar.eOrientation.Vertical
-        Me.ItemContainer5.Name = "ItemContainer5"
-        Me.ItemContainer5.SubItems.AddRange(New DevComponents.DotNetBar.BaseItem() {Me.ButtonItem12, Me.ButtonItem3, Me.ButtonItem4})
-        '
-        '
-        '
-        Me.ItemContainer5.TitleMouseOverStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
-        '
-        '
-        '
-        Me.ItemContainer5.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
-        '
         'ButtonItem14
         '
         Me.ButtonItem14.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
@@ -534,6 +535,15 @@ Partial Class MainForm
         Me.ButtonItem6.Name = "ButtonItem6"
         Me.ButtonItem6.SubItemsExpandWidth = 14
         Me.ButtonItem6.Text = "设置"
+        '
+        'ButtonItem17
+        '
+        Me.ButtonItem17.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem17.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.lock_32px
+        Me.ButtonItem17.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem17.Name = "ButtonItem17"
+        Me.ButtonItem17.SubItemsExpandWidth = 14
+        Me.ButtonItem17.Text = "保护文档"
         '
         'ButtonItem5
         '
@@ -595,14 +605,6 @@ Partial Class MainForm
         Me.ButtonItem11.SubItemsExpandWidth = 14
         Me.ButtonItem11.Text = "保存"
         '
-        'ButtonItem4
-        '
-        Me.ButtonItem4.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem4.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.analysis_16px
-        Me.ButtonItem4.Name = "ButtonItem4"
-        Me.ButtonItem4.SubItemsExpandWidth = 14
-        Me.ButtonItem4.Text = "重新解析"
-        '
         'ButtonItem12
         '
         Me.ButtonItem12.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
@@ -618,6 +620,14 @@ Partial Class MainForm
         Me.ButtonItem3.Name = "ButtonItem3"
         Me.ButtonItem3.SubItemsExpandWidth = 14
         Me.ButtonItem3.Text = "查看原文件"
+        '
+        'ButtonItem4
+        '
+        Me.ButtonItem4.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem4.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.analysis_16px
+        Me.ButtonItem4.Name = "ButtonItem4"
+        Me.ButtonItem4.SubItemsExpandWidth = 14
+        Me.ButtonItem4.Text = "重新解析"
         '
         'MainForm
         '
@@ -684,4 +694,5 @@ Partial Class MainForm
     Friend WithEvents ItemContainer3 As DevComponents.DotNetBar.ItemContainer
     Friend WithEvents ItemContainer4 As DevComponents.DotNetBar.ItemContainer
     Friend WithEvents ItemContainer5 As DevComponents.DotNetBar.ItemContainer
+    Friend WithEvents ButtonItem17 As DevComponents.DotNetBar.ButtonItem
 End Class

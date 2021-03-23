@@ -36,9 +36,19 @@ Public Class BOMTemplateHelper
     Private ReadOnly CacheBOMTemplateFileInfo As BOMTemplateFileInfo
 
     ''' <summary>
+    ''' BOM模板文件配置信息表名
+    ''' </summary>
+    Public Const BOMTemplateFileInfoSheetName As String = "BOMTemplateFileInfo"
+
+    ''' <summary>
     ''' 待导出BOM列表表名
     ''' </summary>
     Public Const BOMConfigurationInfoSheetName As String = "BOMConfigurationInfo"
+    ''' <summary>
+    ''' 待导出BOM其他信息表名
+    ''' </summary>
+    Public Const BOMConfigurationOtherInfoSheetName As String = "BOMConfigurationOtherInfo"
+
     ''' <summary>
     ''' 导出BOM名称设置表名
     ''' </summary>
@@ -1960,6 +1970,145 @@ Public Class BOMTemplateHelper
     End Sub
 #End Region
 
+#Region "保存BOM模板文件配置信息"
+    ''' <summary>
+    ''' 保存BOM模板文件配置信息
+    ''' </summary>
+    Private Sub SaveBOMTemplateFileInfoToBOMTemplate(wb As ExcelPackage)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                     Return tmpSheet.Name.Equals(BOMTemplateFileInfoSheetName)
+                                                                 End Function)
+
+        If tmpWorkSheet Is Nothing Then
+
+        Else
+            tmpWorkBook.Worksheets.Delete(BOMTemplateFileInfoSheetName)
+        End If
+        tmpWorkSheet = tmpWorkBook.Worksheets.Add(BOMTemplateFileInfoSheetName)
+        '调试时不隐藏
+        tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
+
+        If Not String.IsNullOrWhiteSpace(CacheBOMTemplateFileInfo.LockPassword) Then
+            tmpWorkSheet.Cells(1, 1).Value = NameOf(BOMTemplateFileInfo.LockPassword)
+            tmpWorkSheet.Cells(1, 2).Value = CacheBOMTemplateFileInfo.LockPassword
+        End If
+
+    End Sub
+#End Region
+
+#Region "读取BOM模板文件配置信息"
+    ''' <summary>
+    ''' 读取BOM模板文件配置信息
+    ''' </summary>
+    Private Sub ReadBOMTemplateFileInfoFromBOMTemplate(wb As ExcelPackage)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                     Return tmpSheet.Name.Equals(BOMTemplateFileInfoSheetName)
+                                                                 End Function)
+
+        If tmpWorkSheet Is Nothing Then
+            '无表
+            Exit Sub
+
+        ElseIf tmpWorkSheet.Dimension Is Nothing Then
+            '有表但无数据
+            Exit Sub
+
+        Else
+            '有表有数据
+        End If
+
+        Dim tmpDictionary As New Dictionary(Of String, String)
+
+        For rID = 1 To tmpWorkSheet.Dimension.End.Row
+            tmpDictionary.Add($"{tmpWorkSheet.Cells(rID, 1).Value}", $"{tmpWorkSheet.Cells(rID, 2).Value}")
+        Next
+
+        If tmpDictionary.ContainsKey(NameOf(BOMTemplateFileInfo.LockPassword)) Then
+            CacheBOMTemplateFileInfo.LockPassword = $"{tmpDictionary(NameOf(BOMTemplateFileInfo.LockPassword))}"
+        End If
+
+    End Sub
+#End Region
+
+#Region "保存BOM配置其他信息到BOM模板内"
+    ''' <summary>
+    ''' 保存BOM配置其他信息到BOM模板内
+    ''' </summary>
+    Private Sub SaveBOMConfigurationOtherInfoToBOMTemplate(wb As ExcelPackage)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                     Return tmpSheet.Name.Equals(BOMConfigurationOtherInfoSheetName)
+                                                                 End Function)
+
+        If tmpWorkSheet Is Nothing Then
+
+        Else
+            tmpWorkBook.Worksheets.Delete(BOMConfigurationOtherInfoSheetName)
+        End If
+        tmpWorkSheet = tmpWorkBook.Worksheets.Add(BOMConfigurationOtherInfoSheetName)
+        '调试时不隐藏
+        tmpWorkSheet.Hidden = eWorkSheetHidden.Hidden
+
+        For i001 = 0 To CacheBOMTemplateFileInfo.ExportBOMList.Count - 1
+            Dim BOMConfigurationInfoItem = CacheBOMTemplateFileInfo.ExportBOMList(i001)
+
+            tmpWorkSheet.Cells(i001 + 1, 1).Value = i001
+            tmpWorkSheet.Cells(i001 + 1, 2).Value = NameOf(BOMConfigurationInfoItem.Remark)
+            tmpWorkSheet.Cells(i001 + 1, 3).Value = BOMConfigurationInfoItem.Remark
+
+        Next
+
+    End Sub
+#End Region
+
+#Region "读取BOM模板内的BOM配置其他信息"
+    ''' <summary>
+    ''' 读取BOM模板内的BOM配置其他信息
+    ''' </summary>
+    Private Sub ReadBOMConfigurationOtherInfoFromBOMTemplate(wb As ExcelPackage)
+
+        Dim tmpExcelPackage = wb
+        Dim tmpWorkBook = tmpExcelPackage.Workbook
+        Dim tmpWorkSheet = tmpWorkBook.Worksheets.FirstOrDefault(Function(tmpSheet As ExcelWorksheet)
+                                                                     Return tmpSheet.Name.Equals(BOMConfigurationOtherInfoSheetName)
+                                                                 End Function)
+
+        If tmpWorkSheet Is Nothing Then
+            '无表
+            Exit Sub
+
+        ElseIf tmpWorkSheet.Dimension Is Nothing Then
+            '有表但无数据
+            Exit Sub
+
+        Else
+            '有表有数据
+        End If
+
+        Dim tmpDictionary As New Dictionary(Of String, String)
+
+        For rID = 1 To tmpWorkSheet.Dimension.End.Row
+            tmpDictionary.Add($"{tmpWorkSheet.Cells(rID, 1).Value}_{tmpWorkSheet.Cells(rID, 2).Value}", $"{tmpWorkSheet.Cells(rID, 3).Value}")
+        Next
+
+        For i001 = 0 To CacheBOMTemplateFileInfo.ExportBOMList.Count - 1
+            Dim BOMConfigurationInfoItem = CacheBOMTemplateFileInfo.ExportBOMList(i001)
+
+            BOMConfigurationInfoItem.Remark = tmpDictionary($"{i001}_{NameOf(ExportBOMInfo.Remark)}")
+
+        Next
+
+    End Sub
+#End Region
+
 #Region "保存BOM配置到BOM模板内"
     ''' <summary>
     ''' 保存BOM配置到BOM模板内
@@ -1996,6 +2145,8 @@ Public Class BOMTemplateHelper
 
         Next
 
+        SaveBOMConfigurationOtherInfoToBOMTemplate(wb)
+
     End Sub
 #End Region
 
@@ -2014,15 +2165,15 @@ Public Class BOMTemplateHelper
                                                                  End Function)
 
         If tmpWorkSheet Is Nothing Then
-            '无配置表
+            '无表
             Exit Sub
 
         ElseIf tmpWorkSheet.Dimension Is Nothing Then
-            '有配置表但无数据
+            '有表但无数据
             Exit Sub
 
         Else
-            '有配置表有数据
+            '有表有数据
         End If
 
         Dim BOMConfigurationID = -1
@@ -2045,6 +2196,8 @@ Public Class BOMTemplateHelper
             CurrentExportBOMInfo.ConfigurationInfoValueTable.Add($"{tmpWorkSheet.Cells(rID, 2).Value}", $"{tmpWorkSheet.Cells(rID, 3).Value}")
 
         Next
+
+        ReadBOMConfigurationOtherInfoFromBOMTemplate(wb)
 
     End Sub
 #End Region
@@ -2238,15 +2391,15 @@ Public Class BOMTemplateHelper
                                                                  End Function)
 
         If tmpWorkSheet Is Nothing Then
-            '无配置表
+            '无表
             Exit Sub
 
         ElseIf tmpWorkSheet.Dimension Is Nothing Then
-            '有配置表但无数据
+            '有表但无数据
             Exit Sub
 
         Else
-            '有配置表有数据
+            '有表有数据
         End If
 
         For rID = 1 To tmpWorkSheet.Dimension.End.Row
@@ -2325,6 +2478,8 @@ Public Class BOMTemplateHelper
 
                 ReadTechnicalDataInfoFromBOMTemplate(tmpExcelPackage)
 
+                ReadBOMTemplateFileInfoFromBOMTemplate(tmpExcelPackage)
+
             End Using
         End Using
 
@@ -2349,6 +2504,8 @@ Public Class BOMTemplateHelper
                 SaveBOMConfigurationInfoToBOMTemplate(tmpExcelPackage)
 
                 SaveExportConfigurationNodeItemsToBOMTemplate(tmpExcelPackage)
+
+                SaveBOMTemplateFileInfoToBOMTemplate(tmpExcelPackage)
 
                 '另存为
                 Using tmpSaveFileStream = New FileStream(CacheBOMTemplateFileInfo.SourceFilePath, FileMode.Create)
@@ -2382,6 +2539,8 @@ Public Class BOMTemplateHelper
                 SaveBOMConfigurationInfoToBOMTemplate(tmpExcelPackage)
 
                 SaveExportConfigurationNodeItemsToBOMTemplate(tmpExcelPackage)
+
+                SaveBOMTemplateFileInfoToBOMTemplate(tmpExcelPackage)
 
                 '另存为
                 Using tmpSaveFileStream = New FileStream(destFilePath, FileMode.Create)
