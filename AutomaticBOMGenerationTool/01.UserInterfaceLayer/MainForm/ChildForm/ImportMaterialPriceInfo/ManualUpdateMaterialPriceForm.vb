@@ -20,7 +20,7 @@
             .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "旧采集来源", .Width = 120})
             .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "旧更新日期", .Width = 120})
 
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.ErrorColor))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", Color.FromArgb(214, 55, 55)))
 
         End With
 
@@ -41,7 +41,7 @@
                                            item.pUnitPriceOld,
                                            item.SourceFileOld,
                                            item.UpdateDateOld,
-                                           "[移除]"})
+                                           "移除"})
         Next
 
     End Sub

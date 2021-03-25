@@ -46,9 +46,9 @@ Public Class BOMTemplateControl
             tmpDataGridViewTextBoxColumn.DefaultCellStyle.ForeColor = UIFormHelper.ErrorColor
             .Columns.Add(tmpDataGridViewTextBoxColumn)
 
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.NormalColor))
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.ErrorColor))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", Color.FromArgb(0, 118, 200)))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", Color.FromArgb(0, 118, 200)))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", Color.FromArgb(214, 55, 55)))
 
             .EnableHeadersVisualStyles = False
             .RowHeadersDefaultCellStyle.BackColor = Color.FromArgb(60, 60, 64)
@@ -169,9 +169,9 @@ Public Class BOMTemplateControl
                                    $"￥{item.UnitPrice:n4}",
                                    If(item.HaveMissingValue, $"缺失配置项: {String.Join(",", item.MissingConfigurationNodeInfoList)}
 缺失选项值: {String.Join(",", item.MissingConfigurationNodeValueInfoList)}", ""),
-                                   "[查看选项信息]",
-                                   If(item.HaveMissingValue, Nothing, "[查看配置]"),
-                                   "[移除]"})
+                                   "查看选项信息",
+                                   If(item.HaveMissingValue, Nothing, "查看配置"),
+                                   "移除..."})
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = item
         Next
     End Sub
@@ -669,9 +669,9 @@ Public Class BOMTemplateControl
                                    "",
                                    $"￥{tmpExportBOMInfo.UnitPrice:n4}",
                                    "",
-                                   "[查看选项信息]",
-                                   "[查看配置]",
-                                   "[移除]"})
+                                   "查看选项信息",
+                                   "查看配置",
+                                   "移除..."})
             ExportBOMList.Rows(ExportBOMList.Rows.Count - 1).Tag = tmpExportBOMInfo
 
         End Using

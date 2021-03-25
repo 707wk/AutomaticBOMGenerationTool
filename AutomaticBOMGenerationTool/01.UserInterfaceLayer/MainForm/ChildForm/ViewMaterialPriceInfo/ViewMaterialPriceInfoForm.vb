@@ -14,8 +14,8 @@
                 .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = item, .Width = 120})
             Next
 
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.NormalColor))
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", UIFormHelper.ErrorColor))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", Color.FromArgb(0, 118, 200)))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("", Color.FromArgb(214, 55, 55)))
 
         End With
 
@@ -45,8 +45,8 @@
                                            $"{item.UpdateDate:G}",
                                            item.SourceFile,
                                            item.Remark,
-                                           "[编辑]",
-                                           "[删除...]"})
+                                           "编辑",
+                                           "删除..."})
         Next
 
     End Sub

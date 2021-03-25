@@ -1,4 +1,5 @@
 ﻿Imports DevComponents.DotNetBar
+Imports Wangk.Resource
 
 Public NotInheritable Class UIFormHelper
     Private Sub MainFormHelper()
@@ -29,21 +30,13 @@ Public NotInheritable Class UIFormHelper
     ''' </summary>
     Public Shared Function GetDataGridViewLinkColumn(headerText As String,
                                                      foreColor As Color,
-                                                     Optional visible As Boolean = True) As DataGridViewLinkColumn
+                                                     Optional visible As Boolean = True) As CheckBoxDataGridViewButtonColumn
 
-        Dim tmpColumn = New DataGridViewLinkColumn
+        Dim tmpColumn = New CheckBoxDataGridViewButtonColumn
         With tmpColumn
             .Visible = visible
             .HeaderText = If(String.IsNullOrWhiteSpace(headerText), " ", headerText)
-            .ReadOnly = True
-            .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-            .DefaultCellStyle.WrapMode = DataGridViewTriState.False
-            .LinkBehavior = LinkBehavior.NeverUnderline
-            .ActiveLinkColor = foreColor
-            .LinkColor = tmpColumn.ActiveLinkColor
-            .VisitedLinkColor = tmpColumn.ActiveLinkColor
-            .SortMode = DataGridViewColumnSortMode.Automatic
-            .AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            .ForeColor = foreColor
         End With
 
         Return tmpColumn

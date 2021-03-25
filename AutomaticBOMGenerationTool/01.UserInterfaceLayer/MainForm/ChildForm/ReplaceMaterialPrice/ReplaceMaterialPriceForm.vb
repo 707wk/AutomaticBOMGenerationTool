@@ -25,7 +25,7 @@
             .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "更新日期", .Width = 120})
             .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "备注", .Width = 120})
 
-            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", UIFormHelper.ErrorColor))
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", Color.FromArgb(214, 55, 55)))
 
         End With
 
@@ -94,7 +94,7 @@
                                            item.SourceFile,
                                            item.UpdateDate,
                                            item.Remark,
-                                           "[移除]"})
+                                           "移除"})
                 CheckBoxDataGridView1.Rows(CheckBoxDataGridView1.Rows.Count - 1).Tag = item
             Next
 
