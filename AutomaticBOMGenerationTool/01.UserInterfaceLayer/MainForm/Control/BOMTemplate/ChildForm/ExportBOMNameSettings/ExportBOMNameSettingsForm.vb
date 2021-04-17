@@ -23,6 +23,7 @@ Public Class ExportBOMNameSettingsForm
             .Columns.Add(New DataGridViewCheckBoxColumn With {.HeaderText = "导出物料规格首项", .Width = 110, .[ReadOnly] = True})
             .Columns.Add(New DataGridViewCheckBoxColumn With {.HeaderText = "导出匹配型号", .Width = 90, .[ReadOnly] = True})
             .Columns.Add(New DataGridViewTextBoxColumn With {.HeaderText = "型号列表(型号间以 ; 分隔)", .Width = 200})
+            .Columns.Add(UIFormHelper.GetDataGridViewLinkColumn("操作", Color.FromArgb(214, 55, 55)))
 
         End With
 
@@ -35,7 +36,8 @@ Public Class ExportBOMNameSettingsForm
                                            item.IsExportpName,
                                            item.IsExportpConfigFirstTerm,
                                            item.IsExportMatchingValue,
-                                           $"{item.MatchingValues}"
+                                           $"{item.MatchingValues}",
+                                           "移除"
                                            })
         Next
 
@@ -62,7 +64,8 @@ Public Class ExportBOMNameSettingsForm
                                            False,
                                            False,
                                            False,
-                                           ""
+                                           "",
+                                           "移除"
                                            })
             Next
 
@@ -188,5 +191,21 @@ Public Class ExportBOMNameSettingsForm
 
     End Sub
 #End Region
+
+    Private Sub CheckBoxDataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles CheckBoxDataGridView1.CellContentClick
+
+        If e.RowIndex < 0 Then
+            Exit Sub
+        End If
+
+        Select Case e.ColumnIndex
+
+            '移除
+            Case CheckBoxDataGridView1.Columns.Count - 1
+                CheckBoxDataGridView1.Rows.RemoveAt(e.RowIndex)
+
+        End Select
+
+    End Sub
 
 End Class

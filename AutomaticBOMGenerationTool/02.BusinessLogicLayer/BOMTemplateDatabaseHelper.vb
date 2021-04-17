@@ -920,11 +920,22 @@ order by ConfigurationNodeValueInfo.SortID"
 
         Dim parentPriority = 0
 
+        Dim ConfigurationNodeCount = GetConfigurationNodeCount()
+
         Do
+            Console.WriteLine(parentPriority)
             UpdateChildConfigurationNodePriority(parentPriority)
 
             If GetChildConfigurationNodeCount(parentPriority) <= 0 Then
-                Exit Do
+
+                If GetConfigurationNodeCount(parentPriority + 1) = 0 Then
+                    Exit Do
+                End If
+
+            End If
+
+            If parentPriority > ConfigurationNodeCount Then
+                Throw New Exception("0x0035: 子节点优先级已超过配置节点总数,物料固定搭配可能存在循环关联")
             End If
 
             parentPriority += 1
@@ -951,6 +962,54 @@ where ConfigurationNodeInfo.Priority=@parentPriority
 )"
             }
         cmd.Parameters.Add(New SQLiteParameter("@parentPriority", DbType.Int32) With {.Value = parentPriority})
+
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return reader(0)
+            End If
+        End Using
+
+        Return 0
+
+    End Function
+#End Region
+
+#Region "获取某一优先级的配置节点数"
+    ''' <summary>
+    ''' 获取某一优先级的子配置节点数
+    ''' </summary>
+    Private Function GetConfigurationNodeCount(priority As Integer) As Integer
+
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+                .CommandText = "select count(*)
+from ConfigurationNodeInfo
+where ConfigurationNodeInfo.Priority=@priority
+"
+            }
+        cmd.Parameters.Add(New SQLiteParameter("@priority", DbType.Int32) With {.Value = priority})
+
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            If reader.Read Then
+                Return reader(0)
+            End If
+        End Using
+
+        Return 0
+
+    End Function
+#End Region
+
+#Region "获取配置节点数"
+    ''' <summary>
+    ''' 获取子配置节点数
+    ''' </summary>
+    Private Function GetConfigurationNodeCount() As Integer
+
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+                .CommandText = "select count(*)
+from ConfigurationNodeInfo
+"
+            }
 
         Using reader As SQLiteDataReader = cmd.ExecuteReader()
             If reader.Read Then
@@ -990,8 +1049,6 @@ where ConfigurationNodeInfo.Priority=@parentPriority
         cmd.ExecuteNonQuery()
 
     End Sub
-
-
 
 #End Region
 

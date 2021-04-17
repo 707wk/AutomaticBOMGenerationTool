@@ -65,6 +65,12 @@
                 Using tmpDialog As New EditMaterialPriceInfoForm With {
                     .pID = pIDStr
                 }
+                    'Dim tmpCellRectangle = CheckBoxDataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, False)
+                    'Dim tmpScreenPoint = CheckBoxDataGridView1.PointToScreen(tmpCellRectangle.Location)
+                    'tmpScreenPoint.Y += tmpCellRectangle.Height
+
+                    'tmpDialog.Location = tmpScreenPoint
+
                     If tmpDialog.ShowDialog() <> DialogResult.OK Then
                         Exit Sub
                     End If

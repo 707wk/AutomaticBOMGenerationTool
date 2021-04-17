@@ -28,14 +28,14 @@ Partial Class ExportBOMNameSettingsForm
         Me.CancelButton = New System.Windows.Forms.Button()
         Me.AddOrSaveButton = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.CheckBoxDataGridView1 = New Wangk.Resource.CheckBoxDataGridView()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         Me.ImportSettingsButton = New System.Windows.Forms.Button()
+        Me.CheckBoxDataGridView1 = New Wangk.Resource.CheckBoxDataGridView()
         Me.GroupBox1.SuspendLayout()
-        CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ToolStrip1.SuspendLayout()
+        CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'CancelButton
@@ -44,7 +44,7 @@ Partial Class ExportBOMNameSettingsForm
         Me.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.CancelButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.no_16px
         Me.CancelButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CancelButton.Location = New System.Drawing.Point(876, 444)
+        Me.CancelButton.Location = New System.Drawing.Point(983, 460)
         Me.CancelButton.Name = "CancelButton"
         Me.CancelButton.Size = New System.Drawing.Size(96, 25)
         Me.CancelButton.TabIndex = 48
@@ -57,7 +57,7 @@ Partial Class ExportBOMNameSettingsForm
         Me.AddOrSaveButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AddOrSaveButton.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.yes_16px
         Me.AddOrSaveButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.AddOrSaveButton.Location = New System.Drawing.Point(774, 444)
+        Me.AddOrSaveButton.Location = New System.Drawing.Point(881, 460)
         Me.AddOrSaveButton.Name = "AddOrSaveButton"
         Me.AddOrSaveButton.Size = New System.Drawing.Size(96, 25)
         Me.AddOrSaveButton.TabIndex = 47
@@ -74,10 +74,48 @@ Partial Class ExportBOMNameSettingsForm
         Me.GroupBox1.Controls.Add(Me.ToolStrip1)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(960, 426)
+        Me.GroupBox1.Size = New System.Drawing.Size(1067, 442)
         Me.GroupBox1.TabIndex = 49
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "导出项列表"
+        '
+        'ToolStrip1
+        '
+        Me.ToolStrip1.BackColor = System.Drawing.SystemColors.Control
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2})
+        Me.ToolStrip1.Location = New System.Drawing.Point(3, 19)
+        Me.ToolStrip1.Name = "ToolStrip1"
+        Me.ToolStrip1.Size = New System.Drawing.Size(1061, 27)
+        Me.ToolStrip1.TabIndex = 3
+        Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'ToolStripButton1
+        '
+        Me.ToolStripButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.add_20px
+        Me.ToolStripButton1.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(104, 24)
+        Me.ToolStripButton1.Text = "添加导出选项"
+        '
+        'ToolStripButton2
+        '
+        Me.ToolStripButton2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.stop_20px
+        Me.ToolStripButton2.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton2.Name = "ToolStripButton2"
+        Me.ToolStripButton2.Size = New System.Drawing.Size(92, 24)
+        Me.ToolStripButton2.Text = "移除选中项"
+        '
+        'ImportSettingsButton
+        '
+        Me.ImportSettingsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ImportSettingsButton.Location = New System.Drawing.Point(12, 460)
+        Me.ImportSettingsButton.Name = "ImportSettingsButton"
+        Me.ImportSettingsButton.Size = New System.Drawing.Size(96, 25)
+        Me.ImportSettingsButton.TabIndex = 50
+        Me.ImportSettingsButton.Text = "导入设置..."
+        Me.ImportSettingsButton.UseVisualStyleBackColor = True
         '
         'CheckBoxDataGridView1
         '
@@ -110,52 +148,14 @@ Partial Class ExportBOMNameSettingsForm
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(954, 377)
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(1061, 393)
         Me.CheckBoxDataGridView1.TabIndex = 2
-        '
-        'ToolStrip1
-        '
-        Me.ToolStrip1.BackColor = System.Drawing.SystemColors.Control
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2})
-        Me.ToolStrip1.Location = New System.Drawing.Point(3, 19)
-        Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(954, 27)
-        Me.ToolStrip1.TabIndex = 3
-        Me.ToolStrip1.Text = "ToolStrip1"
-        '
-        'ToolStripButton1
-        '
-        Me.ToolStripButton1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.add_20px
-        Me.ToolStripButton1.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(104, 24)
-        Me.ToolStripButton1.Text = "添加导出选项"
-        '
-        'ToolStripButton2
-        '
-        Me.ToolStripButton2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.stop_20px
-        Me.ToolStripButton2.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(92, 24)
-        Me.ToolStripButton2.Text = "移除选中项"
-        '
-        'ImportSettingsButton
-        '
-        Me.ImportSettingsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.ImportSettingsButton.Location = New System.Drawing.Point(12, 444)
-        Me.ImportSettingsButton.Name = "ImportSettingsButton"
-        Me.ImportSettingsButton.Size = New System.Drawing.Size(96, 25)
-        Me.ImportSettingsButton.TabIndex = 50
-        Me.ImportSettingsButton.Text = "导入设置..."
-        Me.ImportSettingsButton.UseVisualStyleBackColor = True
         '
         'ExportBOMNameSettingsForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(984, 481)
+        Me.ClientSize = New System.Drawing.Size(1091, 497)
         Me.Controls.Add(Me.ImportSettingsButton)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.CancelButton)
@@ -170,9 +170,9 @@ Partial Class ExportBOMNameSettingsForm
         Me.Text = "BOM名称设置"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
-        CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
+        CType(Me.CheckBoxDataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub

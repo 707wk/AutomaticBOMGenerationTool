@@ -8,7 +8,7 @@ Imports System.Runtime.InteropServices
 
 '查看程序集特性的值
 
-<Assembly: AssemblyTitle("自动生成BOM工具")>
+<Assembly: AssemblyTitle("BOM生成工具")>
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("Hunan Yestech Optoelectronic Co., LTD.")>
 <Assembly: AssemblyProduct("AutomaticBOMGenerationTool")>
@@ -32,4 +32,4 @@ Imports System.Runtime.InteropServices
 ' <Assembly: AssemblyVersion("1.0.*")>
 
 <Assembly: AssemblyVersion("1.0.0.0")>
-<Assembly: AssemblyFileVersion("2.2.2021.0325")>
+<Assembly: AssemblyFileVersion("2.2.2021.0417")>
