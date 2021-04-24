@@ -50,23 +50,6 @@ Public Class AppSettingHelper
     End Property
 #End Region
 
-#Region "是否长时间未更新"
-    ''' <summary>
-    ''' 是否长时间未更新
-    ''' </summary>
-    Public Shared Function IsLongTimeNoUpdate() As Boolean
-
-        Dim fileVersionStr = _instance.ProductVersion.Substring(_instance.ProductVersion.IndexOf(".") + 1)
-        fileVersionStr = fileVersionStr.Substring(fileVersionStr.IndexOf(".") + 1)
-
-        Dim fileVersion As DateTime = DateTime.ParseExact(fileVersionStr, "yyyy.MMdd", System.Globalization.CultureInfo.CurrentCulture)
-        Dim tmpTimeSpan As TimeSpan = Now - fileVersion
-
-        Return tmpTimeSpan.TotalDays > 365
-
-    End Function
-#End Region
-
 #Region "配置参数"
     ''' <summary>
     ''' 实例
