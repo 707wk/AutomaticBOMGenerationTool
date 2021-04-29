@@ -1,6 +1,7 @@
 ﻿Imports System.Globalization
 Imports System.Net
 Imports Newtonsoft.Json
+Imports Octokit
 
 Public Class UpdateInfoForm
     Private Sub UpdateInfoForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -30,15 +31,10 @@ Public Class UpdateInfoForm
 
             For Each item In nodeList
 
-                For Each textItem In item.TextList
-
-                    TextBox1.Text = $"{TextBox1.Text}# {item.Timeline:d}
-{textItem.Replace(vbLf, vbCrLf)}
+                TextBox1.Text = $"{TextBox1.Text}# {item.Timeline:d}
+{item.Message.Replace(vbLf, vbCrLf)}
 
 "
-
-                Next
-
             Next
 
 #Disable Warning CA1031 ' Do not catch general exception types
@@ -62,40 +58,37 @@ Public Class UpdateInfoForm
 
                 tmpDialog.Start(Sub(be As Wangk.Resource.BackgroundWorkEventArgs)
 
-                                    Dim nodeList = New List(Of CommitInfo)
-
                                     be.Write("获取数据", 0)
 
-                                    Dim webClient As HtmlAgilityPack.HtmlWeb = New HtmlAgilityPack.HtmlWeb()
+                                    Dim tmpGitHubClient As New GitHubClient(New ProductHeaderValue("GetCommitsInfo"))
 
-                                    Dim doc As HtmlAgilityPack.HtmlDocument = webClient.Load("https://github.com/707wk/AutomaticBOMGenerationTool/commits/master")
+                                    Dim tmpOption As New ApiOptions With {
+                                    .PageSize = 25,
+                                    .PageCount = 1
+                                    }
 
-                                    Dim CommitsNodes As HtmlAgilityPack.HtmlNodeCollection = doc.DocumentNode.SelectNodes("//div[contains(@class,'TimelineItem TimelineItem--condensed')]")
+                                    Dim CommitItems = tmpGitHubClient.
+                                    Repository.
+                                    Commit.GetAll("707wk",
+                                                  My.Application.Info.ProductName,
+                                                  tmpOption).GetAwaiter.GetResult
 
-                                    be.Write("解析数据", 50)
+                                    Dim tmpList = New List(Of CommitInfo)
 
-                                    For Each item In CommitsNodes
+                                    For Each item In CommitItems
 
-                                        Dim addCommitInfo = New CommitInfo
-
-                                        Dim TimelineItem = item.SelectSingleNode(".//h2[@class='f5 text-normal']")
-                                        Dim TextItems = item.SelectNodes(".//a[@class='Link--primary text-bold js-navigation-open']")
-
-                                        addCommitInfo.Timeline = DateTime.Parse(TimelineItem.InnerText.Remove(0, 11), CultureInfo.GetCultureInfo("en-US"))
-                                        addCommitInfo.TextList = New List(Of String)
-
-                                        For Each textItem In TextItems
-                                            addCommitInfo.TextList.Add(textItem.Attributes("aria-label").Value)
-                                        Next
-
-                                        nodeList.Add(addCommitInfo)
+                                        tmpList.Add(New CommitInfo With {
+                                                    .Timeline = item.Commit.Committer.Date.LocalDateTime,
+                                                    .Message = item.Commit.Message
+                                                    })
 
                                     Next
+
 
                                     Using t As System.IO.StreamWriter = New System.IO.StreamWriter(".\Data\CommitInfo.json",
                                                                                                    False,
                                                                                                    System.Text.Encoding.UTF8)
-                                        t.Write(JsonConvert.SerializeObject(nodeList))
+                                        t.Write(JsonConvert.SerializeObject(tmpList))
                                     End Using
 
                                 End Sub)
