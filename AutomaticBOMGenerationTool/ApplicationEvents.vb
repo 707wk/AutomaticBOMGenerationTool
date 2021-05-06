@@ -1,4 +1,8 @@
-﻿Imports Microsoft.VisualBasic.ApplicationServices
+﻿Imports System.Globalization
+Imports Microsoft.AppCenter
+Imports Microsoft.AppCenter.Analytics
+Imports Microsoft.AppCenter.Crashes
+Imports Microsoft.VisualBasic.ApplicationServices
 
 Namespace My
     ' 以下事件可用于 MyApplication: 
@@ -27,6 +31,21 @@ Namespace My
 
             AppSettingHelper.SaveToLocaltion()
             AppSettingHelper.Instance.ClearTempFiles()
+        End Sub
+
+        Private Sub MyApplication_Startup(sender As Object, e As StartupEventArgs) Handles Me.Startup
+
+            Dim countryCode = RegionInfo.CurrentRegion.TwoLetterISORegionName
+            AppCenter.SetCountryCode(countryCode)
+
+            'Analytics.SetEnabledAsync(False)
+
+            AppCenter.Start("f8e81501-9e17-46cf-94d2-30d9dafdd8ac",
+                            GetType(Analytics),
+                            GetType(Crashes))
+
+            Analytics.TrackEvent("程序启动")
+
         End Sub
 
     End Class

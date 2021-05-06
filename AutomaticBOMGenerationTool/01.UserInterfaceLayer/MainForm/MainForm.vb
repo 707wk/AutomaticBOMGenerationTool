@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports DevComponents.DotNetBar
+Imports Microsoft.AppCenter.Analytics
 Imports OfficeOpenXml
 
 Public Class MainForm
@@ -93,6 +94,9 @@ Public Class MainForm
             End If
 
         End Using
+
+        Analytics.TrackEvent("选择BOM模板文件")
+
     End Sub
 #End Region
 
@@ -493,6 +497,9 @@ Public Class MainForm
         Using tmpDialog As New ReplaceMaterialPriceForm
             tmpDialog.ShowDialog()
         End Using
+
+        Analytics.TrackEvent("物料价格更新")
+
     End Sub
 
 #End Region
@@ -563,6 +570,8 @@ Public Class MainForm
         CurrentBOMTemplateFileInfo.ExportBOMList.Clear()
 
         UIFormHelper.ToastSuccess("保存成功")
+
+        Analytics.TrackEvent("保存修改")
 
     End Sub
 #End Region
@@ -837,6 +846,8 @@ Public Class MainForm
         End If
 
         ButtonItem17.Checked = CurrentBOMTemplateFileInfo.Locked
+
+        Analytics.TrackEvent("保护文档")
 
     End Sub
 
