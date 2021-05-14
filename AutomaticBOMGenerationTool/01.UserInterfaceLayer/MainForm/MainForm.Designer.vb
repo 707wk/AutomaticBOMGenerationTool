@@ -28,17 +28,34 @@ Partial Class MainForm
         Me.RibbonPanel1 = New DevComponents.DotNetBar.RibbonPanel()
         Me.RibbonBar6 = New DevComponents.DotNetBar.RibbonBar()
         Me.ItemContainer2 = New DevComponents.DotNetBar.ItemContainer()
+        Me.ButtonItem14 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem15 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar4 = New DevComponents.DotNetBar.RibbonBar()
         Me.ItemContainer4 = New DevComponents.DotNetBar.ItemContainer()
+        Me.ButtonItem1 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem16 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem13 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar3 = New DevComponents.DotNetBar.RibbonBar()
+        Me.ButtonItem17 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem6 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar5 = New DevComponents.DotNetBar.RibbonBar()
         Me.ItemContainer1 = New DevComponents.DotNetBar.ItemContainer()
         Me.CheckBoxItem1 = New DevComponents.DotNetBar.CheckBoxItem()
         Me.CheckBoxItem2 = New DevComponents.DotNetBar.CheckBoxItem()
         Me.RibbonBar2 = New DevComponents.DotNetBar.RibbonBar()
         Me.ItemContainer3 = New DevComponents.DotNetBar.ItemContainer()
+        Me.ButtonItem5 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem7 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem8 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem9 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem10 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonBar1 = New DevComponents.DotNetBar.RibbonBar()
+        Me.ButtonItem2 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem11 = New DevComponents.DotNetBar.ButtonItem()
         Me.ItemContainer5 = New DevComponents.DotNetBar.ItemContainer()
+        Me.ButtonItem12 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem3 = New DevComponents.DotNetBar.ButtonItem()
+        Me.ButtonItem4 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonTabItem1 = New DevComponents.DotNetBar.RibbonTabItem()
         Me.QatCustomizeItem1 = New DevComponents.DotNetBar.QatCustomizeItem()
         Me.StyleManager1 = New DevComponents.DotNetBar.StyleManager(Me.components)
@@ -47,23 +64,6 @@ Partial Class MainForm
         Me.ToolStripStatusLabel3 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.SuperTabControl1 = New DevComponents.DotNetBar.SuperTabControl()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.ButtonItem14 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem15 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem1 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem16 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem13 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem6 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem17 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem5 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem7 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem8 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem9 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem10 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem2 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem11 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem12 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem3 = New DevComponents.DotNetBar.ButtonItem()
-        Me.ButtonItem4 = New DevComponents.DotNetBar.ButtonItem()
         Me.RibbonControl1.SuspendLayout()
         Me.RibbonPanel1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -183,6 +183,22 @@ Partial Class MainForm
         '
         Me.ItemContainer2.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
         '
+        'ButtonItem14
+        '
+        Me.ButtonItem14.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem14.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.test_16px
+        Me.ButtonItem14.Name = "ButtonItem14"
+        Me.ButtonItem14.SubItemsExpandWidth = 14
+        Me.ButtonItem14.Text = "已打开文件列表"
+        '
+        'ButtonItem15
+        '
+        Me.ButtonItem15.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem15.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.temp_16px
+        Me.ButtonItem15.Name = "ButtonItem15"
+        Me.ButtonItem15.SubItemsExpandWidth = 14
+        Me.ButtonItem15.Text = "临时文件夹"
+        '
         'RibbonBar4
         '
         Me.RibbonBar4.AutoOverflowEnabled = True
@@ -232,6 +248,31 @@ Partial Class MainForm
         '
         Me.ItemContainer4.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
         '
+        'ButtonItem1
+        '
+        Me.ButtonItem1.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.book_16px
+        Me.ButtonItem1.Name = "ButtonItem1"
+        Me.ButtonItem1.SubItemsExpandWidth = 14
+        Me.ButtonItem1.Text = "配置规则"
+        '
+        'ButtonItem16
+        '
+        Me.ButtonItem16.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem16.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.update_16px
+        Me.ButtonItem16.Name = "ButtonItem16"
+        Me.ButtonItem16.SubItemsExpandWidth = 14
+        Me.ButtonItem16.Text = "最近更新"
+        '
+        'ButtonItem13
+        '
+        Me.ButtonItem13.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem13.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.about
+        Me.ButtonItem13.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem13.Name = "ButtonItem13"
+        Me.ButtonItem13.SubItemsExpandWidth = 14
+        Me.ButtonItem13.Text = "关于"
+        '
         'RibbonBar3
         '
         Me.RibbonBar3.AutoOverflowEnabled = True
@@ -262,6 +303,25 @@ Partial Class MainForm
         '
         '
         Me.RibbonBar3.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
+        'ButtonItem17
+        '
+        Me.ButtonItem17.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem17.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.lock_32px
+        Me.ButtonItem17.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem17.Name = "ButtonItem17"
+        Me.ButtonItem17.SubItemsExpandWidth = 14
+        Me.ButtonItem17.Text = "保护文档"
+        '
+        'ButtonItem6
+        '
+        Me.ButtonItem6.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem6.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.setting_32px
+        Me.ButtonItem6.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem6.Name = "ButtonItem6"
+        Me.ButtonItem6.SubItemsExpandWidth = 14
+        Me.ButtonItem6.Text = "设置"
+        Me.ButtonItem6.Visible = False
         '
         'RibbonBar5
         '
@@ -371,6 +431,48 @@ Partial Class MainForm
         '
         Me.ItemContainer3.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
         '
+        'ButtonItem5
+        '
+        Me.ButtonItem5.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem5.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.importData_16px
+        Me.ButtonItem5.Name = "ButtonItem5"
+        Me.ButtonItem5.SubItemsExpandWidth = 14
+        Me.ButtonItem5.Text = "导入物料价格..."
+        '
+        'ButtonItem7
+        '
+        Me.ButtonItem7.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem7.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportData_16px
+        Me.ButtonItem7.Name = "ButtonItem7"
+        Me.ButtonItem7.SubItemsExpandWidth = 14
+        Me.ButtonItem7.Text = "导出物料价格..."
+        '
+        'ButtonItem8
+        '
+        Me.ButtonItem8.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem8.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.cleanData_16px
+        Me.ButtonItem8.Name = "ButtonItem8"
+        Me.ButtonItem8.SubItemsExpandWidth = 14
+        Me.ButtonItem8.Text = "清空物料价格库..."
+        '
+        'ButtonItem9
+        '
+        Me.ButtonItem9.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem9.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.viewData_32px
+        Me.ButtonItem9.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem9.Name = "ButtonItem9"
+        Me.ButtonItem9.SubItemsExpandWidth = 14
+        Me.ButtonItem9.Text = "查看" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "物料价格库"
+        '
+        'ButtonItem10
+        '
+        Me.ButtonItem10.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem10.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.updatePrice_32px
+        Me.ButtonItem10.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem10.Name = "ButtonItem10"
+        Me.ButtonItem10.SubItemsExpandWidth = 14
+        Me.ButtonItem10.Text = "物料价格" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "更新工具"
+        '
         'RibbonBar1
         '
         Me.RibbonBar1.AutoOverflowEnabled = True
@@ -402,6 +504,24 @@ Partial Class MainForm
         '
         Me.RibbonBar1.TitleStyleMouseOver.CornerType = DevComponents.DotNetBar.eCornerType.Square
         '
+        'ButtonItem2
+        '
+        Me.ButtonItem2.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.openFile_32px
+        Me.ButtonItem2.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem2.Name = "ButtonItem2"
+        Me.ButtonItem2.SubItemsExpandWidth = 14
+        Me.ButtonItem2.Text = "打开..."
+        '
+        'ButtonItem11
+        '
+        Me.ButtonItem11.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem11.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.saveFile_32px
+        Me.ButtonItem11.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
+        Me.ButtonItem11.Name = "ButtonItem11"
+        Me.ButtonItem11.SubItemsExpandWidth = 14
+        Me.ButtonItem11.Text = "保存"
+        '
         'ItemContainer5
         '
         '
@@ -419,6 +539,30 @@ Partial Class MainForm
         '
         '
         Me.ItemContainer5.TitleStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square
+        '
+        'ButtonItem12
+        '
+        Me.ButtonItem12.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem12.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.saveAsFile_16px
+        Me.ButtonItem12.Name = "ButtonItem12"
+        Me.ButtonItem12.SubItemsExpandWidth = 14
+        Me.ButtonItem12.Text = "另存为..."
+        '
+        'ButtonItem3
+        '
+        Me.ButtonItem3.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem3.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.view_16px
+        Me.ButtonItem3.Name = "ButtonItem3"
+        Me.ButtonItem3.SubItemsExpandWidth = 14
+        Me.ButtonItem3.Text = "查看原文件"
+        '
+        'ButtonItem4
+        '
+        Me.ButtonItem4.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
+        Me.ButtonItem4.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.analysis_16px
+        Me.ButtonItem4.Name = "ButtonItem4"
+        Me.ButtonItem4.SubItemsExpandWidth = 14
+        Me.ButtonItem4.Text = "重新解析"
         '
         'RibbonTabItem1
         '
@@ -485,149 +629,6 @@ Partial Class MainForm
         Me.SuperTabControl1.TabFont = New System.Drawing.Font("微软雅黑", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.SuperTabControl1.TabIndex = 11
         Me.SuperTabControl1.Text = "SuperTabControl1"
-        '
-        'ButtonItem14
-        '
-        Me.ButtonItem14.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem14.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.test_16px
-        Me.ButtonItem14.Name = "ButtonItem14"
-        Me.ButtonItem14.SubItemsExpandWidth = 14
-        Me.ButtonItem14.Text = "已打开文件列表"
-        '
-        'ButtonItem15
-        '
-        Me.ButtonItem15.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem15.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.temp_16px
-        Me.ButtonItem15.Name = "ButtonItem15"
-        Me.ButtonItem15.SubItemsExpandWidth = 14
-        Me.ButtonItem15.Text = "临时文件夹"
-        '
-        'ButtonItem1
-        '
-        Me.ButtonItem1.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem1.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.book_16px
-        Me.ButtonItem1.Name = "ButtonItem1"
-        Me.ButtonItem1.SubItemsExpandWidth = 14
-        Me.ButtonItem1.Text = "配置规则"
-        '
-        'ButtonItem16
-        '
-        Me.ButtonItem16.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem16.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.update_16px
-        Me.ButtonItem16.Name = "ButtonItem16"
-        Me.ButtonItem16.SubItemsExpandWidth = 14
-        Me.ButtonItem16.Text = "最近更新"
-        '
-        'ButtonItem13
-        '
-        Me.ButtonItem13.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem13.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.about
-        Me.ButtonItem13.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem13.Name = "ButtonItem13"
-        Me.ButtonItem13.SubItemsExpandWidth = 14
-        Me.ButtonItem13.Text = "关于"
-        '
-        'ButtonItem6
-        '
-        Me.ButtonItem6.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem6.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.setting_32px
-        Me.ButtonItem6.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem6.Name = "ButtonItem6"
-        Me.ButtonItem6.SubItemsExpandWidth = 14
-        Me.ButtonItem6.Text = "设置"
-        '
-        'ButtonItem17
-        '
-        Me.ButtonItem17.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem17.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.lock_32px
-        Me.ButtonItem17.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem17.Name = "ButtonItem17"
-        Me.ButtonItem17.SubItemsExpandWidth = 14
-        Me.ButtonItem17.Text = "保护文档"
-        '
-        'ButtonItem5
-        '
-        Me.ButtonItem5.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem5.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.importData_16px
-        Me.ButtonItem5.Name = "ButtonItem5"
-        Me.ButtonItem5.SubItemsExpandWidth = 14
-        Me.ButtonItem5.Text = "导入物料价格..."
-        '
-        'ButtonItem7
-        '
-        Me.ButtonItem7.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem7.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.exportData_16px
-        Me.ButtonItem7.Name = "ButtonItem7"
-        Me.ButtonItem7.SubItemsExpandWidth = 14
-        Me.ButtonItem7.Text = "导出物料价格..."
-        '
-        'ButtonItem8
-        '
-        Me.ButtonItem8.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem8.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.cleanData_16px
-        Me.ButtonItem8.Name = "ButtonItem8"
-        Me.ButtonItem8.SubItemsExpandWidth = 14
-        Me.ButtonItem8.Text = "清空物料价格库..."
-        '
-        'ButtonItem9
-        '
-        Me.ButtonItem9.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem9.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.viewData_32px
-        Me.ButtonItem9.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem9.Name = "ButtonItem9"
-        Me.ButtonItem9.SubItemsExpandWidth = 14
-        Me.ButtonItem9.Text = "查看" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "物料价格库"
-        '
-        'ButtonItem10
-        '
-        Me.ButtonItem10.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem10.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.updatePrice_32px
-        Me.ButtonItem10.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem10.Name = "ButtonItem10"
-        Me.ButtonItem10.SubItemsExpandWidth = 14
-        Me.ButtonItem10.Text = "物料价格" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "更新工具"
-        '
-        'ButtonItem2
-        '
-        Me.ButtonItem2.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem2.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.openFile_32px
-        Me.ButtonItem2.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem2.Name = "ButtonItem2"
-        Me.ButtonItem2.SubItemsExpandWidth = 14
-        Me.ButtonItem2.Text = "打开..."
-        '
-        'ButtonItem11
-        '
-        Me.ButtonItem11.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem11.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.saveFile_32px
-        Me.ButtonItem11.ImagePosition = DevComponents.DotNetBar.eImagePosition.Top
-        Me.ButtonItem11.Name = "ButtonItem11"
-        Me.ButtonItem11.SubItemsExpandWidth = 14
-        Me.ButtonItem11.Text = "保存"
-        '
-        'ButtonItem12
-        '
-        Me.ButtonItem12.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem12.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.saveAsFile_16px
-        Me.ButtonItem12.Name = "ButtonItem12"
-        Me.ButtonItem12.SubItemsExpandWidth = 14
-        Me.ButtonItem12.Text = "另存为..."
-        '
-        'ButtonItem3
-        '
-        Me.ButtonItem3.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem3.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.view_16px
-        Me.ButtonItem3.Name = "ButtonItem3"
-        Me.ButtonItem3.SubItemsExpandWidth = 14
-        Me.ButtonItem3.Text = "查看原文件"
-        '
-        'ButtonItem4
-        '
-        Me.ButtonItem4.ButtonStyle = DevComponents.DotNetBar.eButtonStyle.ImageAndText
-        Me.ButtonItem4.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.analysis_16px
-        Me.ButtonItem4.Name = "ButtonItem4"
-        Me.ButtonItem4.SubItemsExpandWidth = 14
-        Me.ButtonItem4.Text = "重新解析"
         '
         'MainForm
         '

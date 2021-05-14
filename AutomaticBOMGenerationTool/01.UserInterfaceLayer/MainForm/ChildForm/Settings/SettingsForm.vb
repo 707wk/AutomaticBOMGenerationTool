@@ -1,16 +1,13 @@
 ﻿Public Class SettingsForm
     Private Sub ExportSettingsForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        CheckBox1.Checked = AppSettingHelper.Instance.EnabledBOMTemplateDatabaseUnsafetyOption
+        'CheckBox1.Checked = AppSettingHelper.Instance.EnabledBOMTemplateDatabaseUnsafetyOption
 
     End Sub
 
-
-
-
     Private Sub AddOrSaveButton_Click(sender As Object, e As EventArgs) Handles AddOrSaveButton.Click
 
-        AppSettingHelper.Instance.EnabledBOMTemplateDatabaseUnsafetyOption = CheckBox1.Checked
+        'AppSettingHelper.Instance.EnabledBOMTemplateDatabaseUnsafetyOption = CheckBox1.Checked
 
         Me.Close()
 

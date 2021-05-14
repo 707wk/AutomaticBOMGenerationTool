@@ -38,7 +38,10 @@ Namespace My
             Dim countryCode = RegionInfo.CurrentRegion.TwoLetterISORegionName
             AppCenter.SetCountryCode(countryCode)
 
-            'Analytics.SetEnabledAsync(False)
+            '使用调试器时不记录数据
+            If Debugger.IsAttached Then
+                Analytics.SetEnabledAsync(False)
+            End If
 
             AppCenter.Start("f8e81501-9e17-46cf-94d2-30d9dafdd8ac",
                             GetType(Analytics),
