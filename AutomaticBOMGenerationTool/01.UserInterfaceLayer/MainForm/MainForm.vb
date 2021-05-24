@@ -52,6 +52,9 @@ Public Class MainForm
 
         ToolStripStatusLabel1_TextChanged(Nothing, Nothing)
 
+        Dim tmpAppCenterSparkle As New AppCenterSparkle(AppSettingHelper.AppKey, Me)
+        tmpAppCenterSparkle.CheckUpdateAsync()
+
     End Sub
 
     Private Sub MainForm_Closing(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles Me.Closing
@@ -682,9 +685,9 @@ Public Class MainForm
 #End Region
 
     Private Sub ButtonItem16_Click(sender As Object, e As EventArgs) Handles ButtonItem16.Click
-        Using tmpDialog As New UpdateInfoForm
-            tmpDialog.ShowDialog()
-        End Using
+
+        FileHelper.Open("https://install.appcenter.ms/users/707wk/apps/bom-sheng1-cheng2-gong1-ju4/distribution_groups/public")
+
     End Sub
 
     Private Sub ButtonItem13_Click(sender As Object, e As EventArgs) Handles ButtonItem13.Click

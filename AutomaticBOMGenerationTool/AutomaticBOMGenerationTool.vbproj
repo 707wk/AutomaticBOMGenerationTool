@@ -79,6 +79,9 @@
     <Reference Include="EPPlus, Version=5.6.3.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <HintPath>..\packages\EPPlus.5.6.3\lib\net45\EPPlus.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.33.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.33\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AppCenter, Version=0.0.0.0, Culture=neutral, PublicKeyToken=8a600e2fee7ba272, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AppCenter.4.2.0\lib\net461\Microsoft.AppCenter.dll</HintPath>
     </Reference>
@@ -97,9 +100,6 @@
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.7.9\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Octokit, Version=0.50.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octokit.0.50.0\lib\net46\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="SQLitePCLRaw.batteries_v2, Version=2.0.2.669, Culture=neutral, PublicKeyToken=8226ea5df37bcae9, processorArchitecture=MSIL">
@@ -176,12 +176,6 @@
       <DependentUpon>AboutForm.vb</DependentUpon>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.Designer.vb">
-      <DependentUpon>UpdateInfoForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ViewTechnicalDataInfoForm.Designer.vb">
@@ -285,7 +279,8 @@
     </Compile>
     <Compile Include="02.BusinessLogicLayer\LocalDatabaseHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\BOMTemplateHelper.vb" />
-    <Compile Include="02.BusinessLogicLayer\FileHelper.vb" />
+    <Compile Include="03.DataAccessLayer\Tool\AppCenterSparkle.vb" />
+    <Compile Include="03.DataAccessLayer\Tool\FileHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\MaterialPrice\BOMTemplateMaterialPriceHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\MaterialPrice\PriceFileHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\BOMTemplateDatabaseHelper.vb" />
@@ -294,6 +289,7 @@
     <Compile Include="02.BusinessLogicLayer\MaterialPrice\PriceFileType\BOMFromBOMTemplateTypeHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\MaterialPrice\PriceFileType\BOMTemplateTypeHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\MaterialPrice\PriceFileType\ImportMaterialPriceTableTypeHelper.vb" />
+    <Compile Include="03.DataAccessLayer\Tool\StringHelper.vb" />
     <Compile Include="02.BusinessLogicLayer\UIFormHelper.vb" />
     <Compile Include="03.DataAccessLayer\AppSettingHelper.vb" />
     <Compile Include="03.DataAccessLayer\BOMTemplate\BOMTemplateFileInfo.vb" />
@@ -333,9 +329,6 @@
   <ItemGroup>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\ChildForm\UpdateInfoForm.resx">
-      <DependentUpon>UpdateInfoForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="01.UserInterfaceLayer\MainForm\Control\BOMTemplate\ChildForm\ViewTechnicalDataInfoForm.resx">
       <DependentUpon>ViewTechnicalDataInfoForm.vb</DependentUpon>

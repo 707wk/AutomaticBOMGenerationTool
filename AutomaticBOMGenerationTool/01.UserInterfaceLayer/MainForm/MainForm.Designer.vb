@@ -262,7 +262,7 @@ Partial Class MainForm
         Me.ButtonItem16.Image = Global.AutomaticBOMGenerationTool.My.Resources.Resources.update_16px
         Me.ButtonItem16.Name = "ButtonItem16"
         Me.ButtonItem16.SubItemsExpandWidth = 14
-        Me.ButtonItem16.Text = "最近更新"
+        Me.ButtonItem16.Text = "更新记录"
         '
         'ButtonItem13
         '

@@ -8,6 +8,8 @@ Public Class AppSettingHelper
     Private Sub New()
     End Sub
 
+    Public Const AppKey = "f8e81501-9e17-46cf-94d2-30d9dafdd8ac"
+
 #Region "程序集GUID"
     <Newtonsoft.Json.JsonIgnore>
     Private _GUID As String

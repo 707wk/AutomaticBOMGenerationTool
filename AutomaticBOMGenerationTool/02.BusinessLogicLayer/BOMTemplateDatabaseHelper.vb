@@ -921,7 +921,6 @@ order by ConfigurationNodeValueInfo.SortID"
         Dim ConfigurationNodeCount = GetConfigurationNodeCount()
 
         Do
-            Console.WriteLine(parentPriority)
             UpdateChildConfigurationNodePriority(parentPriority)
 
             If GetChildConfigurationNodeCount(parentPriority) <= 0 Then
@@ -933,7 +932,8 @@ order by ConfigurationNodeValueInfo.SortID"
             End If
 
             If parentPriority > ConfigurationNodeCount Then
-                Throw New Exception("0x0035: 子节点优先级已超过配置节点总数,物料固定搭配可能存在循环关联")
+                Throw New Exception($"0x0035: {String.Join(", ", From item In GetLoopConfigurationNodeItems(parentPriority)
+                                                                 Select item.Name)} 存在循环关联")
             End If
 
             parentPriority += 1
@@ -1048,6 +1048,41 @@ where ConfigurationNodeInfo.Priority=@parentPriority
 
     End Sub
 
+#End Region
+
+#Region "获取循环关联的配置节点列表"
+    ''' <summary>
+    ''' 获取循环关联的配置节点列表
+    ''' </summary>
+    Private Function GetLoopConfigurationNodeItems(priority As Integer) As List(Of ConfigurationNodeInfo)
+
+        Dim tmpList = New List(Of ConfigurationNodeInfo)
+
+        Dim cmd As New SQLiteCommand(DatabaseConnection) With {
+                .CommandText = "select *
+from ConfigurationNodeInfo
+where ConfigurationNodeInfo.Priority>=@priority
+order by SortID"
+            }
+
+        cmd.Parameters.Add(New SQLiteParameter("@priority", DbType.Int32) With {.Value = priority})
+
+        Using reader As SQLiteDataReader = cmd.ExecuteReader()
+            While reader.Read
+                tmpList.Add(New ConfigurationNodeInfo With {
+                    .ID = reader(NameOf(ConfigurationNodeInfo.ID)),
+                    .SortID = reader(NameOf(ConfigurationNodeInfo.SortID)),
+                    .Name = reader(NameOf(ConfigurationNodeInfo.Name)),
+                    .IsMaterial = reader(NameOf(ConfigurationNodeInfo.IsMaterial)),
+                    .GroupID = reader(NameOf(ConfigurationNodeInfo.GroupID)),
+                    .Priority = reader(NameOf(ConfigurationNodeInfo.Priority))
+                })
+            End While
+        End Using
+
+        Return tmpList
+
+    End Function
 #End Region
 
 #End Region

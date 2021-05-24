@@ -43,7 +43,7 @@ Namespace My
                 Analytics.SetEnabledAsync(False)
             End If
 
-            AppCenter.Start("f8e81501-9e17-46cf-94d2-30d9dafdd8ac",
+            AppCenter.Start(AppSettingHelper.AppKey,
                             GetType(Analytics),
                             GetType(Crashes))
 
