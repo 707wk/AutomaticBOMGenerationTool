@@ -266,7 +266,26 @@ Public Class BOMTemplateControl
 
         ConfigurationGroupList.ResumeLayout()
 
+        SortConfigurationNodeControl()
         ShowUnitPrice()
+
+    End Sub
+#End Region
+
+#Region "配置节点控件排序"
+    ''' <summary>
+    ''' 配置节点控件排序
+    ''' </summary>
+    Friend Sub SortConfigurationNodeControl()
+
+        For Each ConfigurationGroupItem As ConfigurationGroupControl In ConfigurationGroupList.Controls
+
+            For Each ConfigurationNodeItem In From item As ConfigurationNodeControl In ConfigurationGroupItem.FlowLayoutPanel1.Controls
+                                              Select item
+                ConfigurationGroupItem.FlowLayoutPanel1.Controls.SetChildIndex(ConfigurationNodeItem, ConfigurationNodeItem.SortID - 1)
+            Next
+
+        Next
 
     End Sub
 #End Region

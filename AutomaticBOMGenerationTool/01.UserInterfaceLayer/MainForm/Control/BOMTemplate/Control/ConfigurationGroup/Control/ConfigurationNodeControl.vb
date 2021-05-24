@@ -150,6 +150,7 @@ Public Class ConfigurationNodeControl
         UpdateChildNodeValue()
 
         If IsUserChecked Then
+            CacheBOMTemplateFileInfo.BOMTControl.SortConfigurationNodeControl()
             CacheBOMTemplateFileInfo.BOMTControl.ShowUnitPrice()
         End If
 
