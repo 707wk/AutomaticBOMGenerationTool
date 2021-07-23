@@ -57,6 +57,10 @@ Public Class BOMTemplateHelper
     ''' 技术参数表表名
     ''' </summary>
     Public Const TechnicalDataInfoSheetName As String = "技术参数表"
+    ''' <summary>
+    ''' 基础物料单项总价表表名
+    ''' </summary>
+    Public Const MaterialTotalPriceTableSheetName As String = "基础物料价格占比表"
 
     ''' <summary>
     ''' 固定搭配分割字符
@@ -1316,6 +1320,9 @@ Public Class BOMTemplateHelper
 
                 ReplaceMaterial(tmpWorkSheet, values)
 
+                Dim tmpMaterialTotalPriceTable As New Dictionary(Of String, Decimal)
+                CalculateMaterialTotalPrice(tmpWorkSheet, tmpMaterialTotalPriceTable)
+
                 Dim pIDColumnID = CurrentBOMpIDColumnID
 
                 '删除物料标记列
@@ -1481,6 +1488,52 @@ Public Class BOMTemplateHelper
                 End If
 #End Region
 
+#Region "创建物料价格占比表"
+                tmpWorkSheet = tmpWorkBook.Worksheets.Add(MaterialTotalPriceTableSheetName)
+
+                '设置表头
+                tmpWorkSheet.Cells(1, 1).Value = "序号"
+                tmpWorkSheet.Cells(1, 2).Value = "物料项"
+                tmpWorkSheet.Cells(1, 3).Value = "价格"
+                tmpWorkSheet.Cells(1, 4).Value = "占比"
+
+                Dim sumPrice = tmpMaterialTotalPriceTable.Sum(Function(item)
+                                                                  Return item.Value
+                                                              End Function)
+
+                Dim tmpMaterialTotalPriceList = From item In tmpMaterialTotalPriceTable
+                                                Where item.Value > 0
+                                                Select item
+                                                Order By item.Value Descending
+
+                For i001 = 0 To tmpMaterialTotalPriceList.Count - 1
+                    Dim tmpNode = tmpMaterialTotalPriceList(i001)
+
+                    tmpWorkSheet.Cells(1 + 1 + i001, 1).Value = $"{i001 + 1}"
+                    tmpWorkSheet.Cells(1 + 1 + i001, 1).Style.HorizontalAlignment = Style.ExcelHorizontalAlignment.Right
+
+                    tmpWorkSheet.Cells(1 + 1 + i001, 2).Value = tmpNode.Key
+                    tmpWorkSheet.Cells(1 + 1 + i001, 3).Value = tmpNode.Value
+                    tmpWorkSheet.Cells(1 + 1 + i001, 4).Value = tmpNode.Value / sumPrice
+
+                Next
+
+                '自适应宽度
+                tmpWorkSheet.Cells.AutoFitColumns()
+
+                '首行筛选
+                tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").AutoFilter = True
+
+                '设置首行背景色
+                tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.PatternType = Style.ExcelFillStyle.Solid
+                tmpWorkSheet.Cells($"A1:{tmpWorkSheet.Cells(1, 4).Address}").Style.Fill.BackgroundColor.SetColor(UIFormHelper.SuccessColor)
+
+                ' 设置单元格值格式
+                tmpWorkSheet.Cells($"C:C").Style.Numberformat.Format = "#,##0.00"
+                tmpWorkSheet.Cells($"D:D").Style.Numberformat.Format = "0.00%"
+
+#End Region
+
                 '另存为
                 Using tmpSaveFileStream = New FileStream(outputFilePath, FileMode.Create)
                     tmpExcelPackage.SaveAs(tmpSaveFileStream)
@@ -1592,13 +1645,14 @@ Public Class BOMTemplateHelper
     End Sub
 #End Region
 
-#Region "计算物料单项总价"
+#Region "计算基础物料单项总价"
     ''' <summary>
-    ''' 计算物料单项总价
+    ''' 计算基础物料单项总价
     ''' </summary>
-    Public Sub CalculateMaterialTotalPrice(workSheet As ExcelWorksheet)
+    Public Sub CalculateMaterialTotalPrice(workSheet As ExcelWorksheet,
+                                           priceTable As Dictionary(Of String, Decimal))
 
-        CacheBOMTemplateFileInfo.MaterialTotalPriceTable.Clear()
+        priceTable.Clear()
 
         Dim MaterialRowMaxID = CurrentBOMMaterialRowMaxID
         Dim MaterialRowMinID = CurrentBOMMaterialRowMinID
@@ -1627,13 +1681,13 @@ Public Class BOMTemplateHelper
             Dim tmpPrice As Decimal = Decimal.Parse(Val($"{workSheet.Cells(rID, pUnitPriceColumnID).Value}")) *
                     Decimal.Parse(Val($"{workSheet.Cells(rID, tmpCountColumnID).Value}"))
 
-            If CacheBOMTemplateFileInfo.MaterialTotalPriceTable.ContainsKey(pName) Then
+            If priceTable.ContainsKey(pName) Then
                 '已存在
-                Dim oldPrice = CacheBOMTemplateFileInfo.MaterialTotalPriceTable(pName)
-                CacheBOMTemplateFileInfo.MaterialTotalPriceTable(pName) = oldPrice + tmpPrice
+                Dim oldPrice = priceTable(pName)
+                priceTable(pName) = oldPrice + tmpPrice
             Else
                 '不存在
-                CacheBOMTemplateFileInfo.MaterialTotalPriceTable.Add(pName, tmpPrice)
+                priceTable.Add(pName, tmpPrice)
             End If
 
         Next

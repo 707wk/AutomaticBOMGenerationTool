@@ -335,7 +335,7 @@ Public Class BOMTemplateControl
 
                 CacheBOMTemplateFileInfo.BOMTHelper.CalculateConfigurationMaterialTotalPrice(tmpWorkSheet, tmpConfigurationNodeRowInfoList)
 
-                CacheBOMTemplateFileInfo.BOMTHelper.CalculateMaterialTotalPrice(tmpWorkSheet)
+                CacheBOMTemplateFileInfo.BOMTHelper.CalculateMaterialTotalPrice(tmpWorkSheet, CacheBOMTemplateFileInfo.MaterialTotalPriceTable)
 
             End Using
         End Using
@@ -382,7 +382,8 @@ Public Class BOMTemplateControl
         End If
 
         Dim tmpNodeItem = From item In CacheBOMTemplateFileInfo.MaterialTotalPriceTable
-                          Where item.Value * 100 / CacheBOMTemplateFileInfo.TotalPrice >= CacheBOMTemplateFileInfo.MinimumTotalPricePercentage
+                          Where item.Value > 0 AndAlso
+                              item.Value * 100 / CacheBOMTemplateFileInfo.TotalPrice >= CacheBOMTemplateFileInfo.MinimumTotalPricePercentage
                           Select item
                           Order By item.Value Descending
 
@@ -420,6 +421,7 @@ Public Class BOMTemplateControl
         End If
 
         Dim tmpNodeItem = From item In CacheBOMTemplateFileInfo.MaterialTotalPriceTable
+                          Where item.Value > 0
                           Select item
                           Order By item.Value Descending
 

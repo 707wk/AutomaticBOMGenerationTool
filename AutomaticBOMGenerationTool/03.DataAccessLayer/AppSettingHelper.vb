@@ -93,6 +93,11 @@ Public Class AppSettingHelper
 
             End If
 
+            ' 添加数据库
+            If Not File.Exists($"{System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Hunan Yestech\{My.Application.Info.ProductName}\Data\LocalDatabase.db") Then
+                File.Copy("Data\LocalDatabase.db", $"{System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Hunan Yestech\{My.Application.Info.ProductName}\Data\LocalDatabase.db", True)
+            End If
+
             Return _instance
         End Get
     End Property
@@ -248,8 +253,8 @@ Public Class AppSettingHelper
 
     ''' <summary>
     ''' 本地数据库地址
-    ''' </summary>
-    Public Shared SQLiteConnection As String = "data source= .\Data\LocalDatabase.db"
+    ''' </summary> 
+    Public Shared SQLiteConnection As String = $"data source= {System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\Hunan Yestech\{My.Application.Info.ProductName}\Data\LocalDatabase.db"
 
     ''' <summary>
     ''' 打开文件历史

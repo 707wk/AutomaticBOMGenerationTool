@@ -46,8 +46,12 @@ Public Class AppCenterSparkle
                              Dim tmpXmlDocument As New XmlDocument
                              tmpXmlDocument.LoadXml(resultStr)
 
-                             ' 版本数量
                              Dim ReleasesItems = tmpXmlDocument.SelectNodes("//item")
+
+                             If ReleasesItems.Count = 0 Then
+                                 Console.WriteLine("无版本信息")
+                                 Exit Try
+                             End If
 
                              For Each ReleasesItem As XmlNode In ReleasesItems
 
@@ -79,11 +83,12 @@ Public Class AppCenterSparkle
 发布日期 : {tmpubDate:d}
 更新说明 :
 {tmpHtmlDocument.DocumentNode.InnerText()}
-是否前去下载 ?", MsgBoxStyle.YesNo Or MsgBoxStyle.Information, "升级提醒")
+是否更新 ?", MsgBoxStyle.YesNo Or MsgBoxStyle.Information, "升级提醒")
 
                                                             End Function), MsgBoxResult) = MsgBoxResult.Yes Then
 
-                                         FileHelper.Open(enclosureNode.Attributes("url").Value)
+                                         Process.Start("DownloadUpdate.exe", $"""{enclosureNode.Attributes("url").Value}"" ""{System.Reflection.Assembly.GetExecutingAssembly().Location}""")
+
                                          Application.Exit()
                                      Else
                                          '退出检测

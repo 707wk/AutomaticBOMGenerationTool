@@ -39,9 +39,7 @@ Namespace My
             AppCenter.SetCountryCode(countryCode)
 
             '使用调试器时不记录数据
-            If Debugger.IsAttached Then
-                Analytics.SetEnabledAsync(False)
-            End If
+            Analytics.SetEnabledAsync(Not Debugger.IsAttached)
 
             AppCenter.Start(AppSettingHelper.AppKey,
                             GetType(Analytics),

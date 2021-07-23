@@ -360,7 +360,7 @@ Partial Class BOMTemplateControl
         Me.TabPage2.Location = New System.Drawing.Point(4, 31)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(631, 454)
+        Me.TabPage2.Size = New System.Drawing.Size(631, 452)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "物料价格占比列表"
         '
@@ -395,7 +395,7 @@ Partial Class BOMTemplateControl
         DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.CheckBoxDataGridView1.RowHeadersDefaultCellStyle = DataGridViewCellStyle3
         Me.CheckBoxDataGridView1.RowTemplate.Height = 30
-        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 421)
+        Me.CheckBoxDataGridView1.Size = New System.Drawing.Size(625, 419)
         Me.CheckBoxDataGridView1.TabIndex = 0
         '
         'ToolStrip4

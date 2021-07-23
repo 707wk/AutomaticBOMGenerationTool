@@ -686,7 +686,7 @@ Public Class MainForm
 
     Private Sub ButtonItem16_Click(sender As Object, e As EventArgs) Handles ButtonItem16.Click
 
-        FileHelper.Open("https://install.appcenter.ms/users/707wk/apps/bom-sheng1-cheng2-gong1-ju4/distribution_groups/public")
+        FileHelper.Open("https://install.appcenter.ms/orgs/hunan-yestech/apps/bom-sheng1-cheng2-gong1-ju4/distribution_groups/public")
 
     End Sub
 

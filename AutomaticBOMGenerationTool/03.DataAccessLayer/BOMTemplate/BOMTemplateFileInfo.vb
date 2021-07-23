@@ -64,7 +64,7 @@ Public Class BOMTemplateFileInfo
     Public MinimumTotalPricePercentage As Decimal = 1
 
     ''' <summary>
-    ''' 物料单项总价表
+    ''' 基础物料单项总价表
     ''' </summary>
     Public MaterialTotalPriceTable As New Dictionary(Of String, Decimal)
 
